@@ -208,7 +208,7 @@
         <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
         <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
         <Param name="ori" updates="constant" val="0" valType="code"/>
-        <Param name="text" updates="constant" val="Thanks!" valType="str"/>
+        <Param name="text" updates="constant" val="Thank you for taking part in science!" valType="str"/>
         <Param name="font" updates="constant" val="Arial" valType="str"/>
         <Param name="letterHeight" updates="constant" val="0.1" valType="code"/>
         <Param name="wrapWidth" updates="constant" val="" valType="code"/>
