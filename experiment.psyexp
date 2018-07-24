@@ -33,11 +33,11 @@
         <Param name="Begin Experiment" updates="constant" val="# DESIGN GENERATOR ======================================================&amp;#10;from darc.designs import Kirby2009, Frye&amp;#10;design_thing = Frye()&amp;#10;&amp;#10;# set `max_trials` to an arbitrary high number... the design thing will &amp;#10;# escape out of the trial loop when it runs out of designs, or otherwise decides&amp;#10;# that we have run enough trials&amp;#10;max_trials = 666&amp;#10;&amp;#10;# we start with no previous response&amp;#10;last_response_chose_delayed = None&amp;#10;&amp;#10;# CREATE A MODEL ========================================================&amp;#10;from darc.delayed import models&amp;#10;model = models.Hyperbolic(n_particles=5_000) # was 50_000&amp;#10;&amp;#10;&amp;#10;# USEFUL HELPER FUNCTIONS ===============================================&amp;#10;&amp;#10;def was_last_response_delayed(last_keypress):&amp;#10;    '''this function returns last_response_chose_delayed as True or False, &amp;#10;    taking into account the location of the immediate and delayed rewards.&amp;#10;    last_keypress is either 'left' or 'right'&amp;#10;    '''&amp;#10;    if last_keypress == 'left':&amp;#10;        last_response_chose_delayed = False&amp;#10;    elif last_keypress == 'right':&amp;#10;        last_response_chose_delayed = True&amp;#10;    else:&amp;#10;        error('unexpected response.keys')&amp;#10;    return last_response_chose_delayed&amp;#10;&amp;#10;&amp;#10;# NOTE: Could break all these up into GET METHODS in design, and just ask for the &amp;#10;# strings directly in the psychopy text item thingy. BUT that is more opaque. Maybe&amp;#10;# having it out in the open and easy to adjust for people is good?&amp;#10;&amp;#10;def design_to_display_strings(design):&amp;#10;    # rewards -------------------------&amp;#10;    text_RA = f'£{design.ProspectA.reward}'&amp;#10;    text_RB = f'£{design.ProspectB.reward}'&amp;#10;    # delays --------------------------&amp;#10;    if design.ProspectA.delay == 0:&amp;#10;        text_DA = f'now'&amp;#10;    else:&amp;#10;        text_DA = f'in {design.ProspectA.delay} days'&amp;#10;&amp;#10;    text_DB = f'in {design.ProspectB.delay} days'&amp;#10;    # probabilities -------------------&amp;#10;    text_PA = f'{design.ProspectA.prob*100}%'&amp;#10;    text_PB = f'{design.ProspectB.prob*100}%'&amp;#10;    return (text_RA, text_RB, text_DA, text_DB, text_PA, text_PB)" valType="extendedCode"/>
         <Param name="Begin Routine" updates="constant" val="# DESIGN GENERATOR =================================================&amp;#10;# TODO: we can probably remove `last_response_chose_delayed` as being a required&amp;#10;# input here... the design_thing already has `all_data` so we can just look it up.&amp;#10;# But we'd have to deal with the special case of there being no data on the first&amp;#10;# trial&amp;#10;design = design_thing.get_next_design(last_response_chose_delayed)&amp;#10;&amp;#10;# NOTE: if we want to do any adjusments to the design, we should do that here&amp;#10;# to the actual design itself rather than just the text displayed to participants.&amp;#10;# That way the data we output will correspond to the prospects actually shown&amp;#10;# to participants.&amp;#10;&amp;#10;# If we are out of designs, then break out of the trial loop&amp;#10;if design is None:&amp;#10;    print('Breaking out of trial loop now')&amp;#10;    break&amp;#10;&amp;#10;# convert the design into meaningful strings &amp;#10;text_RA, text_RB, text_DA, text_DB, text_PA, text_PB = design_to_display_strings(design)&amp;#10;&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="Each Frame" updates="constant" val="" valType="extendedCode"/>
-        <Param name="End Routine" updates="constant" val="# Clear screen as soon as we press the button. Useful because the code &amp;#10;# below can take time to run before things are cleared, which leads to &amp;#10;# crappy responsivity&amp;#10;win.flip()&amp;#10;&amp;#10;&amp;#10;# DEAL WITH LAST RESPONSE #########################################&amp;#10;&amp;#10;last_response_chose_delayed = was_last_response_delayed(response.keys)&amp;#10;&amp;#10;design_thing.enter_trial_design_and_response(design, last_response_chose_delayed)&amp;#10;&amp;#10;model.update_beliefs(design_thing.all_data)&amp;#10;&amp;#10;# NOTE TO SELF: in theory we could be calculating updated beliefs based on both&amp;#10;# possible responses *while the participant is thinking during the trial*&amp;#10;# and then going with the pre-computed version once they make their &amp;#10;# response. Could do this multi-threaded etc :) &amp;#10;&amp;#10;# #################################################################" valType="extendedCode"/>
+        <Param name="End Routine" updates="constant" val="# Clear screen as soon as we press the button. Useful because the code &amp;#10;# below can take time to run before things are cleared, which leads to &amp;#10;# crappy responsivity&amp;#10;win.flip()&amp;#10;&amp;#10;&amp;#10;# DEAL WITH LAST RESPONSE #########################################&amp;#10;last_response_chose_delayed = was_last_response_delayed(response.keys)&amp;#10;&amp;#10;design_thing.enter_trial_design_and_response(design, last_response_chose_delayed)&amp;#10;&amp;#10;model.update_beliefs(design_thing.all_data)&amp;#10;&amp;#10;# NOTE TO SELF: in theory we could be calculating updated beliefs based on both&amp;#10;# possible responses *while the participant is thinking during the trial*&amp;#10;# and then going with the pre-computed version once they make their &amp;#10;# response. Could do this multi-threaded etc :) &amp;#10;&amp;#10;# #################################################################&amp;#10;&amp;#10;# write trial data to .csv&amp;#10;trials.addData('RA', design.ProspectA.reward)&amp;#10;trials.addData('DA', design.ProspectA.delay)&amp;#10;trials.addData('PA', design.ProspectA.prob)&amp;#10;&amp;#10;trials.addData('RB', design.ProspectB.reward)&amp;#10;trials.addData('DB', design.ProspectB.delay)&amp;#10;trials.addData('PB', design.ProspectB.prob)&amp;#10;&amp;#10;if last_response_chose_delayed:&amp;#10;    trials.addData('R', 'B')&amp;#10;else:&amp;#10;    trials.addData('R', 'A')" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="# export parameter summary ----------------------------&amp;#10;# TODO: leave like this or have as a method of `model`&amp;#10;model.θ.describe().to_csv('data/parameter_summary.csv')&amp;#10;&amp;#10;# export all particles, full posterior ----------------&amp;#10;model.θ.to_csv('data/parameter_all_particles.csv')&amp;#10;&amp;#10;# TODO: remove this, it's just handy while we develop&amp;#10;print(design_thing.all_data)&amp;#10;&amp;#10;&amp;#10;# VISUALISE POSTERIOR DISTRIBUTIONS ===============================&amp;#10;# TODO: make this work with whatever model (thus sets of parameters) we have&amp;#10;# visualise posterior&amp;#10;# import matplotlib.pyplot as plt&amp;#10;#fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=True)&amp;#10;#ax1.hist(model.θ['δ'], 50, normed=1, facecolor='green', alpha=0.75)&amp;#10;#ax2.hist(model.θ['alpha'], 50, normed=1, facecolor='green', alpha=0.75)&amp;#10;#plt.savefig('data/lastrun.pdf')&amp;#10;&amp;#10;&amp;#10;&amp;#10;" valType="extendedCode"/>
       </CodeComponent>
-      <TextComponent name="RA">
-        <Param name="name" updates="None" val="RA" valType="code"/>
+      <TextComponent name="RAitem">
+        <Param name="name" updates="None" val="RAitem" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
@@ -56,8 +56,8 @@
         <Param name="wrapWidth" updates="constant" val="" valType="code"/>
         <Param name="flip" updates="constant" val="" valType="str"/>
       </TextComponent>
-      <TextComponent name="DA">
-        <Param name="name" updates="None" val="DA" valType="code"/>
+      <TextComponent name="DAitem">
+        <Param name="name" updates="None" val="DAitem" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
@@ -76,8 +76,8 @@
         <Param name="wrapWidth" updates="constant" val="" valType="code"/>
         <Param name="flip" updates="constant" val="" valType="str"/>
       </TextComponent>
-      <TextComponent name="PA">
-        <Param name="name" updates="None" val="PA" valType="code"/>
+      <TextComponent name="PAitem">
+        <Param name="name" updates="None" val="PAitem" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
@@ -96,8 +96,8 @@
         <Param name="wrapWidth" updates="constant" val="" valType="code"/>
         <Param name="flip" updates="constant" val="" valType="str"/>
       </TextComponent>
-      <TextComponent name="RB">
-        <Param name="name" updates="None" val="RB" valType="code"/>
+      <TextComponent name="RBitem">
+        <Param name="name" updates="None" val="RBitem" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
@@ -116,8 +116,8 @@
         <Param name="wrapWidth" updates="constant" val="" valType="code"/>
         <Param name="flip" updates="constant" val="" valType="str"/>
       </TextComponent>
-      <TextComponent name="DB">
-        <Param name="name" updates="None" val="DB" valType="code"/>
+      <TextComponent name="DBitem">
+        <Param name="name" updates="None" val="DBitem" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
@@ -136,8 +136,8 @@
         <Param name="wrapWidth" updates="constant" val="" valType="code"/>
         <Param name="flip" updates="constant" val="" valType="str"/>
       </TextComponent>
-      <TextComponent name="PB">
-        <Param name="name" updates="None" val="PB" valType="code"/>
+      <TextComponent name="PBitem">
+        <Param name="name" updates="None" val="PBitem" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0" valType="code"/>
