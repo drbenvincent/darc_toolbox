@@ -63,7 +63,6 @@ class Kirby2009(DARCDesign):
         if self.trial < self.max_trials - 1:
             design = Design(ProspectA=Prospect(reward=self.RA[self.trial], delay=self.DA, prob=self.PA),
                             ProspectB=Prospect(reward=self.RB[self.trial], delay=self.DB[self.trial], prob=self.PB))
-            self.trial += 1
             return design
         else:
             return None
@@ -138,6 +137,10 @@ class Frye(DARCDesign):
 # # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
 class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
+    '''
+    An actual concrete class for doing BAD. 
+    Inherit from both DARCDesign and BayesianAdaptiveDesign
+    '''
 
     def __init__(self, DA=[0], DB=[7, 30, 365], RA=None, RB=[100], fixed_reward_ratio=False):
         super().__init__()
@@ -190,7 +193,6 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
         PB = allowable_designs.loc[r_index, 'PB']
         chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
                                ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
-        self.trial += 1
         return chosen_design
 
     def refine_design_space(self):

@@ -37,6 +37,7 @@ class DesignABC(ABC):
 
     def enter_trial_design_and_response(self, design, response):
         self.update_all_data(design, response)
+        self.trial += 1
         # we potentially manually call model to update beliefs here. But so far
         # this is done manually in PsychoPy
         return
