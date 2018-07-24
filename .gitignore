@@ -1,4 +1,4 @@
 *.DS_Store
 *.pyc
 *_lastrun.py
-data/*
+psychopy_experiments/demo_experiment/data/*
