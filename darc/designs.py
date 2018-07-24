@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from bad.base_classes import DesignABC
+from bad.base_classes import DesignABC, BayesianAdaptiveDesign
 import pandas as pd
+import numpy as np
+import itertools
 
 
 # define useful data structures
@@ -21,10 +23,6 @@ class DARCDesign(DesignABC):
         # generate empty `all_data`
         data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
         self.all_data = pd.DataFrame(columns=data_columns)
-
-    def enter_trial_design_and_response(self, design, response):
-        self.update_all_data(design, response)
-        return
 
     def update_all_data(self, design, response):
         # TODO: need to specify types here I think... then life might be 
@@ -135,51 +133,70 @@ class Frye(DARCDesign):
             self.RA = self.RA - (self.RB * self.post_choice_adjustment)
 
 
-# # TODO|: RETHINK THIS... WE MAYBE WANT SOME ABSTRACT BASE CLASS IN THE `BAD` PACKAGE
 
-# class BAD(DARCDesign):
-
-#     heuristic_order = None
-
-#     @abstractmethod
-#     def generate_all_possible_designs(self):
-#         pass
-
-#     @abstractmethod
-#     def refine_design_space(self, all_possible_designs):
-#         ''' In theory we could do design optimisation on ALL possible designs.
-#         However, this is complex. You can imagine some sets of designs will map on to
-#         very distinct values of the decision variable, but that there are many designs
-#         which will be almost invariant to the decision variable. But we would like to 
-#         explore the design space sensibly. Our general approach is (on any given trial)
-#         to take a subset of the possible designs and conduct design optimisation on this
-#         reduced subset. Importantly, over different trials, we are chosing this subset
-#         intelligently to maximise exploration over the design space.'''
-#         pass
 
 # # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-# class BAD_delayed_choices(BAD):
+class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
 
-#     PA, PB = 1, 1
+    def __init__(self, DA=[0], DB=[7, 30, 365], RA=None, RB=[100], fixed_reward_ratio=False):
+        super().__init__()
+        self.DA = DA
+        self.DB = DB
+        self.RA = np.linspace(5, RB, num=20)
+        self.RB = RB
+        self.PA = [1]
+        self.PB = [1]
+        self.generate_all_possible_designs()
+        self.max_trials = 5
 
-#     def __init__(self, DA=0, DB=[7, 14, 30, 365], RA=None, RB=100, fixed_reward_ratio=False):
-#         self.DA = DA
-#         self.DB = DB
-#         self.RA = np.linspace(5, RB, num=20)
-#         self.RB = RB
-#         self.generate_all_possible_designs()
+    def generate_all_possible_designs(self):
+        '''Create a dataframe of all possible designs (one design is one row) based upon
+        the set of design variables (RA, DA, PA, RB, DB, PB) provided.
+        '''
+        # NOTE: the order of the two lists below HAVE to be the same
+        column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
+        list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
 
-    
-#     def get_next_design(self, last_response):
-#         # IMPLEMENT ME
-#         pass
+        # NOTE: list_of_lists must actually be a list of lists... even if there is only one 
+        # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
+        all_combinations = list(itertools.product(*list_of_lists))
+        # TODO: we may want to do further trimming and refining of the possible
+        # set of designs, based upon domain knowledge etc.
+        self.all_possible_designs = pd.DataFrame(
+            all_combinations, columns=column_list)
 
-#     def refine_design_space(self, all_possible_designs):
-#         # IMPLEMENT ME
-#         pass
+    def get_next_design(self, last_response):
 
-# # class BAD_risky_choices(BAD):
+        if self.trial > self.max_trials - 1:
+            return None
 
+        # IMPLEMENT ME
+        allowable_designs = self.refine_design_space()
 
-# # class BAD_delayed_and_risky_choices(BAD):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # TODO: do design optimisation here... calling optimisation.py
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        # KLUDGE!!!!  randomly pick a design, just to test the structure of the code works.
+        n_allowable_designs = allowable_designs.shape[0]
+        r_index = np.random.randint(low=0, high=n_allowable_designs)
+        
+        RA = allowable_designs.loc[r_index, 'RA']
+        DA = allowable_designs.loc[r_index, 'DA']
+        PA = allowable_designs.loc[r_index, 'PA']
+        RB = allowable_designs.loc[r_index, 'RB']
+        DB = allowable_designs.loc[r_index, 'DB']
+        PB = allowable_designs.loc[r_index, 'PB']
+        chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
+                               ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
+        self.trial += 1
+        return chosen_design
+
+    def refine_design_space(self):
+        # TODO KLUDGE ALERT. We need to implement the heuristic shrinking of the `all_possible_designs`
+        # down to the ones which we will allow on a given trial. For the moment, we are simply
+        # by-passing this step, so doing design optimisation over the entire design space (which
+        # is problematic).
+        allowable_designs = self.all_possible_designs
+        return allowable_designs
