@@ -4,6 +4,7 @@ from bad.base_classes import DesignABC, BayesianAdaptiveDesign
 import pandas as pd
 import numpy as np
 import itertools
+from bad.optimisation import design_optimisation
 
 
 # define useful data structures
@@ -37,6 +38,17 @@ class DARCDesign(DesignABC):
         self.all_data = self.all_data.append(pd.DataFrame(trial_data))
         return
 
+    def get_last_response_chose_delayed(self):
+        '''return True if the last response was for the delayed option'''
+        if self.all_data.size == 0:
+            # no previous responses
+            return None
+
+        if list(self.all_data.R)[-1] == 1: # TODO: do this better?
+            return True
+        else:
+            return False
+
 
 # CONCRETE DESIGN CLASSES BELOW ======================================================
 
@@ -58,7 +70,7 @@ class Kirby2009(DARCDesign):
           30, 91, 117, 80, 21, 62, 111, 13, 14, 29, 162, 119, 7]
     PA, PB = 1, 1
 
-    def get_next_design(self, last_response):
+    def get_next_design(self):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             design = Design(ProspectA=Prospect(reward=self.RA[self.trial], delay=self.DA, prob=self.PA),
@@ -92,11 +104,13 @@ class Frye(DARCDesign):
         super().__init__()
 
 
-    def get_next_design(self, last_response_chose_delayed):
+    def get_next_design(self):
         """return the next design as a tuple of prospects"""
-        print(self.delay_counter, len(self.DB))
+        
         if self.delay_counter == len(self.DB):
             return None
+
+        last_response_chose_delayed = self.get_last_response_chose_delayed()
 
         if self.trial_per_delay_counter is 0:
             self.RA = self.RB * 0.5
@@ -169,30 +183,40 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
         self.all_possible_designs = pd.DataFrame(
             all_combinations, columns=column_list)
 
-    def get_next_design(self, last_response):
+    def get_next_design(self, predictive_y, allowable_designs, θ):
 
         if self.trial > self.max_trials - 1:
             return None
 
-        # IMPLEMENT ME
         allowable_designs = self.refine_design_space()
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # TODO: do design optimisation here... calling optimisation.py
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
-        # KLUDGE!!!!  randomly pick a design, just to test the structure of the code works.
-        n_allowable_designs = allowable_designs.shape[0]
-        r_index = np.random.randint(low=0, high=n_allowable_designs)
-        
-        RA = allowable_designs.loc[r_index, 'RA']
-        DA = allowable_designs.loc[r_index, 'DA']
-        PA = allowable_designs.loc[r_index, 'PA']
-        RB = allowable_designs.loc[r_index, 'RB']
-        DB = allowable_designs.loc[r_index, 'DB']
-        PB = allowable_designs.loc[r_index, 'PB']
+        # BAYESIAN DESOGN OPTIMISATION here... calling optimisation.py
+        chosen_design, _ = design_optimisation(predictive_y, allowable_designs, θ)
+        # convert from a 1-row pandas dataframe to a Design named tuple
+        RA = chosen_design.loc[0, 'RA']
+        DA = chosen_design.loc[0, 'DA']
+        PA = chosen_design.loc[0, 'PA']
+        RB = chosen_design.loc[0, 'RB']
+        DB = chosen_design.loc[0, 'DB']
+        PB = chosen_design.loc[0, 'PB']
         chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
                                ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # # KLUDGE!!!!  randomly pick a design, just to test the structure of the code works.
+        # n_allowable_designs = allowable_designs.shape[0]
+        # r_index = np.random.randint(low=0, high=n_allowable_designs)
+        # # convert dataframe row to Design named tuple
+        # # TODO: EXTRACT THIS AS A METHOD... WE MIGHT BE USING THIS IN OTHER PLACES
+        # RA = allowable_designs.loc[r_index, 'RA']
+        # DA = allowable_designs.loc[r_index, 'DA']
+        # PA = allowable_designs.loc[r_index, 'PA']
+        # RB = allowable_designs.loc[r_index, 'RB']
+        # DB = allowable_designs.loc[r_index, 'DB']
+        # PB = allowable_designs.loc[r_index, 'PB']
+        # chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
+        #                        ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return chosen_design
 
     def refine_design_space(self):
