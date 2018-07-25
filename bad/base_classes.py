@@ -28,7 +28,7 @@ class DesignABC(ABC):
     last_response = None
 
     @abstractmethod
-    def get_next_design(self, last_response):
+    def get_next_design(self, model):
         ''' This method must be implemented in concrete classes. It should
         output either a Design (a named tuple we are using), or a None when 
         there are no more designs left.
@@ -151,10 +151,25 @@ class Model(ABC):
         return pd.DataFrame.from_dict(particles_dict)
 
     def predictive_y(self, θ, data):
-        ''' Calculate the probability of chosing delayed '''
+        ''' Calculate the probability of chosing delayed 
+
+        We need this to work in multiple contexts:
+
+        INFERENCE CONTEXT
+        input: θ has P rows, for example P = 5000 particles
+        input: data has T rows, equal to number of trials we've run
+        DESIRED output: p_chose_delayed is a P x 1 array
+
+        OPTIMISATION CONTEXT
+        input: θ has N rows (eg N=500)
+        input: data has N rows
+        DESIRED output: p_chose_delayed is a N x 1 array
+
+        TODO: do some assertions here to catch errors
+        '''
         decision_variable = self.calc_decision_variable(θ, data)
         p_chose_delayed = self.choiceFunction(decision_variable, θ, self.θ_fixed)
-        return p_chose_delayed
+        return np.squeeze(p_chose_delayed)
 
 
     def _get_simulated_response(self, data, θtrue):

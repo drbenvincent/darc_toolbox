@@ -2,8 +2,7 @@ import numpy as np
 from bad.core_utils import normalise, sample_rows
 
 
-
-def design_optimisation(predictive_y, designs, θ,
+def design_optimisation(designs, predictive_y, θ,
                         n_particles=None, n_steps=50, gamma=None,
                         output_type_force=None, pD_min_prop=0.01):
     """
@@ -81,8 +80,8 @@ def design_optimisation(predictive_y, designs, θ,
 
     assert designs.ndim == 2, "designs must be 2D matrix"
 
-    nD = designs.shape[0]
-    nT = θ.shape[0]
+    nD, _ = designs.shape
+    nT,_ = θ.shape
 
     # This will keep track of "target" function for the optimization at each of
     # the candidate points
@@ -96,10 +95,9 @@ def design_optimisation(predictive_y, designs, θ,
 
     # Ensure all input arguments are resolved properly
     if n_particles is None:
-        n_particles = nT/10
+        n_particles = np.uint32(nT/10)
     else:
         assert n_particles <= nT, "n_particles must be <= nT"
-    n_particles = np.uint32(n_particles)
 
     if gamma is None:
         gamma = np.arange(n_steps)
@@ -108,8 +106,9 @@ def design_optimisation(predictive_y, designs, θ,
 
     # Randomly permute the samples so that if not using all of them then there
     # is not a bias originating from the ordering
-    np.random.shuffle(θ)
-
+    # TODO: CHECK THIS ACTUALLY WORKS !!!
+    θ = θ.reindex(np.random.permutation(θ.index))
+    
     θ_pos_counter = 0
 
     for nSam in range(n_steps):
@@ -128,22 +127,25 @@ def design_optimisation(predictive_y, designs, θ,
                                           p=pD)
 
         # Number of times a design was sampled this iteration
+        #n_times_sampled_iter = np.bincount(iSamples, minlength=np.max(iSamples))
+        # NOTE: BEN CHANGED TO...
         n_times_sampled_iter = np.bincount(
-            iSamples, minlength=np.max(iSamples))
-
+            iSamples, minlength=nD)
         # Select the θ that will be used this iteration
         θ_iter, θ_pos_counter = get_θ_subset(θ, θ_pos_counter, n_particles)
 
         # Call one step predictive function for each design-parameter pair,
         # note that this is already normalized so pnotY = 1-pY.
+        # NOTE: both θ_iter and D_samples will have something like 5000 rows. We want
+        # the output p_y_given_θ_and_D to be 5000 elements
         p_y_given_θ_and_D = predictive_y(θ_iter, D_samples)
         log_p_y_given_θ_and_D = np.exp(p_y_given_θ_and_D)
 
         # Calculate p(Y|D) by marginalizing over θ
+        
         p_y_given_D_iter_times_n_samples = np.bincount(iSamples,
                                                        weights=p_y_given_θ_and_D,
                                                        minlength=nD)
-
         p_y_given_D = ((p_y_given_D * n_times_sampled +
                         p_y_given_D_iter_times_n_samples) /
                        (n_times_sampled+n_times_sampled_iter))
@@ -166,7 +168,8 @@ def design_optimisation(predictive_y, designs, θ,
         U = do_output_type_force_thing(U, p_y_given_D, output_type_force)
 
     # Choose the design for which pD is maximal
-    chosen_design = designs[np.argmax(U), :]
+    #chosen_design = designs[np.argmax(U), :]
+    chosen_design = designs.take([np.argmax(U)])
     return (chosen_design, U)
 
 
@@ -184,11 +187,11 @@ def get_θ_subset(θ, θ_pos_counter, n_particles):
     θ_end_position = θ_pos_counter + n_particles
     if θ_end_position < nT:
         idx = np.arange(θ_pos_counter, θ_end_position)
-        θ_iter = θ[idx, :]
+        θ_iter = θ.iloc[idx]
     else:
         idx = np.concatenate([np.arange(0, np.mod(θ_end_position, nT)),
                               np.arange(θ_pos_counter, nT)])
-        θ_iter = θ[idx, :]
+        θ_iter = θ.iloc[idx]
 
     θ_pos_counter = np.mod(θ_end_position, nT)
     return (θ_iter, θ_pos_counter)

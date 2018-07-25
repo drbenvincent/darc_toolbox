@@ -70,7 +70,7 @@ class Kirby2009(DARCDesign):
           30, 91, 117, 80, 21, 62, 111, 13, 14, 29, 162, 119, 7]
     PA, PB = 1, 1
 
-    def get_next_design(self):
+    def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             design = Design(ProspectA=Prospect(reward=self.RA[self.trial], delay=self.DA, prob=self.PA),
@@ -103,8 +103,7 @@ class Frye(DARCDesign):
         # call the superclass constructor
         super().__init__()
 
-
-    def get_next_design(self):
+    def get_next_design(self, _):
         """return the next design as a tuple of prospects"""
         
         if self.delay_counter == len(self.DB):
@@ -183,23 +182,24 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
         self.all_possible_designs = pd.DataFrame(
             all_combinations, columns=column_list)
 
-    def get_next_design(self, predictive_y, allowable_designs, θ):
+    def get_next_design(self, model):
 
         if self.trial > self.max_trials - 1:
             return None
 
         allowable_designs = self.refine_design_space()
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # BAYESIAN DESOGN OPTIMISATION here... calling optimisation.py
-        chosen_design, _ = design_optimisation(predictive_y, allowable_designs, θ)
+        # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
+        chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
+        
         # convert from a 1-row pandas dataframe to a Design named tuple
-        RA = chosen_design.loc[0, 'RA']
-        DA = chosen_design.loc[0, 'DA']
-        PA = chosen_design.loc[0, 'PA']
-        RB = chosen_design.loc[0, 'RB']
-        DB = chosen_design.loc[0, 'DB']
-        PB = chosen_design.loc[0, 'PB']
+        # TODO: do this better!
+        RA = chosen_design.RA.values[0]
+        DA = chosen_design.DA.values[0]
+        PA = chosen_design.PA.values[0]
+        RB = chosen_design.RB.values[0]
+        DB = chosen_design.DB.values[0]
+        PB = chosen_design.PB.values[0]
         chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
                                ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

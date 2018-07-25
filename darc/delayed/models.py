@@ -18,17 +18,27 @@ class Hyperbolic(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
+        VA = data['RA'].values[:, np.newaxis] * self._time_discount_func(data['DA'].values, θ)
+        VB = data['RB'].values[:, np.newaxis] * self._time_discount_func(data['DB'].values, θ)
         return VB-VA
     
     @staticmethod
     def _time_discount_func(delay, θ):
         # NOTE: we want k as a row matrix, and delays as a column matrix to do the
         # appropriate array broadcasting.
-        k = np.exp(θ['logk'])
-        delay = delay[np.newaxis, :]
-        return 1 / (1 + k[:, np.newaxis] * delay)
+
+        # ORIGINAL VERSION 1
+        # k = np.exp(θ['logk'])
+        # delay = delay[np.newaxis, :]
+        # return 1 / (1 + k[:, np.newaxis] * delay)
+
+        # # VERSION 2
+        # k = np.exp(θ['logk'].values)
+        # return 1 / (1 + k * delay)
+
+        # VERSION 3
+        k = np.exp(θ['logk'].values)
+        return 1 / (1 + k[:, np.newaxis] * delay[:, np.newaxis])
         
 
 class Exponential(Model):
