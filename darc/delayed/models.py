@@ -2,12 +2,14 @@ from scipy.stats import norm, bernoulli, halfnorm
 import numpy as np
 from bad.base_classes import Model
 
+
 # The classes in this file are domain specific, and therefore include specifics
 # about the design space and the model parameters.
 
 # The main jobs of the model classes are:
 # a) define priors over parameters - as scipy distribution objects
 # b) implement the `calc_decision_variable` method
+
 
 class Hyperbolic(Model):
     '''Hyperbolic time discounting model'''
@@ -20,38 +22,12 @@ class Hyperbolic(Model):
     def calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
         VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
-        # VA = data['RA'].values[:, np.newaxis] * self._time_discount_func(data['DA'].values, θ)
-        # VB = data['RB'].values[:, np.newaxis] * self._time_discount_func(data['DB'].values, θ)
         return VB-VA
     
     @staticmethod
     def _time_discount_func(delay, θ):
-        # NOTE: we want k as a row matrix, and delays as a column matrix to do the
-        # appropriate array broadcasting.
-
-        # DEBUGGING  OUTPUT SHOULD BE A 1D ARRAY
-
-        # # ORIGINAL VERSION 1
-        # k = np.exp(θ['logk'])
-        # delay = delay[np.newaxis, :]
-        # return 1 / (1 + k[:, np.newaxis] * delay)
-
-        # # ORIGINAL VERSION 1 B
-        # k = np.exp(θ['logk'])
-        # delay = delay[np.newaxis, :]
-        # return np.divide(1, (1 + k[:, np.newaxis] * delay))
-
-        # # VERSION 2
-        # k = np.exp(θ['logk'].values)
-        # return 1 / (1 + k * delay)
-
-        # VERSION 3
-        #k = np.exp(θ['logk'].values)
-        #return 1 / (1 + k[:, np.newaxis] * delay[:, np.newaxis])
-
         k = np.exp(θ['logk'].values)
         return np.divide(1, (1 + k * delay))
-        #return np.divide(1, (1 + k[:, np.newaxis] * delay[:, np.newaxis]))
         
 
 class Exponential(Model):

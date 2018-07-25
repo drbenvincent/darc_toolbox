@@ -124,39 +124,18 @@ class Model(ABC):
         """
         Calculate the log liklihood of the data for given theta parameters.
         Σ log(p(data|θ))
+        We are going to iterate over trials. For each one, we take the trial
+        data and calculate the predictive_y. This gives us many values 
+        (correspoding to particles). We deal with these appropriately for 
+        'chose delayed' and 'chose immediate' trials. Then calculate the log
+        likelihood, which involves summing the ll over trials so that we end
+        up with a log likelihood value for all the particles.
         """
-        # past_responses: vector of binary responses
-        # p_chose_delayed: model prediction(0-1) of response
-        
-        # past_responses = data['R'].astype('int')
-        # p_chose_delayed = self.predictive_y(θ, data)
-        # log_liklihoods = bernoulli.logpmf(past_responses, p_chose_delayed)
-        # return np.sum(log_liklihoods, axis=1)
 
         n_trials, _ = data.shape
         n_particles, _ = θ.shape
-        # if no data, return ll = 0
-
-        # # iterate over trials, calculating p_chose_delayed
-        # p_chose_delayed = []
-        # for trial in range(n_trials):
-        #     trial_data = data.take([trial])
-        #     p_chose_delayed[trial] = self.predictive_y(θ, trial_data)
         
-        # this creates a list of lists
-        # p_chose_delayed = [self.predictive_y(θ, data.take([trial])) for trial in range(n_trials)]
-
-        # # deal with the chose immediate trials
-        # for trial in range(n_trials):
-        #     trialdata = data.take([trial])
-        #     R = trialdata.R.values[0]
-        #     if R is 0:
-        #         p_chose_delayed[trial] = 1 - p_chose_delayed[trial]
-
-        # # then calculate log likelihood... sum(log(p_chose_delayed))
-        # ll = [sum(np.log(p_chose_delayed[trial])) for trial in range(n_trials)]
-        # #ll = sum(np.log(p_chose_delayed))
-        # return ll
+        # TODO safety check... if no data, return ll = 0
 
         p_chose_delayed = np.zeros((n_particles, n_trials))
         R = data.R.values
@@ -211,8 +190,6 @@ class Model(ABC):
 
         TODO: do some assertions here to catch errors
         '''
-        print(f'θ:    {θ.shape}')
-        print(f'data: {data.shape}')
         decision_variable = self.calc_decision_variable(θ, data)
         p_chose_delayed = self.choiceFunction(decision_variable, θ, self.θ_fixed)
         return p_chose_delayed

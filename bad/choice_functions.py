@@ -18,14 +18,8 @@ import numpy as np
 
 @staticmethod
 def CumulativeNormalChoiceFunc(decision_variable, θ, θ_fixed):
-    # TODO: division by alpha needs to be matrix right divide
-    # α = θ['α'][:, np.newaxis]
-    # #return θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(decision_variable / α)
-    # return θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(np.divide(decision_variable, α))
     α = θ['α'].values
-    #return θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(decision_variable / α)
     p_chose_B = θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(np.divide(decision_variable, α))
-    #p_chose_B = θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(np.divide(decision_variable[:, np.newaxis], α[:, np.newaxis]))
     return p_chose_B
 
 
@@ -35,5 +29,3 @@ def _Phi(x):
     # arrays are coming out as dtype = object. So we need to cooerce into
     # floats. This seems like a lot of pain in the arse.
     return norm.cdf(x.astype('float'), loc=0, scale=1)
-
-
