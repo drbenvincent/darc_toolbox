@@ -1,7 +1,8 @@
 import unittest
 import pandas as pd
 from darc.delayed import models
-
+from darc.designs import Kirby2009, Frye, BAD_delayed_choices
+        
 
 class TestModel(unittest.TestCase):
     
@@ -10,18 +11,16 @@ class TestModel(unittest.TestCase):
         
 
     def test_model_update(self):
-        model = models.ProportionalDifference(n_particles=500)
 
-        # create data
-        data_columns = ['RA', 'DA', 'RB', 'DB', 'R']
-        all_data = pd.DataFrame(columns=data_columns)
-        trial_data = {'RA': [100], 'DA': [0], 'PA': [1.],
-                      'RB': [110], 'DB': [7], 'PB': [1.],
-                      'R': [int(False)]}
-        all_data = all_data.append(pd.DataFrame(trial_data))
-
-        # update beliefs
-        model.update_beliefs(all_data)
+        design_thing = Kirby2009()
+        model = models.Hyperbolic(n_particles=5000)
+        design = design_thing.get_next_design(model)
+        # just make a response up
+        last_response_chose_delayed = True
+        design_thing.enter_trial_design_and_response(
+            design, last_response_chose_delayed)
+        # finally update beliefs
+        model.update_beliefs(design_thing.all_data)
 
 
     def test_get_simulated_response(self):
