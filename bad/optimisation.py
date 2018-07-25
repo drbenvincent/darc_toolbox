@@ -78,7 +78,7 @@ def design_optimisation(designs, predictive_y, θ,
     Converted to Python by Benjamin T Vincent, June 2018
     """
 
-    assert designs.ndim == 2, "designs must be 2D matrix"
+    assert designs.ndim == 2, "designs must be 2D"
 
     nD, _ = designs.shape
     nT,_ = θ.shape
@@ -128,8 +128,8 @@ def design_optimisation(designs, predictive_y, θ,
         # Number of times a design was sampled this iteration
         #n_times_sampled_iter = np.bincount(iSamples, minlength=np.max(iSamples))
         # NOTE: BEN CHANGED TO...
-        n_times_sampled_iter = np.bincount(
-            iSamples, minlength=nD)
+        n_times_sampled_iter = np.bincount(iSamples, minlength=nD)
+        
         # Select the θ that will be used this iteration
         θ_iter, θ_pos_counter = get_θ_subset(θ, θ_pos_counter, n_particles)
 
@@ -138,7 +138,7 @@ def design_optimisation(designs, predictive_y, θ,
         # NOTE: both θ_iter and D_samples will have something like 5000 rows. We want
         # the output p_y_given_θ_and_D to be 5000 elements
         p_y_given_θ_and_D = predictive_y(θ_iter, D_samples)
-        log_p_y_given_θ_and_D = np.exp(p_y_given_θ_and_D)
+        log_p_y_given_θ_and_D = np.log(p_y_given_θ_and_D)
 
         # Calculate p(Y|D) by marginalizing over θ
         
@@ -182,16 +182,15 @@ def calculate_pD(U, gamma, pD_min):
 
 
 def get_θ_subset(θ, θ_pos_counter, n_particles):
-    nT = θ.shape[0]
+    nT = θ.shape[0] 
     θ_end_position = θ_pos_counter + n_particles
     if θ_end_position < nT:
         idx = np.arange(θ_pos_counter, θ_end_position)
-        θ_iter = θ.iloc[idx]
     else:
         idx = np.concatenate([np.arange(0, np.mod(θ_end_position, nT)),
                               np.arange(θ_pos_counter, nT)])
-        θ_iter = θ.iloc[idx]
-
+    
+    θ_iter = θ.iloc[idx]
     θ_pos_counter = np.mod(θ_end_position, nT)
     return (θ_iter, θ_pos_counter)
 
