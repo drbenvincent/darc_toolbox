@@ -3,13 +3,13 @@ from darc.designs import Kirby2009, Frye, BAD_delayed_choices
 
 
 design_thing = BAD_delayed_choices()
-model = models.Hyperbolic(n_particles=5_000)  # was 50_000
+model = models.Hyperbolic(n_particles=10_000)  # was 50_000
 
 # set true model parameters, as a dataframe
 import pandas as pd
 model.θ_true = pd.DataFrame.from_dict({'logk': [-3], 'α': [3]})
 
-for trial in range(3):
+for trial in range(10):
     design = design_thing.get_next_design(model)
 
     # simulated response
@@ -23,4 +23,5 @@ for trial in range(3):
     print(f'trial {trial} complete 🙂')
 
 
+model.export_posterior_histograms('zzz')
 print('Parameter recovery completed: 😀 ✅')

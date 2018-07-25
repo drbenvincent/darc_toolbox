@@ -13,6 +13,7 @@ from bad.inference import update_beliefs
 from scipy.stats import norm, bernoulli
 from random import random
 from bad.choice_functions import CumulativeNormalChoiceFunc
+import matplotlib.pyplot as plt
 
 
 # DESIGN RELATED ===================================================================
@@ -218,3 +219,16 @@ class Model(ABC):
         p_chose_delayed = self.predictive_y(self.θ_true, design_df)
         chose_delayed = random() < p_chose_delayed[0]
         return chose_delayed
+
+    def export_posterior_histograms(self, filename):
+        '''Export pdf of marginal posteriors'''
+        n_params = len(self.prior)
+        fig, axes = plt.subplots(1, n_params, figsize=(9, 4), tight_layout=True)
+        for (axis, key) in zip(axes, self.θ.keys()):
+            axis.hist(self.θ[key], 50, density=1, facecolor='green', alpha=0.75)
+            axis.set_xlabel(key)
+            if self.θ_true is not None:
+                axis.axvline(x=self.θ_true[key][0],
+                             color='red', linestyle='--')
+        plt.savefig(filename + '_parameter_plot.pdf')
+        print('PLOT SAVED')
