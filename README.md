@@ -32,9 +32,9 @@ Hyperbolic | ✅ |
 Exponential | ✅ | (Ben needs to double check)
 HyperbolicMagnitudeEffect | ✅ | (Ben needs to double check)
 ExponentialMagnitudeEffect | ✅ | (Ben needs to double check)
-ConstantSensitivity | ✅ | (Ben needs to double check)
+ConstantSensitivity | ❌ | (Ben needs to double check) negative b values
 ProportionalDifference | ✅ | (Ben needs to double check)
-HyperbolicNonLinearUtility | ✅ | (Ben needs to double check)
+HyperbolicNonLinearUtility | ❌ | (Ben needs to double check)
 
 ## Risky reward paradigm models
 Model | Status | Info

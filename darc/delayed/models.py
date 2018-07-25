@@ -15,14 +15,14 @@ class Hyperbolic(Model):
     '''Hyperbolic time discounting model'''
 
     prior = dict()
-    prior['logk'] = norm(loc=np.log(1/365), scale=2)
-    prior['α'] = halfnorm(loc=0, scale=3)
+    prior['logk'] = norm(loc=np.log(1/365), scale=10)
+    prior['α'] = halfnorm(loc=0, scale=2)
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
         VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
-        return VB-VA
+        return VB - VA
     
     @staticmethod
     def _time_discount_func(delay, θ):
@@ -45,11 +45,8 @@ class Exponential(Model):
     
     @staticmethod
     def _time_discount_func(delay, θ):
-        # NOTE: we want k as a row matrix, and delays as a column matrix to do the
-        # appropriate array broadcasting.
-        k = θ['k'][:, np.newaxis]
-        delay = delay[np.newaxis, :]
-        return np.exp((-k * delay).astype('float'))
+        k = θ['k'].values
+        return np.exp((-k * delay).astype('float')) # TODO: I don't know why we need this astype here
 
 
 class HyperbolicMagnitudeEffect(Model):
@@ -75,10 +72,10 @@ class HyperbolicMagnitudeEffect(Model):
     @staticmethod
     def _present_subjective_value(reward, delay, θ):
         # process inputs
-        delay = delay[np.newaxis, :].astype('float')
-        reward = reward[np.newaxis, :].astype('float')
-        m = θ['m'][:,np.newaxis]
-        c = θ['c'][:, np.newaxis]
+        delay = delay.astype('float')
+        reward = reward.astype('float')
+        m = θ['m']
+        c = θ['c']
         # magnitude effect
         k = np.exp( m * np.log(reward) + c )
         # HYPERBOLIC discounting of time
@@ -97,7 +94,7 @@ class ExponentialMagnitudeEffect(Model):
     '''
 
     prior = dict()
-    prior['m'] = norm(loc=-2.43, scale=2) # <---- maybe need to update
+    prior['m'] = norm(loc=-2.43, scale=2) # <---- TODO: need to update
     prior['c'] = norm(loc=0, scale=100)  # <------ TODO: improve this
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
@@ -112,10 +109,10 @@ class ExponentialMagnitudeEffect(Model):
     @staticmethod
     def _present_subjective_value(reward, delay, θ):
         # process inputs
-        delay = delay[np.newaxis, :].astype('float')
-        reward = reward[np.newaxis, :].astype('float')
-        m = θ['m'][:, np.newaxis]
-        c = θ['c'][:, np.newaxis]
+        delay = delay.astype('float')
+        reward = reward.astype('float')
+        m = θ['m']
+        c = θ['c']
         # magnitude effect
         k = np.exp(m * np.log(reward) + c)
         # EXPONENTIAL discounting of time
@@ -135,6 +132,7 @@ class ConstantSensitivity(Model):
     prior = dict()
     prior['a'] = norm(loc=0.01, scale=0.1)
     prior['b'] = halfnorm(loc=0.001, scale=3) # TODO: Improve this prior! make it centered on 1, maybe lognormal
+    prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
@@ -146,10 +144,9 @@ class ConstantSensitivity(Model):
     def _time_discount_func(delay, θ):
         # NOTE: we want params as a row matrix, and delays as a column matrix to do the
         # appropriate array broadcasting.
-        a = θ['a'][:, np.newaxis]
-        b = θ['b'][:, np.newaxis]
-        delay = delay[np.newaxis, :]
-        temp = (a * delay)**b
+        a = θ['a'].values
+        b = θ['b'].values
+        temp = np.power(a * delay, b)
         return np.exp(-temp.astype('float'))
 
 
@@ -173,9 +170,8 @@ class MyersonHyperboloid(Model):
         # NOTE: we want k as a row matrix, and delays as a column matrix to do the
         # appropriate array broadcasting.
         k = np.exp(θ['logk'])
-        s = θ['s'][:, np.newaxis]
-        delay = delay[np.newaxis, :]
-        return 1 / (1 + k[:, np.newaxis] * delay)**s
+        s = θ['s']
+        return 1 / np.power(1 + k * delay, s)
 
 
 class ProportionalDifference(Model):
@@ -196,8 +192,8 @@ class ProportionalDifference(Model):
         prop_delay = self._proportion(
             data['DA'].values, data['DB'].values)
         
-        prop_difference = (prop_reward - prop_delay)[np.newaxis, :]
-        decision_axis = prop_difference + θ['δ'][:, np.newaxis]
+        prop_difference = (prop_reward - prop_delay)
+        decision_axis = prop_difference + θ['δ']
         return decision_axis
 
     @staticmethod
@@ -228,15 +224,12 @@ class HyperbolicNonLinearUtility(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        a = np.exp(θ['a'])
+        a = np.exp(θ['a'].values)
         VA = np.power(data['RA'].values,a) * self._time_discount_func(data['DA'].values, θ)
         VB = np.power(data['RB'].values,a) * self._time_discount_func(data['DB'].values, θ)
         return VB-VA
 
     @staticmethod
     def _time_discount_func(delay, θ):
-        # NOTE: we want k as a row matrix, and delays as a column matrix to do the
-        # appropriate array broadcasting.
-        k = np.exp(θ['logk'])
-        delay = delay[np.newaxis, :]
-        return 1 / (1 + k[:, np.newaxis] * delay)
+        k = np.exp(θ['logk'].values)
+        return np.divide(1, (1 + k * delay))
