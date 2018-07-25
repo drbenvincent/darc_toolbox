@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.stats import norm, t
-from bad.core_utils import normalise, sample_rows
+from bad.utils import normalise, sample_rows
 
 # NOTE: we are expecting particles to be an a pandas dataframe, with column names
 # rather than just a 2D numpy array.

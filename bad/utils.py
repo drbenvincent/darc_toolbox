@@ -17,3 +17,11 @@ def sample_rows(df, size, replace, p):
     iSamples = np.random.choice(n_rows, size=size, replace=replace, p=p)
     samples = df.iloc[iSamples,:]
     return (samples, iSamples)
+
+
+def shuffle_rows(df):
+    '''
+    Shuffle the rows of a dataframe
+    see https://stackoverflow.com/questions/29576430/shuffle-dataframe-rows 
+    '''
+    return df.sample(frac=1).reset_index(drop=True)

@@ -1,5 +1,5 @@
 import numpy as np
-from bad.core_utils import normalise, sample_rows
+from bad.utils import normalise, sample_rows, shuffle_rows
 
 
 def design_optimisation(designs, predictive_y, θ,
@@ -106,8 +106,7 @@ def design_optimisation(designs, predictive_y, θ,
 
     # Randomly permute the samples so that if not using all of them then there
     # is not a bias originating from the ordering
-    # TODO: CHECK THIS ACTUALLY WORKS !!!
-    θ = θ.reindex(np.random.permutation(θ.index))
+    θ = shuffle_rows(θ)
     
     θ_pos_counter = 0
 
