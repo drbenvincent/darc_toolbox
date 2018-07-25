@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from bad.optimisation import design_optimisation
+import matplotlib.pyplot as plt
 
 
 # define useful data structures
@@ -63,6 +64,18 @@ class DARCDesign(DesignABC):
                       'R': [int(response)]}
         self.all_data = self.all_data.append(pd.DataFrame(trial_data))
         return
+
+    def plot_all_data(self, filename):
+        '''Visualise data'''
+        fig, axes = plt.subplots(1, 1, figsize=(9, 4), tight_layout=True)
+        axes.scatter(x=self.all_data.DB.values,
+                     y=self.all_data.RA.values / self.all_data.RB.values,
+                     c=self.all_data.R,
+                     alpha=0.5)
+        axes.set_xlabel('delay (days)')
+        axes.set_ylabel('RA/RB')
+        plt.savefig(filename + '_data_plot.pdf')
+        print('DATA PLOT SAVED')
 
     def get_last_response_chose_delayed(self):
         '''return True if the last response was for the delayed option'''
@@ -182,14 +195,14 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
     '''
 
     def __init__(self, DA=[0],
-                       DB=np.array([1, 2, 3, 4, 5, 6, 7, 14, 30, 30*6, 365, 365*2, 365*5, 365*10]),
+                       DB=np.array([1, 7, 14, 30, 30*6, 365, 365*2, 365*5]),
                        RA=None,
                        RB=np.array([100]),
                        max_trials=20):
         super().__init__()
         self.DA = DA
         self.DB = DB
-        self.RA = np.linspace(5, RB, num=20)
+        self.RA = RB * np.array([0.25, 0.5, 0.75])
         #self.RA = RB * 0.5
         self.RB = RB
         self.PA = [1]
