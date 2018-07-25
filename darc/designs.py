@@ -11,6 +11,29 @@ from bad.optimisation import design_optimisation
 Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
 Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
 
+# helper functions
+def design_tuple_to_df(design):
+    ''' Convert the named tuple into a 1-row pandas dataframe'''
+    trial_data = {'RA': design.ProspectA.reward,
+                  'DA': design.ProspectA.delay,
+                  'PA': design.ProspectA.prob,
+                  'RB': design.ProspectB.reward,
+                  'DB': design.ProspectB.delay,
+                  'PB': design.ProspectB.prob}
+    return pd.DataFrame(trial_data)
+
+def df_to_design_tuple(df):
+    ''' Convert 1-row pandas dataframe into named tuple'''
+    RA = df.RA.values[0]
+    DA = df.DA.values[0]
+    PA = df.PA.values[0]
+    RB = df.RB.values[0]
+    DB = df.DB.values[0]
+    PB = df.PB.values[0]
+    chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
+                           ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
+    return chosen_design
+
 
 ## ANOTHER BASE CLASS: Users not to change this
 
@@ -28,6 +51,9 @@ class DARCDesign(DesignABC):
     def update_all_data(self, design, response):
         # TODO: need to specify types here I think... then life might be 
         # easier to decant the data out at another point
+        # trial_df = design_to_df(design)
+        # self.all_data = self.all_data.append(trial_df)
+        
         trial_data = {'RA': design.ProspectA.reward,
                       'DA': design.ProspectA.delay,
                       'PA': design.ProspectA.prob,
@@ -155,7 +181,7 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
     Inherit from both DARCDesign and BayesianAdaptiveDesign
     '''
 
-    def __init__(self, DA=[0], DB=[7, 30, 365], RA=None, RB=[100], fixed_reward_ratio=False):
+    def __init__(self, DA=[0], DB=[7, 14, 30, 365, 365 * 2, 365 * 5, 365 * 10], RA=None, RB=[100], max_trials=20):
         super().__init__()
         self.DA = DA
         self.DB = DB
@@ -164,7 +190,7 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
         self.PA = [1]
         self.PB = [1]
         self.generate_all_possible_designs()
-        self.max_trials = 5
+        self.max_trials = max_trials
 
     def generate_all_possible_designs(self):
         '''Create a dataframe of all possible designs (one design is one row) based upon
@@ -188,35 +214,10 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
             return None
 
         allowable_designs = self.refine_design_space()
-
         # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
         chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
-        
         # convert from a 1-row pandas dataframe to a Design named tuple
-        # TODO: do this better!
-        RA = chosen_design.RA.values[0]
-        DA = chosen_design.DA.values[0]
-        PA = chosen_design.PA.values[0]
-        RB = chosen_design.RB.values[0]
-        DB = chosen_design.DB.values[0]
-        PB = chosen_design.PB.values[0]
-        chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
-                               ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # # KLUDGE!!!!  randomly pick a design, just to test the structure of the code works.
-        # n_allowable_designs = allowable_designs.shape[0]
-        # r_index = np.random.randint(low=0, high=n_allowable_designs)
-        # # convert dataframe row to Design named tuple
-        # # TODO: EXTRACT THIS AS A METHOD... WE MIGHT BE USING THIS IN OTHER PLACES
-        # RA = allowable_designs.loc[r_index, 'RA']
-        # DA = allowable_designs.loc[r_index, 'DA']
-        # PA = allowable_designs.loc[r_index, 'PA']
-        # RB = allowable_designs.loc[r_index, 'RB']
-        # DB = allowable_designs.loc[r_index, 'DB']
-        # PB = allowable_designs.loc[r_index, 'PB']
-        # chosen_design = Design(ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
-        #                        ProspectB=Prospect(reward=RB, delay=DB, prob=PB))
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        chosen_design = df_to_design_tuple(chosen_design)
         return chosen_design
 
     def refine_design_space(self):

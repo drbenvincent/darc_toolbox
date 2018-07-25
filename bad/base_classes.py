@@ -87,6 +87,7 @@ class Model(ABC):
 
     prior = None
     θ_fixed = None
+    θ_true = None
 
     # Decide on the choice function we are using. I am going to focus on 
     # `CumulativeNormalChoiceFunc`, but if you want to use another choice function
@@ -195,16 +196,25 @@ class Model(ABC):
         return p_chose_delayed
 
 
-    def _get_simulated_response(self, data, θtrue):
+    def _get_simulated_response(self, design_tuple):
         '''
         Get simulated response for a given set of true parameter
         ONLY NEEDED FOR SIMILATED EXPERIMENTS?
         '''
-        assert θtrue.shape[0] == 1, 'Only one true set of parameters expected'
-        assert data.shape[0] == 1, 'Only one design expected'
 
-        p_chose_delayed = self.predictive_y(θtrue, data)
-        print(p_chose_delayed)
-        # TODO: this assumes only one data (ie trial) is coming in
-        chose_delayed = random() < p_chose_delayed
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # TODO: this being here violates bad not knowing about darc
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        ''' Convert the named tuple into a 1-row pandas dataframe'''
+        trial_data = {'RA': [design_tuple.ProspectA.reward],
+                      'DA': [design_tuple.ProspectA.delay],
+                      'PA': [design_tuple.ProspectA.prob],
+                      'RB': [design_tuple.ProspectB.reward],
+                      'DB': [design_tuple.ProspectB.delay],
+                      'PB': [design_tuple.ProspectB.prob]}
+        design_df = pd.DataFrame.from_dict(trial_data)
+
+        p_chose_delayed = self.predictive_y(self.θ_true, design_df)
+        chose_delayed = random() < p_chose_delayed[0]
         return chose_delayed
