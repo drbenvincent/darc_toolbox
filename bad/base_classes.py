@@ -149,9 +149,11 @@ class Model(ABC):
                 p_chose_delayed[:, trial] = self.predictive_y(
                     θ, trial_data)
             elif R[trial] is 0:
-                # choise immediate trial
+                # chose immediate trial
                 p_chose_delayed[:, trial] = 1 - self.predictive_y(
                     θ, trial_data)
+            else:
+                raise ValueError('Failing to identify response')
 
         ll = np.sum(np.log(p_chose_delayed), axis=1)
         return ll
@@ -190,7 +192,7 @@ class Model(ABC):
         input: data has N rows
         DESIRED output: p_chose_delayed is a N x 1 array
 
-        TODO: do some assertions here to catch errors
+        TODO: do some assertions on sizes of inputs/outputs here to catch errors
         '''
         decision_variable = self.calc_decision_variable(θ, data)
         p_chose_delayed = self.choiceFunction(decision_variable, θ, self.θ_fixed)
@@ -225,7 +227,7 @@ class Model(ABC):
         n_params = len(self.prior)
         fig, axes = plt.subplots(1, n_params, figsize=(9, 4), tight_layout=True)
         for (axis, key) in zip(axes, self.θ.keys()):
-            axis.hist(self.θ[key], 50, density=1, facecolor='green', alpha=0.75)
+            axis.hist(self.θ[key], 100, density=1, facecolor='green', alpha=0.75)
             axis.set_xlabel(key)
             if self.θ_true is not None:
                 axis.axvline(x=self.θ_true[key][0],

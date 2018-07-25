@@ -181,11 +181,16 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
     Inherit from both DARCDesign and BayesianAdaptiveDesign
     '''
 
-    def __init__(self, DA=[0], DB=[7, 14, 30, 365, 365 * 2, 365 * 5, 365 * 10], RA=None, RB=[100], max_trials=20):
+    def __init__(self, DA=[0],
+                       DB=np.array([1, 2, 3, 4, 5, 6, 7, 14, 30, 30*6, 365, 365*2, 365*5, 365*10]),
+                       RA=None,
+                       RB=np.array([100]),
+                       max_trials=20):
         super().__init__()
         self.DA = DA
         self.DB = DB
         self.RA = np.linspace(5, RB, num=20)
+        #self.RA = RB * 0.5
         self.RB = RB
         self.PA = [1]
         self.PB = [1]
