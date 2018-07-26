@@ -37,6 +37,46 @@ class Hyperbolic(Model):
         return np.divide(1, (1 + h * odds_against))
 
 
+class ProportionalDifference(Model):
+    '''Proportional difference model for risky rewards
+    
+    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and 
+    context-sensitive model of choice behavior. Psychological Review, 109(1), 
+    137–155. http://doi.org/10.1037//0033-295X.109.1.137
+    '''
+
+    prior = dict()
+    prior['δ'] = norm(loc=0, scale=10)
+    prior['α'] = halfnorm(loc=0, scale=3)
+    θ_fixed = {'ϵ': 0.01}
+
+    def calc_decision_variable(self, θ, data):
+        # organised so that higher values of the decision variable will
+        # mean higher probabability for the delayed option (prospect B)
+
+        prop_reward = self._proportion(
+            data['RA'].values, data['RB'].values)
+
+        prop_risk = self._proportion(
+            data['PA'].values, data['PB'].values)
+
+        prop_difference = (prop_reward - prop_risk)
+        decision_axis = prop_difference + θ['δ']
+        return decision_axis
+
+    @staticmethod
+    def _max_abs(x, y):
+        return np.max(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
+
+    @staticmethod
+    def _min_abs(x, y):
+        return np.min(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
+
+    def _proportion(self, x, y):
+        diff = self._max_abs(x, y) - self._min_abs(x, y)
+        return diff / self._max_abs(x, y)
+
+
 class ProspectTheory(Model):
     '''Prospect Theory'''
     pass

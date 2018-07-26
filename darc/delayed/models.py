@@ -191,7 +191,7 @@ class MyersonHyperboloid(Model):
 
 
 class ProportionalDifference(Model):
-    '''Proportional difference model
+    '''Proportional difference model applied to delay discounting
     
     González-Vallejo, C. (2002). Making trade-offs: A probabilistic and 
     context-sensitive model of choice behavior. Psychological Review, 109(1), 

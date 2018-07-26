@@ -33,15 +33,18 @@ Exponential | ✅ | (Ben needs to double check)
 HyperbolicMagnitudeEffect | ✅ | (Ben needs to double check)
 ExponentialMagnitudeEffect | ✅ | (Ben needs to double check)
 ConstantSensitivity | ❌ | (Ben needs to double check) negative b values
-ProportionalDifference | ✅ | (Ben needs to double check)
+ProportionalDifference | ✅ | An attribute-wise type of model. (Ben needs to double check)
 HyperbolicNonLinearUtility | ❌ | (Ben needs to double check)
 
 ## Risky reward paradigm models
 Model | Status | Info
 --- | --- | ---
-Hyperbolic | ❌ | 
+Hyperbolic | ✅ | Hyperbolic discounting of odds against reward
+Generalized hyperbolic | ❌ |
+Tversky and Kahneman (1992) | ❌ | just the probability weighting function
+Prelec (1998) | ❌ |
 Prospect Theory | ❌ | 
-Proportional difference | ❌ |
+Proportional difference | ✅ | An attribute-wise type of model
 
 
 ## Delayed and risky reward paradigm models
