@@ -265,4 +265,4 @@ class Model(ABC):
                 axis.axvline(x=self.θ_true[key][0],
                              color='red', linestyle='--')
         plt.savefig(filename + '_parameter_plot.pdf')
-        print('📈 Posterior histogram plot exported')
+        print('Posterior histogram plot exported')

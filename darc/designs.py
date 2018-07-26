@@ -90,7 +90,7 @@ class DARCDesign(DesignABC):
         axes.set_xlabel('delay (days)')
         axes.set_ylabel('RA/RB')
         plt.savefig(filename + '_data_plot.pdf')
-        print('📈 DATA PLOT SAVED')
+        print('DATA PLOT SAVED')
 
     def generate_all_possible_designs(self):
         '''Create a dataframe of all possible designs (one design is one row) based upon
