@@ -1,9 +1,9 @@
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, BAD_delayed_choices
+from darc.designs import Kirby2009, Frye, DARC_Designs
 
 def parameter_recovery(θ_true,
                        n_trials=10,
-                       design_method=BAD_delayed_choices,
+                       design_method=DARC_Designs,
                        model_type=model.Hyperbolic,
                        n_particles=10_000):
 

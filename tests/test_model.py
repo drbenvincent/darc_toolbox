@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, BAD_delayed_choices
+from darc.designs import Kirby2009, Frye, DARC_Designs
         
 
 class TestModel(unittest.TestCase):

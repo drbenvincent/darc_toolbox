@@ -1,9 +1,9 @@
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, BAD_delayed_choices
+from darc.designs import Kirby2009, Frye, DARC_Designs
 import numpy as np
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-design_thing = BAD_delayed_choices(max_trials=20)
+design_thing = DARC_Designs(max_trials=5)
 #design_thing = Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
 #design_thing = Kirby2009()
 

@@ -213,25 +213,21 @@ class Frye(DARCDesign):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
+class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
     '''
-    An actual concrete class for doing BAD. 
-    Inherit from both DARCDesign and BayesianAdaptiveDesign
+    A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
 
-    def __init__(self, DA=[0],
-                 DB=DEFAULT_DB,
-                 RA=None,
-                 RB=np.array([100]),
-                 max_trials=20):
+    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=None, RB=np.array([100]), PA=[1], PB=[1], max_trials=20):
+        # NOTE! All design parameter inputs need to be as arrays, even if they consist
+        # of a single values (eg DA=[0])
         super().__init__()
         self.DA = DA
         self.DB = DB
         self.RA = RB * np.linspace(0.1, 0.9, 9)
-        #self.RA = RB * 0.5
         self.RB = RB
-        self.PA = [1]
-        self.PB = [1]
+        self.PA = PA
+        self.PB = PB
         self.generate_all_possible_designs()
         self.max_trials = max_trials
 

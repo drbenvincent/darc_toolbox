@@ -1,8 +1,8 @@
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, BAD_delayed_choices
+from darc.designs import Kirby2009, Frye, DARC_Designs
 import random
 
-design_thing = BAD_delayed_choices()
+design_thing = DARC_Designs()
 model = models.Hyperbolic(n_particles=5_000)
 
 for trial in range(15):
