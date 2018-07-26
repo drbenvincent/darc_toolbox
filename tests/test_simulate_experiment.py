@@ -22,23 +22,23 @@ class TestSimulateExperiment(unittest.TestCase):
         # create the generator
         design_generator = make_Frye_generator(
             DB_vec=delays, RB=100, trials_per_delay=trials_per_delay)
-        last_response_chose_delayed = None
+        last_response_chose_B = None
 
         for _ in range(max_trials):
             # run simulated trial here ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             # generate stimulus
-            DA, RA, DB, RB = design_generator.send(last_response_chose_delayed)
+            DA, RA, DB, RB = design_generator.send(last_response_chose_B)
 
             chosen_design = {'RA': [RA], 'DA': [DA], 'RB': [RB], 'DB': [DB]}
             chosen_design = pd.DataFrame(chosen_design)
 
             print(chosen_design)
-            last_response_chose_delayed = model.get_simulated_response(
+            last_response_chose_B = model.get_simulated_response(
                 chosen_design)
 
             # append it
             trial_data = {'RA': [RA], 'DA': [DA], 'RB': [RB], 'DB': [DB],
-                'R': [int(last_response_chose_delayed)]}
+                'R': [int(last_response_chose_B)]}
             all_data = all_data.append(pd.DataFrame(trial_data))
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

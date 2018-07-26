@@ -10,12 +10,12 @@ for trial in range(15):
 
     # make up a random resonse and enter it
     if random.random() < 0.5:
-        last_response_chose_delayed = True
+        last_response_chose_B = True
     else:
-        last_response_chose_delayed = False
+        last_response_chose_B = False
 
     design_thing.enter_trial_design_and_response(
-        design, last_response_chose_delayed)
+        design, last_response_chose_B)
 
     # update beliefs
     model.update_beliefs(design_thing.all_data)

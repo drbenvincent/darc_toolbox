@@ -16,9 +16,9 @@ class TestModel(unittest.TestCase):
         model = models.Hyperbolic(n_particles=5000)
         design = design_thing.get_next_design(model)
         # just make a response up
-        last_response_chose_delayed = True
+        last_response_chose_B = True
         design_thing.enter_trial_design_and_response(
-            design, last_response_chose_delayed)
+            design, last_response_chose_B)
         # finally update beliefs
         model.update_beliefs(design_thing.all_data)
 
@@ -29,6 +29,6 @@ class TestModel(unittest.TestCase):
         chosen_design = {'RA': [100], 'DA': [0], 'PA': [1.],
                          'RB': [110], 'DB': [7], 'PB': [1.]}
         chosen_design = pd.DataFrame(chosen_design)
-        last_response_chose_delayed = model.get_simulated_response(
+        last_response_chose_B = model.get_simulated_response(
             chosen_design)
-        print(last_response_chose_delayed)
+        print(last_response_chose_B)

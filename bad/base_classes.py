@@ -52,8 +52,8 @@ class DesignABC(ABC):
     def update_all_data(self, design, response):
         pass
 
-    def get_last_response_chose_delayed(self):
-        '''return True if the last response was for the delayed option'''
+    def get_last_response_chose_B(self):
+        '''return True if the last response was for the option B'''
         if self.all_data.size == 0:
             # no previous responses
             return None
@@ -162,7 +162,7 @@ class Model(ABC):
         We are going to iterate over trials. For each one, we take the trial
         data and calculate the predictive_y. This gives us many values 
         (correspoding to particles). We deal with these appropriately for 
-        'chose delayed' and 'chose immediate' trials. Then calculate the log
+        'chose B' and 'chose A' trials. Then calculate the log
         likelihood, which involves summing the ll over trials so that we end
         up with a log likelihood value for all the particles.
         """
@@ -177,14 +177,10 @@ class Model(ABC):
 
         for trial in range(n_trials):
             trial_data = data.take([trial])
-            if R[trial] is 1:
-                # chose delayed trial
-                p_chose_B[:, trial] = self.predictive_y(
-                    θ, trial_data)
-            elif R[trial] is 0:
-                # chose immediate trial
-                p_chose_B[:, trial] = 1 - self.predictive_y(
-                    θ, trial_data)
+            if R[trial] is 1:  # meaning they chose option B
+                p_chose_B[:, trial] = self.predictive_y( θ, trial_data)
+            elif R[trial] is 0:  # meaning they chose option A
+                p_chose_B[:, trial] = 1 - self.predictive_y(θ, trial_data)
             else:
                 raise ValueError('Failing to identify response')
 
@@ -212,7 +208,7 @@ class Model(ABC):
 
     def predictive_y(self, θ, data):
         ''' 
-        Calculate the probability of chosing delayed. We need this to work in multiple
+        Calculate the probability of chosing B. We need this to work in multiple
         contexts:
 
         INFERENCE CONTEXT
@@ -253,8 +249,8 @@ class Model(ABC):
         design_df = pd.DataFrame.from_dict(trial_data)
 
         p_chose_B = self.predictive_y(self.θ_true, design_df)
-        chose_delayed = random() < p_chose_B[0]
-        return chose_delayed
+        chose_B = random() < p_chose_B[0]
+        return chose_B
 
     def export_posterior_histograms(self, filename):
         '''Export pdf of marginal posteriors

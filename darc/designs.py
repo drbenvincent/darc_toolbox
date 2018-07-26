@@ -172,12 +172,12 @@ class Frye(DARCDesign):
         if self.delay_counter == len(self.DB):
             return None
 
-        last_response_chose_delayed = self.get_last_response_chose_delayed()
+        last_response_chose_B = self.get_last_response_chose_B()
 
         if self.trial_per_delay_counter is 0:
             self.RA = self.RB * 0.5
         else:
-            self._update_RA_given_last_response(last_response_chose_delayed)
+            self._update_RA_given_last_response(last_response_chose_B)
             self.post_choice_adjustment *= 0.5
 
         design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
@@ -201,9 +201,9 @@ class Frye(DARCDesign):
         self.trial_per_delay_counter = 0
         self.post_choice_adjustment = 0.25
 
-    def _update_RA_given_last_response(self, last_response_chose_delayed):
+    def _update_RA_given_last_response(self, last_response_chose_B):
         # change things depending upon last response
-        if last_response_chose_delayed:
+        if last_response_chose_B:
             self.RA = self.RA + (self.RB * self.post_choice_adjustment)
         else:
             self.RA = self.RA - (self.RB * self.post_choice_adjustment)
