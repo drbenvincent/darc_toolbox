@@ -15,7 +15,7 @@ Feature | Status | Info
 --- | --- | ---
 Run DARC experiments in PsychoPy | ✅ | This works with a default way to display prospects. You can update this to your liking in the PsychoPy builder view.
 Exporting of data | ✅ | Exports raw trial-level data. Also exports parameters (both summary statistics and full posterior distribution)
-Run simulated experiments | ❌ | 
+Run simulated experiments | ✅ | 
 Choose design and models via GUI | ❌ | At this point we rely on very minor changes to the PsychoPy code snippets to select model and design preferences.
 
 ## Design paradigms

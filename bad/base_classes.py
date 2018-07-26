@@ -1,7 +1,6 @@
 '''
 Provides base classes to be used by _any_ domain specific use of this Bayesian 
 Adaptive Design package.
-
 '''
 
 
@@ -20,12 +19,18 @@ import matplotlib.pyplot as plt
 
 class DesignABC(ABC):
     '''
-    The top level Abstract Base class for designs.
+    The top level Abstract Base class for designs. It is not functional in itself, 
+    but provides the template for handling designs for given contexts, such as DARC.
+
+    Core functionality is:
+    a) It pumps out experimental designs with the get_next_design() method.
+    b) It recieves the resulting (design, response) pair and stores a history of
+       designs and responses.
     '''
 
     # NOTE: these should probably not be class attributes, but declared in the __init__
     trial = 0
-    #all_data = None
+    all_data = None
     last_response = None
 
     @abstractmethod
@@ -46,6 +51,17 @@ class DesignABC(ABC):
     @abstractmethod
     def update_all_data(self, design, response):
         pass
+
+    def get_last_response_chose_delayed(self):
+        '''return True if the last response was for the delayed option'''
+        if self.all_data.size == 0:
+            # no previous responses
+            return None
+
+        if list(self.all_data.R)[-1] == 1:  # TODO: do this better?
+            return True
+        else:
+            return False
 
 
 class BayesianAdaptiveDesign(ABC):
@@ -85,6 +101,23 @@ class BayesianAdaptiveDesign(ABC):
 
 
 class Model(ABC):
+    '''
+    Model abstract base class. It does nothing on it's own, but it sketches out the core
+    elements of _any_ model which we could use. To be clear, a model could be pretty much
+    any computational/mathematical model which relates inputs (ie experimental designs) 
+    and model parameters to a behavioural response:
+        response = f(design, parameters)
+    
+    We are only considering experimental paradigms where we have two possible responses.
+    This is a simplification, but it also covers a very wide range of experiment classes
+    including:
+    a) psychophysics such as yes/no or 2AFC paradigms, 
+    b) decision making experiments with choices between 2 prospects
+
+    I also impose that all of the models will involve a single decision variable. A choice
+    function then operates on this decision variable in order to produce a probability of
+    responding one way of the other.
+    '''
 
     prior = None
     θ_fixed = None
@@ -158,11 +191,12 @@ class Model(ABC):
         ll = np.sum(np.log(p_chose_delayed), axis=1)
         return ll
         
-
     def log_prior_pdf(self, θ):
         """Evaluate the log prior density, log(p(θ)), for the values θ
         θ: dictionary, each key is a parameter name
         """
+        # NOTE: avoid tears by copying θ. If we don't do this then we unintentionally
+        # and undesirably update θ itself.
         log_prior = copy.copy(θ)
         for key in self.parameter_names:
             log_prior[key] = self.prior[key].logpdf(x=θ[key])
@@ -171,16 +205,15 @@ class Model(ABC):
         return log_prior
 
     def _θ_initial(self):
-        """Generate initial θ particles. Might as well sample from the prior"""
-        # dictionary comprehension... iterate through the parameter and sample values from it
+        """Generate initial θ particles, by sampling from the prior"""
         particles_dict = {key: self.prior[key].rvs(size=self.n_particles)
             for key in self.parameter_names}
         return pd.DataFrame.from_dict(particles_dict)
 
     def predictive_y(self, θ, data):
-        ''' Calculate the probability of chosing delayed 
-
-        We need this to work in multiple contexts:
+        ''' 
+        Calculate the probability of chosing delayed. We need this to work in multiple
+        contexts:
 
         INFERENCE CONTEXT
         input: θ has P rows, for example P = 5000 particles
@@ -201,8 +234,9 @@ class Model(ABC):
 
     def _get_simulated_response(self, design_tuple):
         '''
-        Get simulated response for a given set of true parameter
-        ONLY NEEDED FOR SIMILATED EXPERIMENTS?
+        Get simulated response for a given set of true parameter.
+        This functionality is only needed when we are simulating experiment. It is not
+        needed when we just want to run experiments on real participants.
         '''
 
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -223,7 +257,9 @@ class Model(ABC):
         return chose_delayed
 
     def export_posterior_histograms(self, filename):
-        '''Export pdf of marginal posteriors'''
+        '''Export pdf of marginal posteriors
+        filename: expecting this to be a string of filename and experiment date & time.
+        '''
         n_params = len(self.prior)
         fig, axes = plt.subplots(1, n_params, figsize=(9, 4), tight_layout=True)
         for (axis, key) in zip(axes, self.θ.keys()):
@@ -233,4 +269,4 @@ class Model(ABC):
                 axis.axvline(x=self.θ_true[key][0],
                              color='red', linestyle='--')
         plt.savefig(filename + '_parameter_plot.pdf')
-        print('PLOT SAVED')
+        print('📈 Posterior histogram plot exported')

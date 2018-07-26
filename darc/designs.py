@@ -8,6 +8,15 @@ from bad.optimisation import design_optimisation
 import matplotlib.pyplot as plt
 
 
+# some useful things
+
+DEFAULT_DB = np.concatenate([
+    np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 12])/24,
+    np.array([1, 2, 3, 4, 5, 6, 7]),
+    np.array([2, 3, 4])*7,
+    np.array([3, 4, 5, 6, 8, 9])*30,
+    np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365])
+       
 # define useful data structures
 Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
 Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
@@ -39,8 +48,14 @@ def df_to_design_tuple(df):
 ## ANOTHER BASE CLASS: Users not to change this
 
 class DARCDesign(DesignABC):
+    '''
+    Another abstract base class which extends the basic design class, adding
+    specialisations for our DARC domain. This includes:
+    - the design space variables
+    - how to update (design, response) pairs from an experimental trial
+    - some basic plotting of the raw data
+    '''
 
-    trial = 0
     RA, DA, PA = None, None, None
     RB, DB, PB = None, None, None
 
@@ -75,25 +90,33 @@ class DARCDesign(DesignABC):
         axes.set_xlabel('delay (days)')
         axes.set_ylabel('RA/RB')
         plt.savefig(filename + '_data_plot.pdf')
-        print('DATA PLOT SAVED')
+        print('📈 DATA PLOT SAVED')
 
-    def get_last_response_chose_delayed(self):
-        '''return True if the last response was for the delayed option'''
-        if self.all_data.size == 0:
-            # no previous responses
-            return None
+    def generate_all_possible_designs(self):
+        '''Create a dataframe of all possible designs (one design is one row) based upon
+        the set of design variables (RA, DA, PA, RB, DB, PB) provided.
+        '''
+        # NOTE: the order of the two lists below HAVE to be the same
+        column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
+        list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
 
-        if list(self.all_data.R)[-1] == 1: # TODO: do this better?
-            return True
-        else:
-            return False
+        # NOTE: list_of_lists must actually be a list of lists... even if there is only one
+        # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
+        all_combinations = list(itertools.product(*list_of_lists))
+        # TODO: we may want to do further trimming and refining of the possible
+        # set of designs, based upon domain knowledge etc.
+        self.all_possible_designs = pd.DataFrame(
+            all_combinations, columns=column_list)
 
 
 # CONCRETE DESIGN CLASSES BELOW ======================================================
 
 class Kirby2009(DARCDesign):
     '''
-    *** KIRBY REFERENCE HERE ***
+    A class to provide designs from the Kirby (2009) delay discounting task.
+
+    Kirby, K. N. (2009). One-year temporal stability of delay-discount rates. 
+    Psychonomic Bulletin & Review, 16(3):457–462.
     '''
 
     # NOTE: these should probably not be class attributes, but declared in the __init__ 
@@ -121,13 +144,14 @@ class Kirby2009(DARCDesign):
 
 class Frye(DARCDesign):
     '''
+    A class to provide designs based on the Frye et al (2016) protocol.
+
     Frye, C. C. J., Galizio, A., Friedel, J. E., DeHart, W. B., & Odum, A. L.
     (2016). Measuring Delay Discounting in Humans Using an Adjusting Amount
     Task. Journal of Visualized Experiments, (107), 1-8.
     http://doi.org/10.3791/53584
     '''
     
-
     def __init__(self, DB=[7, 30, 365], RB=100., trials_per_delay=5):
         self.DA = 0
         self.DB = DB
@@ -161,6 +185,7 @@ class Frye(DARCDesign):
         self._increment_counter()
         return design
 
+    # Below are helper functions
 
     def _increment_counter(self):
         """Increment trial counter, and increment delay counter if we have done all the trials per delay"""
@@ -186,7 +211,7 @@ class Frye(DARCDesign):
 
 
 
-# # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
+# CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
 class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
     '''
@@ -195,36 +220,20 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
     '''
 
     def __init__(self, DA=[0],
-                       DB=np.array([1, 7, 14, 30, 30*6, 365, 365*2, 365*5]),
-                       RA=None,
-                       RB=np.array([100]),
-                       max_trials=20):
+                 DB=DEFAULT_DB,
+                 RA=None,
+                 RB=np.array([100]),
+                 max_trials=20):
         super().__init__()
         self.DA = DA
         self.DB = DB
-        self.RA = RB * np.array([0.25, 0.5, 0.75])
+        self.RA = RB * np.linspace(0.1, 0.9, 9)
         #self.RA = RB * 0.5
         self.RB = RB
         self.PA = [1]
         self.PB = [1]
         self.generate_all_possible_designs()
         self.max_trials = max_trials
-
-    def generate_all_possible_designs(self):
-        '''Create a dataframe of all possible designs (one design is one row) based upon
-        the set of design variables (RA, DA, PA, RB, DB, PB) provided.
-        '''
-        # NOTE: the order of the two lists below HAVE to be the same
-        column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
-        list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
-
-        # NOTE: list_of_lists must actually be a list of lists... even if there is only one 
-        # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
-        all_combinations = list(itertools.product(*list_of_lists))
-        # TODO: we may want to do further trimming and refining of the possible
-        # set of designs, based upon domain knowledge etc.
-        self.all_possible_designs = pd.DataFrame(
-            all_combinations, columns=column_list)
 
     def get_next_design(self, model):
 
@@ -239,6 +248,10 @@ class BAD_delayed_choices(DARCDesign, BayesianAdaptiveDesign):
         return chosen_design
 
     def refine_design_space(self):
+        '''
+        This will implement something very simular to this
+        https://github.com/drbenvincent/darc-experiments-matlab/blob/master/darc-experiments/response_error_types/%40ChoiceFuncPsychometric/generate_designs.m
+        '''
         # TODO KLUDGE ALERT. We need to implement the heuristic shrinking of the `all_possible_designs`
         # down to the ones which we will allow on a given trial. For the moment, we are simply
         # by-passing this step, so doing design optimisation over the entire design space (which

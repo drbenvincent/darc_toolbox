@@ -1,18 +1,33 @@
+'''The classes in this file are domain specific, and therefore include specifics
+about the design space and the model parameters.
+
+The main jobs of the model classes are:
+a) define priors over parameters - as scipy distribution objects
+b) implement the `calc_decision_variable` method. You can add 
+   whatever useful helper functions you wat in order to help with 
+   that job.
+
+NOTE: There is some faff and checking required when we are doing
+the numerical stuff. This might be my inexperience with Python, but
+I think it comes down to annoyances in grabbing parameters and designs
+out of a Pandas dataframe and getting that into useful Numpy arrays.
+TODO: Can this be made easier/better?
+'''
+
+
 from scipy.stats import norm, bernoulli, halfnorm
 import numpy as np
 from bad.base_classes import Model
 
 
-# The classes in this file are domain specific, and therefore include specifics
-# about the design space and the model parameters.
-
-# The main jobs of the model classes are:
-# a) define priors over parameters - as scipy distribution objects
-# b) implement the `calc_decision_variable` method
-
-
 class Hyperbolic(Model):
-    '''Hyperbolic time discounting model'''
+    '''Hyperbolic time discounting model
+    
+    Mazur, J. E. (1987). An adjusting procedure for studying delayed 
+    re-inforcement. In Commons, M. L., Mazur, J. E., Nevin, J. A., and 
+    Rachlin, H., editors, Quantitative Analyses of Behavior, pages 55–
+    73. Erlbaum, Hillsdale, NJ.
+    '''
 
     prior = dict()
     prior['logk'] = norm(loc=np.log(1/365), scale=10)
@@ -51,6 +66,7 @@ class Exponential(Model):
 
 class HyperbolicMagnitudeEffect(Model):
     '''Hyperbolic time discounting model + magnitude effect
+
     Vincent, B. T. (2016). Hierarchical Bayesian estimation and hypothesis testing for
     delay discounting tasks. Behavior Research Methods, 48(4), 1608–1620.
     http://doi.org/10.3758/s13428-015-0672-2
@@ -175,7 +191,12 @@ class MyersonHyperboloid(Model):
 
 
 class ProportionalDifference(Model):
-    '''Proportional difference model'''
+    '''Proportional difference model
+    
+    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and 
+    context-sensitive model of choice behavior. Psychological Review, 109(1), 
+    137–155. http://doi.org/10.1037//0033-295X.109.1.137
+    '''
 
     prior = dict()
     prior['δ'] = norm(loc=0, scale=10)
