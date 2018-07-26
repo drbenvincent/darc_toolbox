@@ -8,10 +8,15 @@ def prob_to_odds_against(probabilities):
     odds_against = (1 - probabilities) / probabilities
     return odds_against
 
+def odds_against_to_probs(odds):
+    probabilities = 1 / (1+odds)
+    return probabilities
+
 
 class Hyperbolic(Model):
     '''Hyperbolic risk discounting model
-    The idea is that we hyperbolically discount ODDS AGAINST the reward'''
+    The idea is that we hyperbolically discount ODDS AGAINST the reward.
+    '''
 
     prior = dict()
     prior['logh'] = norm(loc=0, scale=1)  # h=1 (ie logh=0) equates to risk neutral
