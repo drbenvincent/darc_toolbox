@@ -232,6 +232,10 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         # NOTE! All design parameter inputs need to be as arrays, even if they consist
         # of a single values (eg DA=[0])
         super().__init__()
+        if np.any((np.array(PA) < 0) | (np.array(PA) > 1)):
+            raise ValueError('Expect all values of PA to be between 0-1')
+        if np.any((np.array(PB) < 0) | (np.array(PB) > 1)):
+            raise ValueError('Expect all values of PB to be between 0-1')
         self.DA = DA
         self.DB = DB
         self.RA = RB * np.linspace(0.1, 0.9, 9)
