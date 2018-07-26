@@ -23,17 +23,17 @@ Feature | Status | Info
 --- | --- | ---
 Run DARC experiments in PsychoPy | ✅ | Run experiments with ease using PsychoPy
 Exporting of data | ✅ | Exports raw trial-level data, summary statistics of our posteriors over model parameters, and a full particle-based representation of our posterior distribution over parameters. Reaction times are also exported.
-Customisable experimental protocol | ✅ | Easy to customise the set of allowable rewards, delays and probabilities. (i.e. the design space). Make simple updates to Python code snippets in the PsychoPy Builder view.
-Choose design and models via GUI | ❌ | At this point we rely on very minor changes to the PsychoPy code snippets to select model and design preferences.
-Customise the framing of choices presented to participants. | ❌ | You can customise the commodity being offered (eg. dollars, British pounds, chocolate bars). You can also customise the framing of delays (presented as delays vs future date) or probabilties (probabilties vs odds).
+Pick your own experiment design + model combination| ✅ | At this point we rely on very minor changes to the PsychoPy code snippets to select model and design preferences. (We might be able to explore doing this with a simple GUI in the future)
+Customisable experimental protocol | ✅ | Easy to customise the set of allowable rewards, delays and probabilities, i.e. the design space. Make simple updates to Python code snippets in the PsychoPy Builder view.
+Customise the framing of choices presented to participants. | ✅ | You can customise the way in which the experiment designs (rewards, delays, and probabilities) are presented to the participant by: a) altering stimulus components in the PsychoPy Builder view, and b) making edits to the short Python code snippets in PsychoPy
 
 ## Additional or advanced features
 Feature | Status | Info
 --- | --- | ---
-Easily customise your prior beliefs over parameters | ❌ | This is a key feature of running efficient adaptive experiments.
+Customise your prior beliefs over parameters | ✅ | This is a key feature of running efficient adaptive experiments. At the moment you have to edit priors in our Python code.
 Basic results visualization | ✅ | So far we've got basic visualisation of the marginal posteriors over parameters, and also some basic plotting of the (design, response) data collected.
-Run simulated experiments | ✅ | This is of use to people wanting to develop/impliment their own models, to check it works.
-Interleave multiple adaptive experiments | ❌ | If you want to do interesting mixed-block experiments or react to the current estimates of model parameters (e.g. discount rates) then you can do that. You can do this by asking the experiment to run just one trial.
+Run simulated experiments | in progress | This is of use to people wanting to develop/impliment their own models, to check it works.
+Interleave multiple adaptive experiments | ❌ | If you want to do interesting mixed-block experiments or react to the current estimates of model parameters (e.g. discount rates) then you can do that.
 Inject custom trials | ❌ | Left to it's own devices, an experiment will choose it's own set of designs. But if you have particular experimental needs, you can inject your own (manually specified) designs amongst automatically run trials.
 
 
@@ -42,7 +42,7 @@ Paradigm | Status | Info
 --- | --- | ---
 Kirby paradigm | ✅ | Fixed design, delay discounting only
 Frye et al paradigm | ✅ | Adaptive (heuristic) approach, delay discounting only
-BAD | ❌ | PREPRINT: Vincent, B. T., & Rainforth, T. (2017, October 20). The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design. Retrieved from psyarxiv.com/yehjb
+BAD | ✅ ❌ | **Preprint:** Vincent, B. T., & Rainforth, T. (2017, October 20). The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design. Retrieved from psyarxiv.com/yehjb
 
 
 # DARC Cognitive models available
