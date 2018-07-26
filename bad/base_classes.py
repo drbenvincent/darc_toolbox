@@ -172,23 +172,23 @@ class Model(ABC):
         
         # TODO safety check... if no data, return ll = 0
 
-        p_chose_delayed = np.zeros((n_particles, n_trials))
+        p_chose_B = np.zeros((n_particles, n_trials))
         R = data.R.values
 
         for trial in range(n_trials):
             trial_data = data.take([trial])
             if R[trial] is 1:
                 # chose delayed trial
-                p_chose_delayed[:, trial] = self.predictive_y(
+                p_chose_B[:, trial] = self.predictive_y(
                     θ, trial_data)
             elif R[trial] is 0:
                 # chose immediate trial
-                p_chose_delayed[:, trial] = 1 - self.predictive_y(
+                p_chose_B[:, trial] = 1 - self.predictive_y(
                     θ, trial_data)
             else:
                 raise ValueError('Failing to identify response')
 
-        ll = np.sum(np.log(p_chose_delayed), axis=1)
+        ll = np.sum(np.log(p_chose_B), axis=1)
         return ll
         
     def log_prior_pdf(self, θ):
@@ -218,18 +218,18 @@ class Model(ABC):
         INFERENCE CONTEXT
         input: θ has P rows, for example P = 5000 particles
         input: data has T rows, equal to number of trials we've run
-        DESIRED output: p_chose_delayed is a P x 1 array
+        DESIRED output: p_chose_B is a P x 1 array
 
         OPTIMISATION CONTEXT
         input: θ has N rows (eg N=500)
         input: data has N rows
-        DESIRED output: p_chose_delayed is a N x 1 array
+        DESIRED output: p_chose_B is a N x 1 array
 
         TODO: do some assertions on sizes of inputs/outputs here to catch errors
         '''
         decision_variable = self.calc_decision_variable(θ, data)
-        p_chose_delayed = self.choiceFunction(decision_variable, θ, self.θ_fixed)
-        return p_chose_delayed
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
 
 
     def _get_simulated_response(self, design_tuple):
@@ -252,8 +252,8 @@ class Model(ABC):
                       'PB': [design_tuple.ProspectB.prob]}
         design_df = pd.DataFrame.from_dict(trial_data)
 
-        p_chose_delayed = self.predictive_y(self.θ_true, design_df)
-        chose_delayed = random() < p_chose_delayed[0]
+        p_chose_B = self.predictive_y(self.θ_true, design_df)
+        chose_delayed = random() < p_chose_B[0]
         return chose_delayed
 
     def export_posterior_histograms(self, filename):
