@@ -82,13 +82,23 @@ class DARCDesign(DesignABC):
 
     def plot_all_data(self, filename):
         '''Visualise data'''
-        fig, axes = plt.subplots(1, 1, figsize=(9, 4), tight_layout=True)
-        axes.scatter(x=self.all_data.DB.values,
+        fig, axes = plt.subplots(1, 2, figsize=(9, 4), tight_layout=True)
+        # delay plot
+        axes[0].scatter(x=self.all_data.DB.values,
                      y=self.all_data.RA.values / self.all_data.RB.values,
                      c=self.all_data.R,
                      alpha=0.5)
-        axes.set_xlabel('delay (days)')
-        axes.set_ylabel('RA/RB')
+        axes[0].set_xlabel('delay (days)')
+        axes[0].set_ylabel('RA/RB')
+
+        # probability plot
+        axes[1].scatter(x=self.all_data.PB.values,
+                     y=self.all_data.RA.values / self.all_data.RB.values,
+                     c=self.all_data.R,
+                     alpha=0.5)
+        axes[1].set_xlabel('probability (PB)')
+        axes[1].set_ylabel('RA/RB')
+
         plt.savefig(filename + '_data_plot.pdf')
         print('DATA PLOT SAVED')
 
