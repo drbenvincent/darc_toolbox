@@ -50,9 +50,10 @@ Proportional difference | ✅ | An attribute-wise type of model
 ## Delayed and risky reward paradigm models
 Model | Status | Info
 --- | --- | ---
-MultiplicativeHyperbolic | ❌ | 
-Proportional difference | ❌ |
-
+AdditiveHyperbolic | ❌ | Yi, R., la Piedad, de, X., & Bickel, W. K. (2006). The combined effects of delay and probability in discounting. Behavioural Processes, 73(2), 149–155. http://doi.org/10.1016/j.beproc.2006.05.001
+MultiplicativeHyperbolic | ✅ | Vanderveldt, A., Green, L., & Myerson, J. (2015). Discounting of monetary rewards that are both delayed and probabilistic: delay and probability combine multiplicatively, not additively. Journal of Experimental Psychology: Learning, Memory, and Cognition, 41(1), 148–162. http://doi.org/10.1037/xlm0000029 
+Proportional difference | ❌ | [think, then implement]
+Probability and Time Trade-off model | ❌ | (Baucells & Heukamp)
 
 # Requirements 🔥
 
