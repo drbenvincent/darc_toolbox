@@ -302,12 +302,33 @@ def remove_highly_predictable_designs(allowable_designs, model):
     p_chose_B = model.predictive_y(θ_point_estimate, allowable_designs)
     # add p_chose_B as a column to allowable_designs
     allowable_designs['p_chose_B'] = pd.Series(p_chose_B)
-    # remove highly predictable designs here
-    threshold = 0.02  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
-    # drop the offending designs (rows)
-    allowable_designs = allowable_designs.drop(
-        allowable_designs[allowable_designs.p_chose_B < threshold].index)
-    allowable_designs = allowable_designs.drop(
-        allowable_designs[allowable_designs.p_chose_B > 1 - threshold].index)
+    # label rows which are highly predictable
+    threshold = 0.01  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
+    highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
+        allowable_designs['p_chose_B'] > 1 - threshold)
+    allowable_designs['highly_predictable'] = pd.Series(highly_predictable)
+
+    n_not_predictable = allowable_designs.size - sum(allowable_designs.highly_predictable)
+    if n_not_predictable > 10:
+        # drop the offending designs (rows)
+        allowable_designs = allowable_designs.drop(
+            allowable_designs[allowable_designs.p_chose_B < threshold].index)
+        allowable_designs = allowable_designs.drop(
+            allowable_designs[allowable_designs.p_chose_B > 1 - threshold].index)
+    else:
+        # take the 10 designs closest to p_chose_B=0.5
+        # NOTE: This is not exactly the same as Tom's implementation which examines
+        # VB-VA (which is the design variable axis) and also VA+VB (orthogonal to
+        # the design variable axis)
+        print('not many unpredictable designs, so taking the 10 closest to unpredictable')
+        allowable_designs['badness'] = np.abs(0.5- allowable_designs.p_chose_B)
+        allowable_designs.sort_values(by=['badness'], inplace=True)
+        allowable_designs = allowable_designs[:10]
+
     allowable_designs.drop(columns=['p_chose_B'])
     return allowable_designs
+
+
+# highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
+#     allowable_designs['p_chose_B'] > 1 - threshold)
+# allowable_designs['highly_predictable'] = pd.Series(highly_predictable)
