@@ -6,6 +6,7 @@ import numpy as np
 import itertools
 from bad.optimisation import design_optimisation
 import matplotlib.pyplot as plt
+import copy
 
 
 # some useful things
@@ -257,14 +258,24 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         chosen_design = df_to_design_tuple(chosen_design)
         return chosen_design
 
-    def refine_design_space(self):
+    def refine_design_space(self, NO_REPEATS=True):
         '''
-        This will implement something very simular to this
+        This will implement something very simular to our initial Matlab implementation written 
+        by Tom Rainforth.
         https://github.com/drbenvincent/darc-experiments-matlab/blob/master/darc-experiments/response_error_types/%40ChoiceFuncPsychometric/generate_designs.m
         '''
-        # TODO KLUDGE ALERT. We need to implement the heuristic shrinking of the `all_possible_designs`
-        # down to the ones which we will allow on a given trial. For the moment, we are simply
-        # by-passing this step, so doing design optimisation over the entire design space (which
-        # is problematic).
-        allowable_designs = self.all_possible_designs
+        
+        # Start with all allowable designs
+        allowable_designs = copy.copy(self.all_possible_designs)
+
+        # Eliminate designs that we've already run
+        if NO_REPEATS:
+            allowable_designs = remove_trials_already_run(allowable_designs, self.all_data)
+
         return allowable_designs
+
+
+def remove_trials_already_run(design_set, exclude_these):
+    '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)'''
+    # using https://stackoverflow.com/a/40209800/5172570
+    return pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
