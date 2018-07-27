@@ -99,6 +99,16 @@ This code is being developed with:
 (coming soon)
 
 
+# Other packages/projects we rely upon
+
+- [PsychoPy](http://www.psychopy.org) as the main experiment environment
+
+Various Python packages such as: 
+- Numpy
+- Pandas
+- SciPy.stats. We use the scipy distributions to represent our prior beliefs over model parameters, and to draw samples from those prior beliefs. See [the full list of distributions here](https://docs.scipy.org/doc/scipy/reference/stats.html)
+
+
 # References
 
 **NOTE:** This work is based on the pre-print below. This is not yet published and is likely to appear in a subtantially altered form.
