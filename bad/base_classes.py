@@ -266,3 +266,9 @@ class Model(ABC):
                              color='red', linestyle='--')
         plt.savefig(filename + '_parameter_plot.pdf')
         print('Posterior histogram plot exported')
+
+    def get_θ_point_estimate(self):
+        '''return a point estimate (posterior median) for the model parameters'''
+        median_series = self.θ.median(axis=0)
+        return median_series.to_frame().T
+        

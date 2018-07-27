@@ -251,14 +251,14 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         if self.trial > self.max_trials - 1:
             return None
 
-        allowable_designs = self.refine_design_space()
+        allowable_designs = self.refine_design_space(model)
         # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
         chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
         # convert from a 1-row pandas dataframe to a Design named tuple
         chosen_design = df_to_design_tuple(chosen_design)
         return chosen_design
 
-    def refine_design_space(self, NO_REPEATS=True):
+    def refine_design_space(self, model, NO_REPEATS=True):
         '''
         This will implement something very simular to our initial Matlab implementation written 
         by Tom Rainforth.
@@ -268,10 +268,23 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         # Start with all allowable designs
         allowable_designs = copy.copy(self.all_possible_designs)
 
-        # Eliminate designs that we've already run
-        if NO_REPEATS:
-            allowable_designs = remove_trials_already_run(allowable_designs, self.all_data)
+        print(f'Initially there were {allowable_designs.size} designs')
+        # # Remove the R (response) column
+        # allowable_designs.drop(columns=['R'])
 
+        # Eliminate designs that we've already run
+        if NO_REPEATS and self.trial>1:
+            allowable_designs = remove_trials_already_run(
+                allowable_designs, self.all_data.drop(columns=['R']))
+
+        print(f'After removing prior designs, there were {allowable_designs.size} designs')
+
+        # Eliminate designs which are highly predictable as these will 
+        # not be very informative
+        allowable_designs = remove_highly_predictable_designs(
+            allowable_designs, model)
+
+        print(f'After there were {allowable_designs.size} designs')
         return allowable_designs
 
 
@@ -279,3 +292,22 @@ def remove_trials_already_run(design_set, exclude_these):
     '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)'''
     # using https://stackoverflow.com/a/40209800/5172570
     return pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
+
+
+def remove_highly_predictable_designs(allowable_designs, model):
+    ''' Eliminate designs which are highly predictable as these will not be very informative '''
+    θ_point_estimate = model.get_θ_point_estimate()
+
+    # TODO: CHECK WE CAN EPSILON TO 0
+    p_chose_B = model.predictive_y(θ_point_estimate, allowable_designs)
+    # add p_chose_B as a column to allowable_designs
+    allowable_designs['p_chose_B'] = pd.Series(p_chose_B)
+    # remove highly predictable designs here
+    threshold = 0.02  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
+    # drop the offending designs (rows)
+    allowable_designs = allowable_designs.drop(
+        allowable_designs[allowable_designs.p_chose_B < threshold].index)
+    allowable_designs = allowable_designs.drop(
+        allowable_designs[allowable_designs.p_chose_B > 1 - threshold].index)
+    allowable_designs.drop(columns=['p_chose_B'])
+    return allowable_designs
