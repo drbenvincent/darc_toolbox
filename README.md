@@ -32,13 +32,17 @@ Run simulated experiments | in progress | This is of use to people wanting to de
 Interleave multiple adaptive experiments | ❌ | If you want to do interesting mixed-block experiments or react to the current estimates of model parameters (e.g. discount rates) then you can do that.
 Inject custom trials | ❌ | Left to it's own devices, an experiment will choose it's own set of designs. But if you have particular experimental needs, you can inject your own (manually specified) designs amongst automatically run trials.
 
+## Customise your adaptive experiment for your purposes: choosing a design + model combination
+When you run an adaptive experiment, it can be viewed as a combination of a **design paradigm** and a **cognitive model**. The design paradigm is essentially the space of possible designs (prospects presented to participants), and our Bayesian Adaptive Design methods select which to present to participants on a trial-to-trial basis, in real time. The goal of this is to maximise the information we gain about our model parameters.
+
+So the experimenter must choose a design paradigm + cognitive model combination which will suit their purposes. This is actually a pretty straight-forward task. Your reasearch goals will dictate your design paradigm (eg delayed choice). You can use a default cognitive model (such as Hyperbolic discounting) or one of the other delay discounting models which you might be particularly interested in.
 
 # Design paradigms
 One of the core components of this package is to provide designs chosen through Bayesian Adaptive Design, as outlined in our prepint (Vincent & Rainforth, 2017). However, we also provide the ability to run the Kirby 27-item task as well as the Frye et al adpative procedure. The core classes of design we focus on are:
 
-- Delayed choice tasks (aka inter-temporal choice)
-- Risky choice tasks
-- Simultaneous delayed and risky choice tasks
+- **Delayed choice tasks (aka inter-temporal choice):** you can choose between various protocols such as: front-end delays, fixed delayed reward, fixed immediate reward, fixed delay, etc.
+- **Risky choice tasks:** Ahoose your range of reward probabilities. These can also be seen as a transformed version of odds against recieving a reward.
+- **Simultaneous delayed and risky choice tasks:** Again, you can customise the range of delays and reward probability (risk) levels used in your experiment.
 
 Below, we outline the cognitive models which we have implemented, for each of these classes of paradigms.
 
