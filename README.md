@@ -1,13 +1,9 @@
 # darc-experiments-python
 
-## About
-
 **Status:  🔥 Under active development. This is pre-alpha code. 🔥** 
 
-This code relates to the following pre-print:
+This code relates to the following pre-print. But, the pre-print is likely to appear in quite a different form when finally published.
 > Vincent, B. T., & Rainforth, T. (2017, October 20). The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design. Retrieved from psyarxiv.com/yehjb
-
-The pre-print is likely to appear in quite a different form when finally published.
 
 
 # What does this do?
@@ -38,16 +34,17 @@ Inject custom trials | ❌ | Left to it's own devices, an experiment will choose
 
 
 # Design paradigms
-Paradigm | Status | Info
---- | --- | ---
-Kirby paradigm | ✅ | Fixed design, delay discounting only
-Frye et al paradigm | ✅ | Adaptive (heuristic) approach, delay discounting only
-BAD | ✅ ❌ | **Preprint:** Vincent, B. T., & Rainforth, T. (2017, October 20). The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design. Retrieved from psyarxiv.com/yehjb
+One of the core components of this package is to provide designs chosen through Bayesian Adaptive Design, as outlined in our prepint (Vincent & Rainforth, 2017). However, we also provide the ability to run the Kirby 27-item task as well as the Frye et al adpative procedure. The core classes of design we focus on are:
 
+- Delayed choice tasks (aka inter-temporal choice)
+- Risky choice tasks
+- Simultaneous delayed and risky choice tasks
+
+Below, we outline the cognitive models which we have implemented, for each of these classes of paradigms.
 
 # DARC Cognitive models available
 
-Yes, you can in run adaptive experiments to make very efficient inferences about the parameters for models of your choice 🙂. See below for a list of completed and planned model implementations.
+Yes, you can in run adaptive experiments to make very efficient inferences about the parameters for models of your choice 🙂 See below for a list of completed and planned model implementations.
 
 ## Delayed reward paradigm models
 Model | Status | Info
@@ -59,6 +56,8 @@ ExponentialMagnitudeEffect | ✅ |
 ConstantSensitivity | ❌ | * Negative b values causing errors *
 ProportionalDifference | ✅ | González-Vallejo, C. (2002). Making trade-offs: A probabilistic and context-sensitive model of choice behavior. Psychological Review, 109(1), 137–155. http://doi.org/10.1037//0033-295X.109.1.137
 HyperbolicNonLinearUtility | ❌ | Cheng, J., & González-Vallejo, C. (2014). Hyperbolic Discounting: Value and Time Processes of Substance Abusers and Non-Clinical Individuals in Intertemporal Choice. PLoS ONE, 9(11), e111378–18. http://doi.org/10.1371/journal.pone.0111378
+ExponentialPower | ❌ | Takahashi, T., Oono, H., and Radford, M. H. B. (2008). Psychophysics of time perception and intertemporal choice models. 387(8-9):2066–2074.
+Rachlin hyperboloid | ❌ | Rachlin, H. (2006). Notes on Discounting. Journal of the experimental analysis of behavior, 85(3):425–435.
 
 ## Risky reward paradigm models
 Model | Status | Info
