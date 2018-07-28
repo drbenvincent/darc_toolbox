@@ -4,7 +4,7 @@
     <Param name="expName" updates="None" val="DARC Demo Experiment" valType="str"/>
     <Param name="Show info dlg" updates="None" val="True" valType="bool"/>
     <Param name="Enable Escape" updates="None" val="True" valType="bool"/>
-    <Param name="Experiment info" updates="None" val="{'participant': '', 'session': '01', 'trials': '20', 'particles': '10000'}" valType="code"/>
+    <Param name="Experiment info" updates="None" val="{'participant': '', 'trials': '20', 'particles': '10000'}" valType="code"/>
     <Param name="Use version" updates="None" val="" valType="str"/>
     <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
     <Param name="Window size (pixels)" updates="None" val="[2560, 1440]" valType="code"/>
