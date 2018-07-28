@@ -8,6 +8,7 @@ from bad.optimisation import design_optimisation
 import matplotlib.pyplot as plt
 import copy
 import logging
+import time
 
 
 DEFAULT_DB = np.concatenate([
@@ -252,14 +253,15 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
 
         if self.trial > self.max_trials - 1:
             return None
-
+        start_time = time.time()
         logging.info(f'Getting design for trial {self.trial}')
-
         allowable_designs = self.refine_design_space(model)
         # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
         chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
         # convert from a 1-row pandas dataframe to a Design named tuple
         chosen_design = df_to_design_tuple(chosen_design)
+
+        logging.info(f'get_next_design() took: {time.time()-start_time:1.2f} seconds')
         return chosen_design
 
     def refine_design_space(self, model, NO_REPEATS=True):
