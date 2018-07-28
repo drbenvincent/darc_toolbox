@@ -119,7 +119,7 @@ class DARCDesign(DesignABC):
         logging.debug(f'provided RB = {self.RB}')
         logging.debug(f'provided DB = {self.DB}')
         logging.debug(f'provided PB = {self.PB}')
-        
+
         # NOTE: list_of_lists must actually be a list of lists... even if there is only one
         # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
         all_combinations = list(itertools.product(*list_of_lists))
@@ -280,7 +280,7 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         '''
         
         allowable_designs = copy.copy(self.all_possible_designs)
-        logging.debug(f'{allowable_designs.size} designs initially')
+        logging.debug(f'{allowable_designs.shape[0]} designs initially')
 
         if NO_REPEATS and self.trial>1:
             allowable_designs = remove_trials_already_run(
@@ -298,7 +298,7 @@ def remove_trials_already_run(design_set, exclude_these):
     be a subset of `design_set`'''
     # see https://stackoverflow.com/a/40209800/5172570
     allowable_designs = pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
-    logging.debug(f'{allowable_designs.size} designs after removing prior designs')
+    logging.debug(f'{allowable_designs.shape[0]} designs after removing prior designs')
     return allowable_designs
 
 
@@ -334,5 +334,5 @@ def remove_highly_predictable_designs(allowable_designs, model):
         allowable_designs = allowable_designs[:10]
 
     allowable_designs.drop(columns=['p_chose_B'])
-    logging.debug(f'{allowable_designs.size} designs after removing highly predicted designs')
+    logging.debug(f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
     return allowable_designs
