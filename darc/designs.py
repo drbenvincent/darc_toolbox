@@ -101,7 +101,7 @@ class DARCDesign(DesignABC):
 
         savename = filename + '_data_plot.pdf'
         plt.savefig(savename)
-        logging.info(f'📊 Data plot saved as: {savename}')
+        logging.info(f'Data plot saved as: {savename}')
 
     def generate_all_possible_designs(self):
         '''Create a dataframe of all possible designs (one design is one row) based upon
@@ -146,6 +146,7 @@ class Kirby2009(DARCDesign):
     def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
+            logging.info(f'Getting design for trial {self.trial}')
             design = Design(ProspectA=Prospect(reward=self.RA[self.trial], delay=self.DA, prob=self.PA),
                             ProspectB=Prospect(reward=self.RB[self.trial], delay=self.DB[self.trial], prob=self.PB))
             return design
@@ -183,6 +184,7 @@ class Frye(DARCDesign):
         if self.delay_counter == len(self.DB):
             return None
 
+        logging.info(f'Getting design for trial {self.trial}')
         last_response_chose_B = self.get_last_response_chose_B()
 
         if self.trial_per_delay_counter is 0:
@@ -250,6 +252,8 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
 
         if self.trial > self.max_trials - 1:
             return None
+
+        logging.info(f'Getting design for trial {self.trial}')
 
         allowable_designs = self.refine_design_space(model)
         # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
