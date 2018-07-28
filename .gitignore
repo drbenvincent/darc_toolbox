@@ -1,7 +1,7 @@
 *.DS_Store
 *.pyc
 *_lastrun.py
-psychopy_experiments/demo_experiment/data/*
+psychopy/demo/data/*
 .vscode/*
 *.pdf
 *.log
