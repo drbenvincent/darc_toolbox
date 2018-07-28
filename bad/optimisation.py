@@ -101,7 +101,7 @@ def design_optimisation(designs, predictive_y, θ,
         assert n_particles <= nT, "n_particles must be <= nT"
 
     if gamma is None:
-        gamma = np.arange(n_steps)
+        gamma = np.arange(n_steps+1)
 
     pD_min = pD_min_prop/nD
 
@@ -111,7 +111,7 @@ def design_optimisation(designs, predictive_y, θ,
     
     θ_pos_counter = 0
 
-    for nSam in range(n_steps):
+    for nSam in range(1, n_steps):
 
         if sum(U) == 0:
             logging.warning('No design helpful, off the edge of the design space!')
