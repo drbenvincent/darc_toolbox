@@ -6,15 +6,15 @@
     <Param name="Enable Escape" updates="None" val="True" valType="bool"/>
     <Param name="Experiment info" updates="None" val="{'participant': '', 'session': '01', 'trials': '20'}" valType="code"/>
     <Param name="Use version" updates="None" val="" valType="str"/>
-    <Param name="Full-screen window" updates="None" val="False" valType="bool"/>
-    <Param name="Window size (pixels)" updates="None" val="[1280, 720]" valType="code"/>
+    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
+    <Param name="Window size (pixels)" updates="None" val="[2560, 1440]" valType="code"/>
     <Param name="Screen" updates="None" val="1" valType="num"/>
     <Param name="Monitor" updates="None" val="testMonitor" valType="str"/>
     <Param name="color" updates="None" val="$[0,0,0]" valType="str"/>
     <Param name="colorSpace" updates="None" val="rgb" valType="str"/>
     <Param name="Units" updates="None" val="use prefs" valType="str"/>
     <Param name="blendMode" updates="None" val="avg" valType="str"/>
-    <Param name="Show mouse" updates="None" val="False" valType="bool"/>
+    <Param name="Show mouse" updates="None" val="True" valType="bool"/>
     <Param name="Data filename" updates="None" val="u'data/%s_%s_%s' % (expInfo['participant'], expName, expInfo['date'])" valType="code"/>
     <Param name="Save log file" updates="None" val="True" valType="bool"/>
     <Param name="Save wide csv file" updates="None" val="True" valType="bool"/>
@@ -38,7 +38,36 @@
       </CodeComponent>
       <CodeComponent name="darc">
         <Param name="name" updates="None" val="darc" valType="code"/>
-        <Param name="Begin Experiment" updates="constant" val="# Import our DARC design code&amp;#10;from darc.designs import Kirby2009, Frye, DARC_Designs&amp;#10;&amp;#10;&amp;#10;# CHOOSE YOUR (DESIGN + MODEL) COMBINATION HERE @@@@@@@@@@@@@@@@@@@@@@@@@@@@&amp;#10;what_I_want = 'delayed_choice_task'&amp;#10;&amp;#10;if what_I_want is 'delayed_choice_task':&amp;#10;&amp;#10;    # create an appropriate model object&amp;#10;    from darc.delayed import models&amp;#10;    model = models.Hyperbolic(n_particles=5_000)&amp;#10;    &amp;#10;    # create an appropriate design object&amp;#10;    design_thing = DARC_Designs(max_trials=expInfo['trials'])&amp;#10;&amp;#10;elif what_I_want is 'risky_choice_task':&amp;#10;&amp;#10;    # create an appropriate model object&amp;#10;    from darc.risky import models&amp;#10;    model = models.Hyperbolic(n_particles=5_000)&amp;#10;    &amp;#10;    # create an appropriate design object&amp;#10;    prob_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]&amp;#10;    design_thing = DARC_Designs(max_trials=expInfo['trials'], &amp;#10;        DA=[0], DB=[0], PA=[1], PB=prob_list)&amp;#10;&amp;#10;elif what_I_want is 'delayed_and_risky_choice_task':&amp;#10;&amp;#10;    # create an appropriate model object&amp;#10;    from darc.delayed_and_risky import models&amp;#10;    model = models.MultiplicativeHyperbolic(n_particles=5_000)&amp;#10;    &amp;#10;    # create an appropriate design object&amp;#10;    design_thing = DARC_Designs(max_trials=expInfo['trials'], &amp;#10;        PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])&amp;#10;&amp;#10;else:&amp;#10;    print('I don''t know what you want of me!')&amp;#10;    raise ValueError('value provided for `what_I_want` is not recognised')&amp;#10;&amp;#10;# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@&amp;#10;&amp;#10;&amp;#10;# NOTE: Could break all these up into GET METHODS in design, and &amp;#10;# just ask for the strings directly in the psychopy text item thingy.&amp;#10;# BUT that is more opaque. Maybe having it out in the open and easy &amp;#10;# to adjust for people is good?&amp;#10;&amp;#10;def design_to_display_strings(design):&amp;#10;    # rewards -------------------------&amp;#10;    text_RA = f'£{design.ProspectA.reward}'&amp;#10;    text_RB = f'£{design.ProspectB.reward}'&amp;#10;    # delays --------------------------&amp;#10;    if design.ProspectA.delay == 0:&amp;#10;        text_DA = f'now'&amp;#10;    else:&amp;#10;        text_DA = f'in {design.ProspectA.delay} days'&amp;#10;&amp;#10;    text_DB = f'in {design.ProspectB.delay} days'&amp;#10;    # probabilities -------------------&amp;#10;    text_PA = f'{design.ProspectA.prob*100}%'&amp;#10;    text_PB = f'{design.ProspectB.prob*100}%'&amp;#10;    return (text_RA, text_RB, text_DA, text_DB, text_PA, text_PB)" valType="extendedCode"/>
+        <Param name="Begin Experiment" updates="constant" val="# Import our DARC design code&amp;#10;from darc.designs import Kirby2009, Frye, DARC_Designs&amp;#10;&amp;#10;&amp;#10;&amp;#10;&amp;#10;&amp;#10;# IN PROGRESS &amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;#10;# see here https://discourse.psychopy.org/t/bug-user-defined-gui-does-not-display-in-full-screen-on-mac-osx/2214/4&amp;#10;&amp;#10;win.fullscr = False           #not sure if this is necessary
+win.winHandle.set_fullscreen(False)
+win.winHandle.minimize()
+win.flip()
+# ---------------------------------------------------------------------------
+expt_type = {'Experiment type': ['delayed', 'risky', 'delayed and risky']}
+dlg = gui.DlgFromDict(dictionary=expt_type, title='Choose your experiment type')
+if dlg.OK == False:
+    core.quit()  # user pressed cancel
+
+# Available models should be decided based on choice for Experiment Type
+if expt_type['Experiment type'] is 'delayed':
+    models_available = ['Hyperbolic', 'Exponential', 'MyersonHyperboloid',
+        'ProportionalDifference']
+elif expt_type['Experiment type'] is 'risky':
+    models_available = ['Hyperbolic', 'ProportionalDifference', 'ProspectTheory']
+elif expt_type['Experiment type'] is 'delayed and risky':
+    models_available = ['MultiplicativeHyperbolic']
+
+model_type = {'Model': models_available}
+
+dlg = gui.DlgFromDict(dictionary=model_type, title='Choose your model')
+if dlg.OK == False:
+    core.quit()  # user pressed cancel
+# ---------------------------------------------------------------------------
+win.winHandle.maximize()
+win.winHandle.activate()
+win.fullscr=True
+win.winHandle.set_fullscreen(True)
+win.flip()&amp;#10;# &amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;#10;&amp;#10;&amp;#10;&amp;#10;&amp;#10;# CHOOSE YOUR (DESIGN + MODEL) COMBINATION HERE @@@@@@@@@@@@@@@@@@@@@@@@@@@@&amp;#10;what_I_want = 'delayed_choice_task'&amp;#10;&amp;#10;if what_I_want is 'delayed_choice_task':&amp;#10;&amp;#10;    # create an appropriate model object&amp;#10;    from darc.delayed import models&amp;#10;    model = models.Hyperbolic(n_particles=5_000)&amp;#10;    &amp;#10;    # create an appropriate design object&amp;#10;    design_thing = DARC_Designs(max_trials=expInfo['trials'])&amp;#10;&amp;#10;elif what_I_want is 'risky_choice_task':&amp;#10;&amp;#10;    # create an appropriate model object&amp;#10;    from darc.risky import models&amp;#10;    model = models.Hyperbolic(n_particles=5_000)&amp;#10;    &amp;#10;    # create an appropriate design object&amp;#10;    prob_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]&amp;#10;    design_thing = DARC_Designs(max_trials=expInfo['trials'], &amp;#10;        DA=[0], DB=[0], PA=[1], PB=prob_list)&amp;#10;&amp;#10;elif what_I_want is 'delayed_and_risky_choice_task':&amp;#10;&amp;#10;    # create an appropriate model object&amp;#10;    from darc.delayed_and_risky import models&amp;#10;    model = models.MultiplicativeHyperbolic(n_particles=5_000)&amp;#10;    &amp;#10;    # create an appropriate design object&amp;#10;    design_thing = DARC_Designs(max_trials=expInfo['trials'], &amp;#10;        PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])&amp;#10;&amp;#10;else:&amp;#10;    print('I don''t know what you want of me!')&amp;#10;    raise ValueError('value provided for `what_I_want` is not recognised')&amp;#10;&amp;#10;# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@&amp;#10;&amp;#10;&amp;#10;# NOTE: Could break all these up into GET METHODS in design, and &amp;#10;# just ask for the strings directly in the psychopy text item thingy.&amp;#10;# BUT that is more opaque. Maybe having it out in the open and easy &amp;#10;# to adjust for people is good?&amp;#10;&amp;#10;def design_to_display_strings(design):&amp;#10;    # rewards -------------------------&amp;#10;    text_RA = f'£{design.ProspectA.reward}'&amp;#10;    text_RB = f'£{design.ProspectB.reward}'&amp;#10;    # delays --------------------------&amp;#10;    if design.ProspectA.delay == 0:&amp;#10;        text_DA = f'now'&amp;#10;    else:&amp;#10;        text_DA = f'in {design.ProspectA.delay} days'&amp;#10;&amp;#10;    text_DB = f'in {design.ProspectB.delay} days'&amp;#10;    # probabilities -------------------&amp;#10;    text_PA = f'{design.ProspectA.prob*100}%'&amp;#10;    text_PB = f'{design.ProspectB.prob*100}%'&amp;#10;    return (text_RA, text_RB, text_DA, text_DB, text_PA, text_PB)" valType="extendedCode"/>
         <Param name="Begin Routine" updates="constant" val="# convert the design into meaningful strings &amp;#10;text_RA, text_RB, text_DA, text_DB, text_PA, text_PB = design_to_display_strings(design)" valType="extendedCode"/>
         <Param name="Each Frame" updates="constant" val="" valType="extendedCode"/>
         <Param name="End Routine" updates="constant" val="# add DARC specific data, eventually exported by PsychoPy as a .csv&amp;#10;# note: the name here (ie `trials` has to match the PsychoPy trial&amp;#10;# loop object name&amp;#10;trials.addData('RA', design.ProspectA.reward)&amp;#10;trials.addData('DA', design.ProspectA.delay)&amp;#10;trials.addData('PA', design.ProspectA.prob)&amp;#10;&amp;#10;trials.addData('RB', design.ProspectB.reward)&amp;#10;trials.addData('DB', design.ProspectB.delay)&amp;#10;trials.addData('PB', design.ProspectB.prob)&amp;#10;&amp;#10;if last_response_chose_B:&amp;#10;    trials.addData('R', 'B')&amp;#10;else:&amp;#10;    trials.addData('R', 'A')" valType="extendedCode"/>
