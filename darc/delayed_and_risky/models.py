@@ -17,7 +17,14 @@ def odds_against_to_probs(odds):
 
 class MultiplicativeHyperbolic(Model):
     '''Hyperbolic risk discounting model
-    The idea is that we hyperbolically discount ODDS AGAINST the reward'''
+    The idea is that we hyperbolically discount ODDS AGAINST the reward
+    
+    Vanderveldt, A., Green, L., & Myerson, J. (2015). Discounting of monetary
+    rewards that are both delayed and probabilistic: delay and probability 
+    combine multiplicatively, not additively. Journal of Experimental Psychology: 
+    Learning, Memory, and Cognition, 41(1), 148–162.
+    http://doi.org/10.1037/xlm0000029
+    '''
 
     prior = dict()
     prior['logk'] = norm(loc=np.log(1/365), scale=2)
