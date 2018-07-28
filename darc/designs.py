@@ -112,6 +112,14 @@ class DARCDesign(DesignABC):
         column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
         list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
 
+        # Log the raw values to help with debugging
+        logging.debug(f'provided RA = {self.RA}')
+        logging.debug(f'provided DA = {self.DA}')
+        logging.debug(f'provided PA = {self.PA}')
+        logging.debug(f'provided RB = {self.RB}')
+        logging.debug(f'provided DB = {self.DB}')
+        logging.debug(f'provided PB = {self.PB}')
+        
         # NOTE: list_of_lists must actually be a list of lists... even if there is only one
         # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
         all_combinations = list(itertools.product(*list_of_lists))
@@ -261,7 +269,7 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         # convert from a 1-row pandas dataframe to a Design named tuple
         chosen_design = df_to_design_tuple(chosen_design)
 
-        logging.info(f'get_next_design() took: {time.time()-start_time:1.2f} seconds')
+        logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design
 
     def refine_design_space(self, model, NO_REPEATS=True):
