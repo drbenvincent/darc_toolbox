@@ -1,5 +1,6 @@
 import numpy as np
 from bad.utils import normalise, sample_rows, shuffle_rows
+import logging
 
 
 def design_optimisation(designs, predictive_y, θ,
@@ -113,7 +114,7 @@ def design_optimisation(designs, predictive_y, θ,
     for nSam in range(n_steps):
 
         if sum(U) == 0:
-            print('No design helpful, off the edge of the design space!')
+            logging.warning('No design helpful, off the edge of the design space!')
             chosen_design = designs[np.random.randint(0, nD), :]
             estimated_utilities = U
             return (chosen_design, estimated_utilities)

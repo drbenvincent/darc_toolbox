@@ -13,6 +13,7 @@ from scipy.stats import norm, bernoulli
 from random import random
 from bad.choice_functions import CumulativeNormalChoiceFunc
 import matplotlib.pyplot as plt
+import logging
 
 
 # DESIGN RELATED ===================================================================
@@ -264,8 +265,9 @@ class Model(ABC):
             if self.θ_true is not None:
                 axis.axvline(x=self.θ_true[key][0],
                              color='red', linestyle='--')
-        plt.savefig(filename + '_parameter_plot.pdf')
-        print('Posterior histogram plot exported')
+        savename = filename + '_parameter_plot.pdf'
+        plt.savefig(savename)
+        logging.info(f'📊 Posterior histograms exported: {savename}')
 
     def get_θ_point_estimate(self):
         '''return a point estimate (posterior median) for the model parameters'''

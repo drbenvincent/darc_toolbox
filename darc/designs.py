@@ -7,9 +7,8 @@ import itertools
 from bad.optimisation import design_optimisation
 import matplotlib.pyplot as plt
 import copy
+import logging
 
-
-# some useful things
 
 DEFAULT_DB = np.concatenate([
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 12])/24,
@@ -100,8 +99,9 @@ class DARCDesign(DesignABC):
         axes[1].set_xlabel('probability (PB)')
         axes[1].set_ylabel('RA/RB')
 
-        plt.savefig(filename + '_data_plot.pdf')
-        print('DATA PLOT SAVED')
+        savename = filename + '_data_plot.pdf'
+        plt.savefig(savename)
+        logging.info(f'📊 Data plot saved as: {savename}')
 
     def generate_all_possible_designs(self):
         '''Create a dataframe of all possible designs (one design is one row) based upon
@@ -265,33 +265,27 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         https://github.com/drbenvincent/darc-experiments-matlab/blob/master/darc-experiments/response_error_types/%40ChoiceFuncPsychometric/generate_designs.m
         '''
         
-        # Start with all allowable designs
         allowable_designs = copy.copy(self.all_possible_designs)
+        logging.debug(f'{allowable_designs.size} designs initially')
 
-        print(f'Initially there were {allowable_designs.size} designs')
-        # # Remove the R (response) column
-        # allowable_designs.drop(columns=['R'])
-
-        # Eliminate designs that we've already run
         if NO_REPEATS and self.trial>1:
             allowable_designs = remove_trials_already_run(
                 allowable_designs, self.all_data.drop(columns=['R']))
 
-        print(f'After removing prior designs, there were {allowable_designs.size} designs')
-
-        # Eliminate designs which are highly predictable as these will 
-        # not be very informative
         allowable_designs = remove_highly_predictable_designs(
             allowable_designs, model)
 
-        print(f'After there were {allowable_designs.size} designs')
         return allowable_designs
 
 
 def remove_trials_already_run(design_set, exclude_these):
-    '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)'''
-    # using https://stackoverflow.com/a/40209800/5172570
-    return pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
+    '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)
+    Dropping duplicates will work in this situation because `exclude_these` is going to 
+    be a subset of `design_set`'''
+    # see https://stackoverflow.com/a/40209800/5172570
+    allowable_designs = pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
+    logging.debug(f'{allowable_designs.size} designs after removing prior designs')
+    return allowable_designs
 
 
 def remove_highly_predictable_designs(allowable_designs, model):
@@ -320,15 +314,11 @@ def remove_highly_predictable_designs(allowable_designs, model):
         # NOTE: This is not exactly the same as Tom's implementation which examines
         # VB-VA (which is the design variable axis) and also VA+VB (orthogonal to
         # the design variable axis)
-        print('not many unpredictable designs, so taking the 10 closest to unpredictable')
+        logging.warning('not many unpredictable designs, so taking the 10 closest to unpredictable')
         allowable_designs['badness'] = np.abs(0.5- allowable_designs.p_chose_B)
         allowable_designs.sort_values(by=['badness'], inplace=True)
         allowable_designs = allowable_designs[:10]
 
     allowable_designs.drop(columns=['p_chose_B'])
+    logging.debug(f'{allowable_designs.size} designs after removing highly predicted designs')
     return allowable_designs
-
-
-# highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
-#     allowable_designs['p_chose_B'] > 1 - threshold)
-# allowable_designs['highly_predictable'] = pd.Series(highly_predictable)

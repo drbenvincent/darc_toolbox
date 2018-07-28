@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm, t
 from bad.utils import normalise, sample_rows
+import logging
+
 
 # NOTE: we are expecting particles to be an a pandas dataframe, with column names
 # rather than just a 2D numpy array.
@@ -95,7 +97,7 @@ def pmc(data, p_log_pdf, q_log_pdf, q_sample, θstart, n_steps, display=False):
     proposal adaptation. See "Population Monte Carlo" (Cappe et al 2012).
     In short PMC without adaptation equates to SMC on a stationary target
     distribtuion.
-
+    
     Inputs
     p_log_pdf  :  Anonymous function giving the log pdf of the target
                   distribution p.  Need not be normalized.  Should take a
@@ -149,9 +151,12 @@ def pmc(data, p_log_pdf, q_log_pdf, q_sample, θstart, n_steps, display=False):
 
         log_Z_steps[n] = z_max + np.log(sum_w) - np.log(w.size)
 
-        if display:
-            print(f'mean {np.mean(θ)}, std_dev {np.std(θ)}')
-
+        # TODO: fix this logging/printing 
+        # logging.info(f'mean {np.mean(θ)}, std_dev {np.std(θ)}')
+        # if display:
+        #     # TODO: I've not confirmed that this works
+        #     print(f'mean {np.mean(θ)}, std_dev {np.std(θ)}')
+            
     log_Z_steps_max = np.max(log_Z_steps)
     Zs = np.exp(log_Z_steps - log_Z_steps_max)
     log_Z = log_Z_steps_max + np.log(np.sum(Zs)) - np.log(log_Z_steps_max.size)

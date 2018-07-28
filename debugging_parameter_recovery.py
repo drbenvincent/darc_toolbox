@@ -1,6 +1,10 @@
 from darc.delayed import models
 from darc.designs import Kirby2009, Frye, DARC_Designs
 import numpy as np
+import logging
+
+
+logging.basicConfig(filename='test.log', level=logging.DEBUG)
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 design_thing = DARC_Designs(max_trials=5)
@@ -28,10 +32,10 @@ for trial in range(666):
     # update beliefs
     model.update_beliefs(design_thing.all_data)
 
-    print(f'trial {trial} complete')
+    logging.info(f'Trial {trial} complete')
 
 
-print('Parameter recovery completed: 😀 ✅')
+logging.info('Parameter recovery completed: 😀 ✅')
 
 model.export_posterior_histograms('zzz')
 design_thing.plot_all_data('zzz')
