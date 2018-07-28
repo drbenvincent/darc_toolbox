@@ -1,10 +1,16 @@
+# Point Python to the path where we have installed the bad and darc packages
+import sys
+sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
+
+
 from darc.delayed import models
 from darc.designs import Kirby2009, Frye, DARC_Designs
 import numpy as np
 import logging
 
 
-logging.basicConfig(filename='test.log', level=logging.DEBUG)
+logging.basicConfig(filename='test.log', level=logging.DEBUG, 
+                    format='%(asctime)s:%(levelname)s:%(funcName)s:%(message)s')
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 design_thing = DARC_Designs(max_trials=5)
@@ -12,7 +18,7 @@ design_thing = DARC_Designs(max_trials=5)
 #design_thing = Kirby2009()
 
 
-model = models.Hyperbolic(n_particles=10_000)  # was 50_000
+model = models.Hyperbolic(n_particles=50_000)  # was 50_000
 
 # set true model parameters, as a dataframe
 import pandas as pd
@@ -36,6 +42,7 @@ for trial in range(666):
 
 
 logging.info('Parameter recovery completed: 😀 ✅')
+print('Parameter recovery completed: 😀 ✅')
 
 model.export_posterior_histograms('zzz')
 design_thing.plot_all_data('zzz')
