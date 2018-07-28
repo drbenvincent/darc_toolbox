@@ -134,7 +134,7 @@ class Model(ABC):
 
     def __init__(self, n_particles):
         self.n_particles = n_particles
-
+        logging.debug(f'number of particles = {self.n_particles}')
         # FINISHING UP STUFF ==================================
         # NOTE `prior` and `θ_fixed` must be defined in the concrete model class before
         # we call this. I've not figures out how to demand these exist in this ABC yet
