@@ -12,7 +12,7 @@ import darc
 logging.basicConfig(filename='test.log', level=logging.DEBUG, 
                     format='%(asctime)s:%(levelname)s:%(funcName)s:%(message)s')
 
-DEFAULT_DB = np.concatenate([
+DA_ARRAY = np.concatenate([
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 12])/24,
     np.array([1, 2, 3, 4, 5, 6, 7]),
     np.array([2, 3, 4])*7,
@@ -20,7 +20,7 @@ DEFAULT_DB = np.concatenate([
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365])
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-design_thing = darc.designs.DARC_Designs(max_trials=10, DA=DEFAULT_DB)
+design_thing = darc.designs.DARC_Designs(max_trials=10, DA=DA_ARRAY)
 #design_thing = darc.designs.Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
 #design_thing = darc.designs.Kirby2009()
 
