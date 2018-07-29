@@ -76,8 +76,14 @@ def gui_get_desired_model(gui, core):
     elif expt_type['Experiment type'] is 'risky':
         models_available = risky_models_available
 
-    elif expt_type['Experiment type'] is 'delayed and risky':     
+    elif expt_type['Experiment type'] == 'delayed and risky':
         models_available = delayed_and_risky_models_available
+
+    else:
+        expt_type_value = expt_type['Experiment type']
+        print(expt_type_value)
+        logging.error(f'Value of experiment type ({expt_type_value}) not recognised')
+        raise ValueError('Filed to indentify selected experiment type')
 
     model_type = {'Model': models_available}
     dlg = gui.DlgFromDict(dictionary=model_type, title='Choose your model')
@@ -110,7 +116,7 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
         # import the appropriate set of models
         from darc.risky import models
 
-    elif desired_experiment_type is 'delayed and risky':
+    elif desired_experiment_type == 'delayed and risky':
         # create an appropriate design object
         design_thing = DARC_Designs(max_trials=expInfo['trials'],
                                     PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
@@ -135,7 +141,11 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
         model = models.ProspectTheory(n_particles=expInfo['particles'])
 
     elif desired_model is 'MultiplicativeHyperbolic':
-        model = models.MultiplicativeHyperbolic(
-            n_particles=expInfo['particles'])
+        model = models.MultiplicativeHyperbolic(n_particles=expInfo['particles'])
+
+    else:
+        logging.error(f'Value of desired_model ({desired_model}) not recognised')
+        raise ValueError('Filed to act on desired_model')
+
 
     return (design_thing, model)
