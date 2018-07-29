@@ -232,26 +232,12 @@ class Model(ABC):
         return p_chose_B
 
 
-    def get_simulated_response(self, design_tuple):
+    def get_simulated_response(self, design_df):
         '''
         Get simulated response for a given set of true parameter.
         This functionality is only needed when we are simulating experiment. It is not
         needed when we just want to run experiments on real participants.
         '''
-
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # TODO: this being here violates bad not knowing about darc
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        ''' Convert the named tuple into a 1-row pandas dataframe'''
-        trial_data = {'RA': [design_tuple.ProspectA.reward],
-                      'DA': [design_tuple.ProspectA.delay],
-                      'PA': [design_tuple.ProspectA.prob],
-                      'RB': [design_tuple.ProspectB.reward],
-                      'DB': [design_tuple.ProspectB.delay],
-                      'PB': [design_tuple.ProspectB.prob]}
-        design_df = pd.DataFrame.from_dict(trial_data)
-
         p_chose_B = self.predictive_y(self.θ_true, design_df)
         chose_B = random() < p_chose_B[0]
         return chose_B

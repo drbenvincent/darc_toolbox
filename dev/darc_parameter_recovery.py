@@ -1,3 +1,4 @@
+import darc
 from darc.delayed import models
 from darc.designs import Kirby2009, Frye, DARC_Designs
 
@@ -14,7 +15,8 @@ def parameter_recovery(θ_true,
 
     for trial in range(n_trials):
         design = design_thing.get_next_design(model)
-        response = model.get_simulated_response(design)
+        response = model.get_simulated_response(
+            darc.single_design_tuple_to_df(design))
         design_thing.enter_trial_design_and_response(design, response)
         model.update_beliefs(design_thing.all_data)
 
@@ -29,3 +31,4 @@ def parameter_recovery(θ_true,
 # TODO: add ability to run a parameter sweep
 
 # TODO: add ability to 
+

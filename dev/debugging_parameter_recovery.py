@@ -7,6 +7,7 @@ from darc.delayed import models
 from darc.designs import Kirby2009, Frye, DARC_Designs
 import numpy as np
 import logging
+import darc
 
 
 logging.basicConfig(filename='test.log', level=logging.DEBUG, 
@@ -31,7 +32,8 @@ for trial in range(666):
         break
 
     # simulated response
-    response = model.get_simulated_response(design)
+    design_df = darc.single_design_tuple_to_df(design)
+    response = model.get_simulated_response(design_df)
 
     design_thing.enter_trial_design_and_response(design, response)
 
