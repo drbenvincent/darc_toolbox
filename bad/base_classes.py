@@ -232,7 +232,7 @@ class Model(ABC):
         return p_chose_B
 
 
-    def _get_simulated_response(self, design_tuple):
+    def get_simulated_response(self, design_tuple):
         '''
         Get simulated response for a given set of true parameter.
         This functionality is only needed when we are simulating experiment. It is not

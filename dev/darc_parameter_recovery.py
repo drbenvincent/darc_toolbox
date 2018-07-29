@@ -14,7 +14,7 @@ def parameter_recovery(θ_true,
 
     for trial in range(n_trials):
         design = design_thing.get_next_design(model)
-        response = model._get_simulated_response(design)
+        response = model.get_simulated_response(design)
         design_thing.enter_trial_design_and_response(design, response)
         model.update_beliefs(design_thing.all_data)
 
