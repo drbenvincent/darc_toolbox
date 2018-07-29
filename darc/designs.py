@@ -250,7 +250,7 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
             raise ValueError('Expect all values of PB to be between 0-1')
         self.DA = DA
         self.DB = DB
-        self.RA = RB * np.linspace(0.1, 0.9, 9)
+        self.RA = RB * np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
         self.RB = RB
         self.PA = PA
         self.PB = PB
@@ -311,7 +311,7 @@ def remove_highly_predictable_designs(allowable_designs, model):
     # add p_chose_B as a column to allowable_designs
     allowable_designs['p_chose_B'] = pd.Series(p_chose_B)
     # label rows which are highly predictable
-    threshold = 0.01  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
+    threshold = 0.011  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
     highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
         allowable_designs['p_chose_B'] > 1 - threshold)
     allowable_designs['highly_predictable'] = pd.Series(highly_predictable)
