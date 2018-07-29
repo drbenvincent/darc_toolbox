@@ -5,3 +5,4 @@ psychopy/demo/data/*
 .vscode/*
 *.pdf
 *.log
+.pytest_cache/*
