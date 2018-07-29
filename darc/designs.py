@@ -123,10 +123,18 @@ class DARCDesign(DesignABC):
         # NOTE: list_of_lists must actually be a list of lists... even if there is only one
         # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
         all_combinations = list(itertools.product(*list_of_lists))
+
+        # convert to a DataFrame
+        D = pd.DataFrame(all_combinations, columns=column_list)
+
+        # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
+        D.drop(D[D.DA > D.DB].index, inplace=True)
+
         # TODO: we may want to do further trimming and refining of the possible
         # set of designs, based upon domain knowledge etc.
-        self.all_possible_designs = pd.DataFrame(
-            all_combinations, columns=column_list)
+
+        # set the values
+        self.all_possible_designs = D
 
 
 # CONCRETE DESIGN CLASSES BELOW ======================================================
