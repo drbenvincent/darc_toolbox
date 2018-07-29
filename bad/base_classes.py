@@ -30,9 +30,8 @@ class DesignABC(ABC):
     '''
 
     # NOTE: these should probably not be class attributes, but declared in the __init__
-    trial = 0
-    all_data = None
-    last_response = None
+    trial = int(0)
+    all_data = pd.DataFrame()
 
     @abstractmethod
     def get_next_design(self, model):
@@ -69,7 +68,7 @@ class BayesianAdaptiveDesign(ABC):
     '''An abstract base class for Bayesian Adaptive Design'''
 
     heuristic_order = None
-    all_possible_designs = None
+    all_possible_designs = pd.DataFrame()
 
     @abstractmethod
     def generate_all_possible_designs(self):
@@ -120,8 +119,8 @@ class Model(ABC):
     responding one way of the other.
     '''
 
-    prior = None
-    θ_fixed = None
+    prior = dict()
+    θ_fixed = dict()
     θ_true = None
 
     # Decide on the choice function we are using. I am going to focus on 
@@ -133,7 +132,7 @@ class Model(ABC):
     choiceFunction = CumulativeNormalChoiceFunc
 
     def __init__(self, n_particles):
-        self.n_particles = n_particles
+        self.n_particles = int(n_particles)
         logging.debug(f'number of particles = {self.n_particles}')
         # FINISHING UP STUFF ==================================
         # NOTE `prior` and `θ_fixed` must be defined in the concrete model class before

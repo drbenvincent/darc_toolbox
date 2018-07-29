@@ -57,8 +57,8 @@ class DARCDesign(DesignABC):
     - some basic plotting of the raw data
     '''
 
-    RA, DA, PA = None, None, None
-    RB, DB, PB = None, None, None
+    RA, DA, PA = list(), list(), list()
+    RB, DB, PB = list(), list(), list()
 
     def __init__(self):
         # generate empty `all_data`
@@ -240,7 +240,7 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
 
-    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=None, RB=np.array([100]), PA=[1], PB=[1], max_trials=20):
+    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=np.array([100]), PA=[1], PB=[1], max_trials=20):
         # NOTE! All design parameter inputs need to be as arrays, even if they consist
         # of a single values (eg DA=[0])
         super().__init__()
