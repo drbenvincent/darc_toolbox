@@ -4,22 +4,27 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, DARC_Designs
+import darc.designs
 import numpy as np
 import logging
 import darc
 
-
 logging.basicConfig(filename='test.log', level=logging.DEBUG, 
                     format='%(asctime)s:%(levelname)s:%(funcName)s:%(message)s')
 
+DEFAULT_DB = np.concatenate([
+    np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 12])/24,
+    np.array([1, 2, 3, 4, 5, 6, 7]),
+    np.array([2, 3, 4])*7,
+    np.array([3, 4, 5, 6, 8, 9])*30,
+    np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365])
+
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-design_thing = DARC_Designs(max_trials=20, DA=[0, 7, 14, 30, 365])
-#design_thing = Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
-#design_thing = Kirby2009()
+design_thing = darc.designs.DARC_Designs(max_trials=10, DA=DEFAULT_DB)
+#design_thing = darc.designs.Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
+#design_thing = darc.designs.Kirby2009()
 
-
-model = models.Hyperbolic(n_particles=10_000)  # was 50_000
+model = models.Hyperbolic(n_particles=5_000)  # was 50_000
 
 # set true model parameters, as a dataframe
 import pandas as pd
