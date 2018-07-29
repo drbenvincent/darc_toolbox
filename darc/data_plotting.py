@@ -72,7 +72,11 @@ def plot_delay_without_front_end_delays(ax, RA, DA, RB, DB, R):
 
 
 def plot_probability_data(ax, RA, PA, RB, PB, R):
-    ax.scatter(x=PB, y=RA / RB, c=R, alpha=0.5)
+    ax.scatter(x=PB[R == 0], y=RA[R == 0] / RB[R == 0],
+               c='b', alpha=0.5, label='chose A')
+    ax.scatter(x=PB[R == 1], y=RA[R == 1] / RB[R == 1],
+                c='r', alpha=0.5, label='chose B')
     ax.set_xlabel('probability (PB)')
     ax.set_ylabel('RA/RB')
-    ax.set_title('Plot by reward probability')
+    ax.legend()
+    ax.set_title('Plot by reward probability (Assumes PA=1=riskless)')
