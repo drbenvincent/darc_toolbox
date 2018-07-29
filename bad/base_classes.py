@@ -12,9 +12,10 @@ from bad.inference import update_beliefs
 from scipy.stats import norm, bernoulli
 from random import random
 from bad.choice_functions import CumulativeNormalChoiceFunc
-import matplotlib.pyplot as plt
 import logging
 import time
+from bad.triplot import tri_plot
+
 
 # DESIGN RELATED ===================================================================
 
@@ -245,17 +246,8 @@ class Model(ABC):
         '''Export pdf of marginal posteriors
         filename: expecting this to be a string of filename and experiment date & time.
         '''
-        n_params = len(self.prior)
-        fig, axes = plt.subplots(1, n_params, figsize=(9, 4), tight_layout=True)
-        for (axis, key) in zip(axes, self.θ.keys()):
-            axis.hist(self.θ[key], 100, density=1, facecolor='green', alpha=0.75)
-            axis.set_xlabel(key)
-            if self.θ_true is not None:
-                axis.axvline(x=self.θ_true[key][0],
-                             color='red', linestyle='--')
-        savename = filename + '_parameter_plot.pdf'
-        plt.savefig(savename)
-        logging.info(f'Posterior histograms exported: {savename}')
+        tri_plot(self.θ, filename, θ_true=self.θ_true, priors=self.prior)
+
 
     def get_θ_point_estimate(self):
         '''return a point estimate (posterior median) for the model parameters'''
