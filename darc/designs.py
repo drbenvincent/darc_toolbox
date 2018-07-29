@@ -268,7 +268,7 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
         # convert from a 1-row pandas dataframe to a Design named tuple
         chosen_design = df_to_design_tuple(chosen_design)
-
+        logging.debug(f'chosen design is: {chosen_design}')
         logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design
 
