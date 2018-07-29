@@ -240,7 +240,11 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
             raise ValueError('Expect all values of PB to be between 0-1')
         self.DA = DA
         self.DB = DB
-        self.RA = RB * np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
+        if len(RA)==0:
+            self.RA = RB * np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
+        else:
+            self.RA = RA
+            
         self.RB = RB
         self.PA = PA
         self.PB = PB

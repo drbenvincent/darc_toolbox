@@ -10,6 +10,7 @@ exactly what you want to run.
 
 
 import logging
+import numpy as np
 
 
 # define what is available
@@ -100,9 +101,12 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
 
     elif desired_experiment_type is 'risky':
         # create an appropriate design object
-        prob_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]
+        prob_list = [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99]
+
         design_thing = DARC_Designs(max_trials=expInfo['trials'],
-                                    DA=[0], DB=[0], PA=[1], PB=prob_list)
+                                    DA=[0], DB=[0], PA=[1], PB=prob_list,
+                                    RA=list(100*np.linspace(0.05, 0.95, 91)),
+                                    RB=[100])
         # import the appropriate set of models
         from darc.risky import models
 
