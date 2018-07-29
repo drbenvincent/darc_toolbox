@@ -57,9 +57,15 @@ def plot_delay_with_front_end_delays(ax, RA, DA, RB, DB, R):
 
 
 def plot_delay_without_front_end_delays(ax, RA, DA, RB, DB, R):
-    ax.scatter(x=DB, y=RA / RB, c=R, alpha=0.5)
+    ax.scatter(x=DB[R == 0], y=RA[R == 0] / RB[R == 0], 
+               c='b', alpha=0.5, label='chose A')
+    ax.scatter(x=DB[R == 1], y=RA[R == 1] / RB[R == 1],
+               c='r', alpha=0.5, label='chose B')
+    ax.legend()
     ax.set_xlabel('delay (days)')
     ax.set_ylabel('RA/RB')
+    ax.set_xscale('log')
+    ax.set_title('Plot for data without front-end delays')
 
 
 # RISKY PLOTS =========================================================
