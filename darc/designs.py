@@ -84,59 +84,7 @@ class DARCDesign(DesignABC):
 
     def plot_all_data(self, filename):
         '''Visualise data'''
-
         all_data_plotter(self.all_data, filename) 
-
-        # f, axes = plt.subplots(1, 2, figsize=(9, 4), tight_layout=True)
-
-        # #fig, axes = plt.subplots(1, 2, figsize=(9, 4), tight_layout=True)
-        
-        # # delay plot ===================================================
-        # if np.any(self.all_data.DA > 0):
-        #     # there are front end delays
-
-        #     # plot lines between pairs of prospects
-        #     n_points,_ = self.all_data.shape
-        #     for t in range(n_points):
-        #         axes[0].plot(x=np.array([self.all_data.DA.values[t], self.all_data.DB.values[t]]),
-        #                      y=np.array([self.all_data.RA.values[t], self.all_data.RB.values[t]]),
-        #                      c='b',
-        #                      linewidth=2)
-        #     #plt.show()
-        #     axes[0].scatter(x=self.all_data.DA.values,
-        #                     y=self.all_data.RA.values,
-        #                     c=self.all_data.R,
-        #                     alpha=0.5)
-        #     axes[0].scatter(x=self.all_data.DB.values,
-        #                     y=self.all_data.RB.values,
-        #                     c=self.all_data.R,
-        #                     alpha=0.5)
-        #     axes[0].set_xlabel('delay (days)')
-        #     axes[0].set_ylabel('reward')
-        #     axes[0].set_xscale('log')
-        #     axes[0].set_title('Plot for data with front-end delays')
-        # else:
-        #     # there are NO front end delays
-        #     axes[0].scatter(x=self.all_data.DB.values,
-        #                 y=self.all_data.RA.values / self.all_data.RB.values,
-        #                 c=self.all_data.R,
-        #                 alpha=0.5)
-
-        #     axes[0].set_xlabel('delay (days)')
-        #     axes[0].set_ylabel('RA/RB')
-
-        # # probability plot =============================================
-        # axes[1].scatter(x=self.all_data.PB.values,
-        #              y=self.all_data.RA.values / self.all_data.RB.values,
-        #              c=self.all_data.R,
-        #              alpha=0.5)
-        # axes[1].set_xlabel('probability (PB)')
-        # axes[1].set_ylabel('RA/RB')
-        # axes[1].set_title('Plot by reward probability')
-
-        # savename = filename + '_data_plot.pdf'
-        # plt.savefig(savename)
-        # logging.info(f'Data plot saved as: {savename}')
 
     def generate_all_possible_designs(self):
         '''Create a dataframe of all possible designs (one design is one row) based upon
