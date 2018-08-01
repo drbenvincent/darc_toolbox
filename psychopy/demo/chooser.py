@@ -16,11 +16,16 @@ import numpy as np
 # define what is available
 expt_type = {'Experiment type': ['delayed', 'risky', 'delayed and risky']}
 
-delay_models_available = ['Hyperbolic', 'Exponential', 'MyersonHyperboloid',
-                         'ProportionalDifference']
+delay_models_available = ['Hyperbolic', 'Exponential',
+                          'HyperbolicMagnitudeEffect',
+                          'ExponentialMagnitudeEffect',
+                          'MyersonHyperboloid',
+                          'ProportionalDifference',
+                          'HyperbolicNonLinearUtility']
 
 risky_models_available = ['Hyperbolic',
-                          'ProportionalDifference', 'ProspectTheory']
+                          'ProportionalDifference',
+                          'ProspectTheory']
 
 delayed_and_risky_models_available = ['MultiplicativeHyperbolic']
 
@@ -132,7 +137,7 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
         model = models.Exponential(n_particles=expInfo['particles'])
 
     elif desired_model is 'MyersonHyperboloid':
-        model = models.Exponential(n_particles=expInfo['particles'])
+        model = models.MyersonHyperboloid(n_particles=expInfo['particles'])
 
     elif desired_model is 'ProportionalDifference':
         model = models.ProportionalDifference(n_particles=expInfo['particles'])
@@ -140,8 +145,20 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
     elif desired_model is 'ProspectTheory':
         model = models.ProspectTheory(n_particles=expInfo['particles'])
 
+    elif desired_model is 'HyperbolicMagnitudeEffect':
+        model = models.HyperbolicMagnitudeEffect(n_particles=expInfo['particles'])
+
+    elif desired_model is 'ExponentialMagnitudeEffect':
+        model = models.ExponentialMagnitudeEffect(
+            n_particles=expInfo['particles'])
+
+    elif desired_model is 'HyperbolicNonLinearUtility':
+        model = models.HyperbolicNonLinearUtility(
+            n_particles=expInfo['particles'])
+    
     elif desired_model is 'MultiplicativeHyperbolic':
-        model = models.MultiplicativeHyperbolic(n_particles=expInfo['particles'])
+        model = models.MultiplicativeHyperbolic(
+            n_particles=expInfo['particles'])
 
     else:
         logging.error(f'Value of desired_model ({desired_model}) not recognised')
