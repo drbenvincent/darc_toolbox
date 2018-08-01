@@ -13,6 +13,7 @@ from darc.data_plotting import all_data_plotter
 
 
 DEFAULT_DB = np.concatenate([
+    np.array([1, 2, 5, 10, 15, 30, 45])/24/60,
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 12])/24,
     np.array([1, 2, 3, 4, 5, 6, 7]),
     np.array([2, 3, 4])*7,
