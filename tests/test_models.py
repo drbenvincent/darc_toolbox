@@ -75,3 +75,22 @@ def test_update_beliefs(model):
     model_instance.update_beliefs(all_data)
     # basically checking model_instance is a model and that we've not errored by this point
     assert isinstance(model_instance, model)
+
+
+@pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
+def test_get_simulated_response(model):
+    # set up model
+    n_particles = 100
+    model_instance = model(n_particles=n_particles)
+    
+    # Generate some made up true parameters by sampling from the model's priors
+    particles_dict = {key: model_instance.prior[key].rvs(
+        size=1) for key in model_instance.parameter_names}
+    model.θ_true = pd.DataFrame.from_dict(particles_dict)
+
+    faux_design = pd.DataFrame({'RA': [100], 'DA': [0], 'PA': [1],
+                                'RB': [150], 'DB': [14], 'PB': [1]})
+
+    response = model_instance.get_simulated_response(faux_design)
+    isinstance(response, bool)
+
