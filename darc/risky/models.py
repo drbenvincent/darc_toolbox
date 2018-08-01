@@ -62,9 +62,9 @@ class ProportionalDifference(Model):
         prop_risk = self._proportion(
             data['PA'].values, data['PB'].values)
 
-        prop_difference = (prop_reward - prop_risk)
-        decision_axis = prop_difference + θ['δ']
-        return decision_axis
+        prop_difference = prop_reward - prop_risk
+        decision_variable = prop_difference + θ['δ'].values
+        return decision_variable
 
     @staticmethod
     def _max_abs(x, y):

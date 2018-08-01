@@ -90,8 +90,8 @@ class HyperbolicMagnitudeEffect(Model):
         # process inputs
         delay = delay.astype('float')
         reward = reward.astype('float')
-        m = θ['m']
-        c = θ['c']
+        m = θ['m'].values
+        c = θ['c'].values
         # magnitude effect
         k = np.exp( m * np.log(reward) + c )
         # HYPERBOLIC discounting of time
@@ -127,8 +127,8 @@ class ExponentialMagnitudeEffect(Model):
         # process inputs
         delay = delay.astype('float')
         reward = reward.astype('float')
-        m = θ['m']
-        c = θ['c']
+        m = θ['m'].values
+        c = θ['c'].values
         # magnitude effect
         k = np.exp(m * np.log(reward) + c)
         # EXPONENTIAL discounting of time
@@ -185,8 +185,8 @@ class MyersonHyperboloid(Model):
     def _time_discount_func(delay, θ):
         # NOTE: we want k as a row matrix, and delays as a column matrix to do the
         # appropriate array broadcasting.
-        k = np.exp(θ['logk'])
-        s = θ['s']
+        k = np.exp(θ['logk'].values)
+        s = θ['s'].values
         return 1 / np.power(1 + k * delay, s)
 
 
@@ -213,9 +213,9 @@ class ProportionalDifference(Model):
         prop_delay = self._proportion(
             data['DA'].values, data['DB'].values)
         
-        prop_difference = (prop_reward - prop_delay)
-        decision_axis = prop_difference + θ['δ']
-        return decision_axis
+        prop_difference = prop_reward - prop_delay
+        decision_variable = prop_difference + θ['δ'].values
+        return decision_variable
 
     @staticmethod
     def _max_abs(x, y):
