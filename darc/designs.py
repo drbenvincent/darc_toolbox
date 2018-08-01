@@ -87,7 +87,7 @@ class DARCDesign(DesignABC):
         '''Visualise data'''
         all_data_plotter(self.all_data, filename) 
 
-    def generate_all_possible_designs(self):
+    def generate_all_possible_designs(self, assume_discounting=True):
         '''Create a dataframe of all possible designs (one design is one row) based upon
         the set of design variables (RA, DA, PA, RB, DB, PB) provided.
         '''
@@ -112,6 +112,9 @@ class DARCDesign(DesignABC):
 
         # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
         D.drop(D[D.DA > D.DB].index, inplace=True)
+
+        if assume_discounting:
+            D.drop(D[D.RB < D.RA].index, inplace=True)
 
         # TODO: we may want to do further trimming and refining of the possible
         # set of designs, based upon domain knowledge etc.
