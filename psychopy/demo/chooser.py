@@ -107,7 +107,7 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
     if desired_experiment_type is 'delayed':
         # regular, or magnitude effect
         if desired_model is 'HyperbolicMagnitudeEffect' or 'ExponentialMagnitudeEffect':
-            RB = list([10, 100, 500, 1_000])
+            RB = [10, 100, 500, 1_000]
             design_thing = DARC_Designs(max_trials=expInfo['trials'], RB=RB)
         else:
             design_thing = DARC_Designs(max_trials=expInfo['trials'])

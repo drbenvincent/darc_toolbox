@@ -32,6 +32,13 @@ def test_Frye_custom1_instantiation():
 def test_DARC_Designs_delay_instantiation():    
     design_thing = DARC_Designs(max_trials=3,
                                 RA=list(100*np.linspace(0.05, 0.95, 91)),
+                                RB=[100])
+    assert isinstance(design_thing, DARC_Designs)
+
+
+def test_DARC_Designs_delay_magnitide_effect_instantiation():
+    # we want more RB values for magnitude effects
+    design_thing = DARC_Designs(max_trials=3,
                                 RB=[70, 80, 90, 100, 110, 120, 130])
     assert isinstance(design_thing, DARC_Designs)
 
