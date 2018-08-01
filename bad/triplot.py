@@ -29,9 +29,9 @@ def tri_plot(θ, filename, θ_true=None, priors=None):
                 axes[row, col].scatter(θ[col_key], θ[row_key], alpha=0.1)
                 if θ_true is not None:
                     axes[row, col].axvline(
-                        x=θ_true[col_key], color='k', linestyle='-')
+                        x=θ_true[col_key][0], color='k', linestyle='-')
                     axes[row, col].axhline(
-                        y=θ_true[row_key], color='k', linestyle='-')
+                        y=θ_true[row_key][0], color='k', linestyle='-')
                 axes[row, col].set_xlabel(col_key)
                 axes[row, col].set_ylabel(row_key)
             
