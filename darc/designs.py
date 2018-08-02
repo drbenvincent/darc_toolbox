@@ -50,7 +50,7 @@ def df_to_design_tuple(df):
 
 ## ANOTHER BASE CLASS: Users not to change this
 
-class DARCDesignABC(DesignABC):
+class DARCDesignABC(DesignABC, ABC):
     '''
     Another abstract base class which extends the basic design class, adding
     specialisations for our DARC domain. This includes:
