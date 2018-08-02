@@ -50,7 +50,7 @@ def df_to_design_tuple(df):
 
 ## ANOTHER BASE CLASS: Users not to change this
 
-class DARCDesign(DesignABC):
+class DARCDesignABC(DesignABC):
     '''
     Another abstract base class which extends the basic design class, adding
     specialisations for our DARC domain. This includes:
@@ -131,7 +131,7 @@ class DARCDesign(DesignABC):
 
 # CONCRETE DESIGN CLASSES BELOW ======================================================
 
-class Kirby2009(DARCDesign):
+class Kirby2009(DARCDesignABC):
     '''
     A class to provide designs from the Kirby (2009) delay discounting task.
 
@@ -163,7 +163,7 @@ class Kirby2009(DARCDesign):
             return None
 
 
-class Frye(DARCDesign):
+class Frye(DARCDesignABC):
     '''
     A class to provide designs based on the Frye et al (2016) protocol.
 
@@ -235,7 +235,7 @@ class Frye(DARCDesign):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
+class DARC_Designs(DARCDesignABC, BayesianAdaptiveDesign):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
