@@ -18,7 +18,7 @@ DEFAULT_DB = np.concatenate([
     np.array([1, 2, 3, 4, 5, 6, 7]),
     np.array([2, 3, 4])*7,
     np.array([3, 4, 5, 6, 8, 9])*30,
-    np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365])
+    np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365]).tolist()
        
 # define useful data structures
 Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
@@ -240,27 +240,56 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
 
-    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=np.array([100]), PA=[1], PB=[1], max_trials=20):
-        # NOTE! All design parameter inputs need to be as arrays, even if they consist
-        # of a single values (eg DA=[0])
+    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100], 
+                 PA=[1], PB=[1], max_trials=20):
         super().__init__()
-        if np.any((np.array(PA) < 0) | (np.array(PA) > 1)):
-            raise ValueError('Expect all values of PA to be between 0-1')
-        if np.any((np.array(PB) < 0) | (np.array(PB) > 1)):
-            raise ValueError('Expect all values of PB to be between 0-1')
+
+        
+        self._input_type_validation(RA, DA, PA, RB, DB, PB)
+        self._input_value_validation(PA, PB, DA, DB)
+        RA, DA, PA, RB, DB, PB = self._apply_logic_to_design_space_spec(RA, DA, PA, RB, DB, PB)  
+
         self.DA = DA
         self.DB = DB
-        if len(RA) == 0:
-            # we have vector RB
-            self.RA = list(np.array(RB) * np.linspace(0.05, 0.95, 19))  # [5, 10, 15, .... 95]
-        else:
-            self.RA = RA
-            
+        self.RA = RA
         self.RB = RB
         self.PA = PA
         self.PB = PB
-        self.generate_all_possible_designs()
         self.max_trials = max_trials
+
+        self.generate_all_possible_designs()
+
+    def _apply_logic_to_design_space_spec(self, RA, DA, PA, RB, DB, PB):
+        '''Apply our domain specific logic to the design space specs provided'''
+        # go through logic based on inputs
+        if len(RA) == 0:
+            # we have vector RB
+            RA_over_RB = np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
+            RA = list(np.array(RB) * RA_over_RB)  
+        return RA, DA, PA, RB, DB, PB
+
+    def _input_type_validation(self, RA, DA, PA, RB, DB, PB):
+        # NOTE: possibly not very Pythonic
+        assert isinstance(RA, list), "RA should be a list"
+        assert isinstance(DA, list), "DA should be a list"
+        assert isinstance(PA, list), "PA should be a list"
+        assert isinstance(RB, list), "RB should be a list"
+        assert isinstance(DB, list), "DB should be a list"
+        assert isinstance(PB, list), "PB should be a list"
+        
+    def _input_value_validation(self, PA, PB, DA, DB):
+        '''Confirm values of provided design space specs are valid'''
+        if np.any((np.array(PA) < 0) | (np.array(PA) > 1)):
+            raise ValueError('Expect all values of PA to be between 0-1')
+
+        if np.any((np.array(PB) < 0) | (np.array(PB) > 1)):
+            raise ValueError('Expect all values of PB to be between 0-1')
+
+        if np.any(np.array(DA) < 0):
+            raise ValueError('Expecting all values of DA to be >= 0')
+
+        if np.any(np.array(DB) < 0):
+            raise ValueError('Expecting all values of DB to be >= 0')
 
     def get_next_design(self, model):
 
