@@ -121,6 +121,10 @@ class DARCDesign(DesignABC):
         # NOTE: we may want to do further trimming and refining of the possible
         # set of designs, based upon domain knowledge etc.
 
+        # check we actually have some designs!
+        if D.shape[0] == 0:
+            logging.error(f'No ({D.shape[0]}) designs generated!')
+
         # set the values
         self.all_possible_designs = D
 
@@ -289,6 +293,9 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
 
         allowable_designs = remove_highly_predictable_designs(
             allowable_designs, model)
+
+        if allowable_designs.shape[0] == 0:
+            logging.error(f'No ({allowable_designs.shape[0]}) designs left')
 
         if allowable_designs.shape[0] < 10:
             logging.warning(f'Very few ({allowable_designs.shape[0]}) designs left')
