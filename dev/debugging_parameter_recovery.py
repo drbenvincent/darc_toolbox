@@ -4,7 +4,7 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, DARC_Designs
+from darc.designs import Kirby2009, Frye, DARCDesign
 import numpy as np
 import logging
 import darc
@@ -14,12 +14,12 @@ logging.basicConfig(filename='test.log', level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(funcName)s:%(message)s')
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-design_thing = DARC_Designs(max_trials=20)
+design_thing = DARCDesign(max_trials=5)
 #design_thing = Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
 #design_thing = Kirby2009()
 
 
-model = models.Hyperbolic(n_particles=10_000)  # was 50_000
+model = models.Hyperbolic(n_particles=1_000)  # was 50_000
 
 # set true model parameters, as a dataframe
 import pandas as pd

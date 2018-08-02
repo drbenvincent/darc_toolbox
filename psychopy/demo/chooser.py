@@ -30,7 +30,7 @@ risky_models_available = ['Hyperbolic',
 delayed_and_risky_models_available = ['MultiplicativeHyperbolic']
 
 
-def gui_chooser_for_demo(win, gui, core, event, DARC_Designs, expInfo):
+def gui_chooser_for_demo(win, gui, core, event, DARCDesign, expInfo):
     '''
     Get user choices about (design, model) combination and generate
     the appropriate objects
@@ -40,7 +40,7 @@ def gui_chooser_for_demo(win, gui, core, event, DARC_Designs, expInfo):
     desired_experiment_type = gui_get_desired_experiment_type(gui, core)
     desired_model = gui_get_desired_model(gui, core)
     design_thing, model = act_on_choices(
-        desired_experiment_type, desired_model, DARC_Designs, expInfo)
+        desired_experiment_type, desired_model, DARCDesign, expInfo)
     show_window(win, mouse)
     return (design_thing, model)
 
@@ -100,7 +100,7 @@ def gui_get_desired_model(gui, core):
     return desired_model
 
 
-def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo):
+def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
 
     # create desired experiment object
 
@@ -108,9 +108,9 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
         # regular, or magnitude effect
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
             RB = [10, 100, 500, 1_000]
-            design_thing = DARC_Designs(max_trials=expInfo['trials'], RB=RB)
+            design_thing = DARCDesign(max_trials=expInfo['trials'], RB=RB)
         else:
-            design_thing = DARC_Designs(max_trials=expInfo['trials'])
+            design_thing = DARCDesign(max_trials=expInfo['trials'])
         
         # import the appropriate set of models
         from darc.delayed import models
@@ -119,7 +119,7 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
         # create an appropriate design object
         prob_list = [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99]
 
-        design_thing = DARC_Designs(max_trials=expInfo['trials'],
+        design_thing = DARCDesign(max_trials=expInfo['trials'],
                                     DA=[0], DB=[0], PA=[1], PB=prob_list,
                                     RA=list(100*np.linspace(0.05, 0.95, 91)),
                                     RB=[100])
@@ -128,7 +128,7 @@ def act_on_choices(desired_experiment_type, desired_model, DARC_Designs, expInfo
 
     elif desired_experiment_type == 'delayed and risky':
         # create an appropriate design object
-        design_thing = DARC_Designs(max_trials=expInfo['trials'],
+        design_thing = DARCDesign(max_trials=expInfo['trials'],
                                     PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
         # import the appropriate set of models
         from darc.delayed_and_risky import models

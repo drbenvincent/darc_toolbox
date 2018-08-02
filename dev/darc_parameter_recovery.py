@@ -5,7 +5,7 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 import darc
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, DARC_Designs
+from darc.designs import Kirby2009, Frye, DARCDesign
 import pandas as pd
 import numpy as np
 

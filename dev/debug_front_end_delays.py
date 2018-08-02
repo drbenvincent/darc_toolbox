@@ -20,7 +20,7 @@ DA_ARRAY = np.concatenate([
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365])
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-design_thing = darc.designs.DARC_Designs(max_trials=10, DA=DA_ARRAY)
+design_thing = darc.designs.DARCDesign(max_trials=10, DA=DA_ARRAY)
 #design_thing = darc.designs.Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
 #design_thing = darc.designs.Kirby2009()
 

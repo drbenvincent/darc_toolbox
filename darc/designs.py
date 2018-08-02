@@ -235,7 +235,7 @@ class Frye(DARCDesignABC):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class DARC_Designs(DARCDesignABC, BayesianAdaptiveDesign):
+class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
