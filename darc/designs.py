@@ -91,9 +91,6 @@ class DARCDesignABC(DesignABC, ABC):
         '''Create a dataframe of all possible designs (one design is one row) based upon
         the set of design variables (RA, DA, PA, RB, DB, PB) provided.
         '''
-        # NOTE: the order of the two lists below HAVE to be the same
-        column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
-        list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
 
         # Log the raw values to help with debugging
         logging.debug(f'provided RA = {self.RA}')
@@ -102,13 +99,36 @@ class DARCDesignABC(DesignABC, ABC):
         logging.debug(f'provided RB = {self.RB}')
         logging.debug(f'provided DB = {self.DB}')
         logging.debug(f'provided PB = {self.PB}')
+        logging.debug(f'provided RA_over_RB = {self.RA_over_RB}')
 
-        # NOTE: list_of_lists must actually be a list of lists... even if there is only one
-        # value being considered for a particular design variable (DA=0) for example, should dbe DA=[0]
-        all_combinations = list(itertools.product(*list_of_lists))
-        D = pd.DataFrame(all_combinations, columns=column_list)
-        logging.debug(
-            f'{D.shape[0]} designs generated initially')
+        if not self.RA_over_RB:
+            '''assuming we are not doing magnitude effect, as this is
+            when we normally would be providing RA_over_RB values'''
+
+            # NOTE: the order of the two lists below HAVE to be the same
+            column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
+            list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
+            all_combinations = list(itertools.product(*list_of_lists))
+            D = pd.DataFrame(all_combinations, columns=column_list)
+
+        elif not self.RA:
+            '''now assume we are dealing with magnitude effect'''
+
+            # create all designs, but using RA_over_RB
+            column_list = ['RA_over_RB', 'DA', 'PA', 'RB', 'DB', 'PB']
+            list_of_lists = [self.RA_over_RB, self.DA, self.PA, self.RB, self.DB, self.PB]
+            all_combinations = list(itertools.product(*list_of_lists))
+            D = pd.DataFrame(all_combinations, columns=column_list)
+
+            # now we will convert RA_over_RB to RA for each design then remove it
+            D['RA'] = D['RB'] * D['RA_over_RB']
+            D = D.drop(columns=['RA_over_RB'])
+
+        else:
+            logging.error('Failed to work out what we want. Confusion over RA and RA_over_RB')            
+
+        
+        logging.debug(f'{D.shape[0]} designs generated initially')
 
         # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
         D.drop(D[D.DA > D.DB].index, inplace=True)
@@ -241,13 +261,12 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
     '''
 
     def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100], 
-                 PA=[1], PB=[1], max_trials=20):
-        super().__init__()
+                 RA_over_RB=list(), PA=[1], PB=[1], max_trials=20):
+        super().__init__()     
 
-        
-        self._input_type_validation(RA, DA, PA, RB, DB, PB)
-        self._input_value_validation(PA, PB, DA, DB)
-        RA, DA, PA, RB, DB, PB = self._apply_logic_to_design_space_spec(RA, DA, PA, RB, DB, PB)  
+        self._input_type_validation(RA, DA, PA, RB, DB, PB, RA_over_RB)
+        self._input_value_validation(PA, PB, DA, DB, RA_over_RB)
+        RA, DA, PA, RB, DB, PB = self._apply_logic_to_design_space_spec(RA, DA, PA, RB, DB, PB, RA_over_RB)  
 
         self.DA = DA
         self.DB = DB
@@ -255,20 +274,22 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         self.RB = RB
         self.PA = PA
         self.PB = PB
+        self.RA_over_RB = RA_over_RB
         self.max_trials = max_trials
 
         self.generate_all_possible_designs()
 
-    def _apply_logic_to_design_space_spec(self, RA, DA, PA, RB, DB, PB):
+    def _apply_logic_to_design_space_spec(self, RA, DA, PA, RB, DB, PB, RA_over_RB):
         '''Apply our domain specific logic to the design space specs provided'''
-        # go through logic based on inputs
-        if len(RA) == 0:
-            # we have vector RB
-            RA_over_RB = np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
-            RA = list(np.array(RB) * RA_over_RB)  
-        return RA, DA, PA, RB, DB, PB
+        pass
+        # # deal with magnitude effect, where we are providing RA_over_RB instead of RA
+        # if len(RA) == 0:
+        #     # we have vector RB
+        #     RA_over_RB = np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
+        #     RA = list(np.array(RB) * RA_over_RB)  
+        # return RA, DA, PA, RB, DB, PB
 
-    def _input_type_validation(self, RA, DA, PA, RB, DB, PB):
+    def _input_type_validation(self, RA, DA, PA, RB, DB, PB, RA_over_RB):
         # NOTE: possibly not very Pythonic
         assert isinstance(RA, list), "RA should be a list"
         assert isinstance(DA, list), "DA should be a list"
@@ -276,8 +297,17 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         assert isinstance(RB, list), "RB should be a list"
         assert isinstance(DB, list), "DB should be a list"
         assert isinstance(PB, list), "PB should be a list"
+        assert isinstance(RA_over_RB, list), "RA_over_RB should be a list"
+
+        # we expect EITHER values in RA OR values in RA_over_RB
+        if not RA:
+            assert not RA_over_RB is False, "If not providing list for RA, we expect a list for RA_over_RB"
         
-    def _input_value_validation(self, PA, PB, DA, DB):
+        if not RA_over_RB:
+            assert not RA is False, "If not providing list for RA_over_RB, we expect a list for RA"
+
+
+    def _input_value_validation(self, PA, PB, DA, DB, RA_over_RB):
         '''Confirm values of provided design space specs are valid'''
         if np.any((np.array(PA) < 0) | (np.array(PA) > 1)):
             raise ValueError('Expect all values of PA to be between 0-1')
@@ -290,6 +320,9 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
 
         if np.any(np.array(DB) < 0):
             raise ValueError('Expecting all values of DB to be >= 0')
+
+        if np.any((np.array(RA_over_RB) < 0) | (np.array(RA_over_RB) > 1)):
+            raise ValueError('Expect all values of RA_over_RB to be between 0-1')
 
     def get_next_design(self, model):
 

@@ -37,9 +37,13 @@ def test_DARCDesign_delay_instantiation():
 
 
 def test_DARCDesign_delay_magnitude_effect_instantiation():
-    # we want more RB values for magnitude effects
+    '''When we are investigating the magnitide effect, we want to ask for a 
+    reasonable range of DB values. When we do this, we are going to provide
+    a vector of proportions (RA_over_RB) which will be translated into 
+    actual RA values. '''
     design_thing = DARCDesign(max_trials=3,
-                                RB=[70, 80, 90, 100, 110, 120, 130])
+                              RB=[10, 100, 1_000],
+                              RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
     assert isinstance(design_thing, DARCDesign)
 
 
