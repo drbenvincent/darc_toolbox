@@ -290,6 +290,9 @@ class DARC_Designs(DARCDesign, BayesianAdaptiveDesign):
         allowable_designs = remove_highly_predictable_designs(
             allowable_designs, model)
 
+        if allowable_designs.shape[0] < 10:
+            logging.warning(f'Very few ({allowable_designs.shape[0]}) designs left')
+
         return allowable_designs
 
 
