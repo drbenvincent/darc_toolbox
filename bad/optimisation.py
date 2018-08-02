@@ -84,6 +84,8 @@ def design_optimisation(designs, predictive_y, θ,
     nD, _ = designs.shape
     nT,_ = θ.shape
 
+    assert nD > 0, "No designs provided!"
+
     # This will keep track of "target" function for the optimization at each of
     # the candidate points
     U = (1/nD)*np.ones(nD)
