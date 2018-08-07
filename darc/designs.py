@@ -317,13 +317,14 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         if np.any((np.array(RA_over_RB) < 0) | (np.array(RA_over_RB) > 1)):
             raise ValueError('Expect all values of RA_over_RB to be between 0-1')
 
-    def get_next_design(self, model):
+    def get_next_design(self, model, random_choice_dimension=None):
 
         if self.trial > self.max_trials - 1:
             return None
         start_time = time.time()
         logging.info(f'Getting design for trial {self.trial}')
-        allowable_designs = self.refine_design_space(model)
+        allowable_designs = self.refine_design_space(
+            model, random_choice_dimension=random_choice_dimension)
         # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
         chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
         # convert from a 1-row pandas dataframe to a Design named tuple
@@ -332,7 +333,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design
 
-    def refine_design_space(self, model, NO_REPEATS=True):
+    def refine_design_space(self, model, NO_REPEATS=True, random_choice_dimension=None):
         '''A series of filter operations to refine down the space of designs which we
         do design optimisations on.'''
         
@@ -345,7 +346,11 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
 
         # apply a heuristic here to promote good spread of designs based on domain-specific
         # knowledge for DARC
-        allowable_designs = choose_one_along_design_dimension(allowable_designs, 'DB')
+        if random_choice_dimension is not None:
+            allowable_designs = choose_one_along_design_dimension(
+                allowable_designs, random_choice_dimension)
+            logging.debug(
+                f'{allowable_designs.shape[0]} designs remain after choose_one_along_design_dimension with {random_choice_dimension}')
 
         allowable_designs = remove_highly_predictable_designs(
             allowable_designs, model)

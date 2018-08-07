@@ -29,7 +29,7 @@ import pandas as pd
 model.θ_true = pd.DataFrame.from_dict({'logk': [np.log(1/365)], 'α': [2]})
 
 for trial in range(666):
-    design = design_thing.get_next_design(model)
+    design = design_thing.get_next_design(model, random_choice_dimension='DB')
     
     if design is None:
         break
