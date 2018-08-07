@@ -10,6 +10,7 @@ import copy
 import logging
 import time
 from darc.data_plotting import all_data_plotter
+import random
 
 
 DEFAULT_DB = np.concatenate([
@@ -278,7 +279,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         self.max_trials = max_trials
 
         self.generate_all_possible_designs()
-        
+
 
     def _input_type_validation(self, RA, DA, PA, RB, DB, PB, RA_over_RB):
         # NOTE: possibly not very Pythonic
@@ -291,6 +292,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         assert isinstance(RA_over_RB, list), "RA_over_RB should be a list"
 
         # we expect EITHER values in RA OR values in RA_over_RB
+        # assert (not RA) ^ (not RA_over_RB), "Expecting EITHER RA OR RA_over_RB as an" 
         if not RA:
             assert not RA_over_RB is False, "If not providing list for RA, we expect a list for RA_over_RB"
         
@@ -331,11 +333,8 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         return chosen_design
 
     def refine_design_space(self, model, NO_REPEATS=True):
-        '''
-        This will implement something very simular to our initial Matlab implementation written 
-        by Tom Rainforth.
-        https://github.com/drbenvincent/darc-experiments-matlab/blob/master/darc-experiments/response_error_types/%40ChoiceFuncPsychometric/generate_designs.m
-        '''
+        '''A series of filter operations to refine down the space of designs which we
+        do design optimisations on.'''
         
         allowable_designs = copy.copy(self.all_possible_designs)
         logging.debug(f'{allowable_designs.shape[0]} designs initially')
@@ -343,6 +342,10 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         if NO_REPEATS and self.trial>1:
             allowable_designs = remove_trials_already_run(
                 allowable_designs, self.all_data.drop(columns=['R']))
+
+        # apply a heuristic here to promote good spread of designs based on domain-specific
+        # knowledge for DARC
+        allowable_designs = choose_one_along_design_dimension(allowable_designs, 'DB')
 
         allowable_designs = remove_highly_predictable_designs(
             allowable_designs, model)
@@ -399,4 +402,19 @@ def remove_highly_predictable_designs(allowable_designs, model):
 
     allowable_designs.drop(columns=['p_chose_B'])
     logging.debug(f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
+    return allowable_designs
+
+
+def choose_one_along_design_dimension(allowable_designs, design_dim_name):
+    '''We are going to take one design dimension given by `design_dim_name` and randomly
+    pick one of it's values and hold it constant by removing all others from the list of
+    allowable_designs.
+    The purpose of this is to promote variation along the chosen design dimension. 
+    Cutting down the set of allowable_designs which we do design optimisation on is a 
+    nice side-effect rather than a direct goal.
+    '''
+    unique_values = allowable_designs[design_dim_name].unique()
+    chosen_value = random.choice(unique_values)
+    # filter by chosen value of this dimension
+    allowable_designs = allowable_designs.loc[allowable_designs[design_dim_name] == chosen_value]
     return allowable_designs
