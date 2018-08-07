@@ -111,7 +111,8 @@ def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
             design_thing = DARCDesign(max_trials=expInfo['trials'], RB=RB,
                                       RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
         else:
-            design_thing = DARCDesign(max_trials=expInfo['trials'])
+            design_thing = DARCDesign(max_trials=expInfo['trials'],
+                                      RA=list(100*np.linspace(0.05, 0.95, 91)))
         
         # import the appropriate set of models
         from darc.delayed import models
