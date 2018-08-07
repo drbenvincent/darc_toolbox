@@ -267,7 +267,6 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
 
         self._input_type_validation(RA, DA, PA, RB, DB, PB, RA_over_RB)
         self._input_value_validation(PA, PB, DA, DB, RA_over_RB)
-        RA, DA, PA, RB, DB, PB = self._apply_logic_to_design_space_spec(RA, DA, PA, RB, DB, PB, RA_over_RB)  
 
         self.DA = DA
         self.DB = DB
@@ -279,15 +278,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         self.max_trials = max_trials
 
         self.generate_all_possible_designs()
-
-    def _apply_logic_to_design_space_spec(self, RA, DA, PA, RB, DB, PB, RA_over_RB):
-        '''Apply our domain specific logic to the design space specs provided'''
-        # deal with magnitude effect, where we are providing RA_over_RB instead of RA
-        # if len(RA) == 0:
-        #     # we have vector RB
-        #     RA_over_RB = np.linspace(0.05, 0.95, 19)  # [5, 10, 15, .... 95]
-        #     RA = list(np.array(RB) * RA_over_RB)  
-        return RA, DA, PA, RB, DB, PB
+        
 
     def _input_type_validation(self, RA, DA, PA, RB, DB, PB, RA_over_RB):
         # NOTE: possibly not very Pythonic
