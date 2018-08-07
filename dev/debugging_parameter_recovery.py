@@ -14,7 +14,10 @@ logging.basicConfig(filename='test.log', level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(funcName)s:%(message)s')
 
 # CHOSE THE DESIGN METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-design_thing = DARCDesign(max_trials=5)
+design_thing = DARCDesign(max_trials=5,
+                          RA=list(100*np.linspace(0.05, 0.95, 91)))
+
+assert design_thing.all_possible_designs.shape[0] > 0
 #design_thing = Frye(DB=[7, 30, 30*6, 365], trials_per_delay=7)
 #design_thing = Kirby2009()
 
