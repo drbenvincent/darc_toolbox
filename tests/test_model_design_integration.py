@@ -39,6 +39,9 @@ def test_model_design_integration():
                               RA=list(100*np.linspace(0.05, 0.95, 10)))
 
     model = models.Hyperbolic(n_particles=100) 
-    model.θ_true = pd.DataFrame.from_dict({'logk': [np.log(1/365)], 'α': [2]})
+
+    # Generate some made up true parameters by sampling from the model's priors
+    particles_dict = {key: model.prior[key].rvs(size=1) for key in model.parameter_names}
+    model.θ_true = pd.DataFrame.from_dict(particles_dict)
 
     simulated_experiment_trial_loop(design_thing, model)
