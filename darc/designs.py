@@ -267,7 +267,9 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
     '''
 
     def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100], 
-                 RA_over_RB=list(), PA=[1], PB=[1], max_trials=20):
+                 RA_over_RB=list(), PA=[1], PB=[1], 
+                 random_choice_dimension=None,
+                 max_trials=20):
         super().__init__()     
 
         self._input_type_validation(RA, DA, PA, RB, DB, PB, RA_over_RB)
@@ -281,6 +283,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         self.PB = PB
         self.RA_over_RB = RA_over_RB
         self.max_trials = max_trials
+        self.random_choice_dimension=None
 
         self.generate_all_possible_designs()
 
@@ -321,14 +324,13 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         if np.any((np.array(RA_over_RB) < 0) | (np.array(RA_over_RB) > 1)):
             raise ValueError('Expect all values of RA_over_RB to be between 0-1')
 
-    def get_next_design(self, model, random_choice_dimension=None):
+    def get_next_design(self, model):
 
         if self.trial > self.max_trials - 1:
             return None
         start_time = time.time()
         logging.info(f'Getting design for trial {self.trial}')
-        allowable_designs = self.refine_design_space(
-            model, random_choice_dimension=random_choice_dimension)
+        allowable_designs = self.refine_design_space(model)
         # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
         chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
         # convert from a 1-row pandas dataframe to a Design named tuple
@@ -337,7 +339,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design
 
-    def refine_design_space(self, model, NO_REPEATS=True, random_choice_dimension=None):
+    def refine_design_space(self, model, NO_REPEATS=True):
         '''A series of filter operations to refine down the space of designs which we
         do design optimisations on.'''
         
@@ -350,11 +352,11 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
 
         # apply a heuristic here to promote good spread of designs based on domain-specific
         # knowledge for DARC
-        if random_choice_dimension is not None:
+        if self.random_choice_dimension is not None:
             allowable_designs = choose_one_along_design_dimension(
-                allowable_designs, random_choice_dimension)
+                allowable_designs, self.random_choice_dimension)
             logging.debug(
-                f'{allowable_designs.shape[0]} designs remain after choose_one_along_design_dimension with {random_choice_dimension}')
+                f'{allowable_designs.shape[0]} designs remain after choose_one_along_design_dimension with {self.random_choice_dimension}')
 
         allowable_designs = remove_highly_predictable_designs(
             allowable_designs, model)

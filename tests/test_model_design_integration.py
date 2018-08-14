@@ -47,7 +47,6 @@ delayed_and_risky_models_list = [
 def simulated_experiment_trial_loop(design_thing, model):
     '''run a simulated experiment trial loop'''
     for trial in range(666):
-        #design = design_thing.get_next_design(model, random_choice_dimension='DB')
         design = design_thing.get_next_design(model)
 
         if design is None:
