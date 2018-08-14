@@ -72,7 +72,7 @@ def test_model_design_integration_delayed(model):
     design_thing = DARCDesign(max_trials=5,
                               RA=list(100*np.linspace(0.05, 0.95, 19)))
 
-    model = models.Hyperbolic(n_particles=100) 
+    model = models.model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -88,7 +88,7 @@ def test_model_design_integration_delayed_ME(model):
                                       RB=[100, 500, 1_000],
                                       RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
 
-    model = models.Hyperbolic(n_particles=100) 
+    model = models.model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -105,7 +105,7 @@ def test_model_design_integration_risky(model):
                               RA=list(100*np.linspace(0.05, 0.95, 91)),
                               RB=[100])
 
-    model = models.Hyperbolic(n_particles=100) 
+    model = models.model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -119,7 +119,7 @@ def test_model_design_integration_delayed_and_risky(model):
     design_thing = DARCDesign(max_trials=5,
                               PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
 
-    model = models.Hyperbolic(n_particles=100) 
+    model = models.model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
