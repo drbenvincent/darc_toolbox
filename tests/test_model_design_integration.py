@@ -71,7 +71,7 @@ def test_model_design_integration_delayed(model):
     design_thing = DARCDesign(max_trials=5,
                               RA=list(100*np.linspace(0.05, 0.95, 19)))
 
-    model = model(n_particles=1_000) 
+    model = model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -84,10 +84,10 @@ def test_model_design_integration_delayed_ME(model):
     Estimation'''
 
     design_thing = DARCDesign(max_trials=5,
-                                      RB=[100, 500, 1_000],
-                                      RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
+                              RB=[100, 500, 1_000],
+                              RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
 
-    model = model(n_particles=1_000) 
+    model = model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -101,10 +101,10 @@ def test_model_design_integration_risky(model):
     design_thing = DARCDesign(max_trials=5,
                               DA=[0], DB=[0], PA=[1], 
                               PB=list(np.linspace(0.01, 0.99, 91)),
-                              RA=list(100*np.linspace(0.05, 0.95, 91)),
+                              RA=list(100*np.linspace(0.05, 0.95, 19)),
                               RB=[100])
 
-    model = model(n_particles=1_000) 
+    model = model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -117,9 +117,9 @@ def test_model_design_integration_delayed_and_risky(model):
 
     design_thing = DARCDesign(max_trials=5,
                               RA=list(100*np.linspace(0.05, 0.95, 91)),
-                              PB=list(np.linspace(0.01, 0.99, 91)))
+                              PB=list(np.linspace(0.01, 0.99, 19)))
 
-    model = model(n_particles=1_000) 
+    model = model(n_particles=100) 
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
