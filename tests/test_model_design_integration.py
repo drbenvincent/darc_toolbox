@@ -100,7 +100,7 @@ def test_model_design_integration_risky(model):
 
     design_thing = DARCDesign(max_trials=5,
                               DA=[0], DB=[0], PA=[1], 
-                              PB=[np.linspace(0.01, 0.99, 91)],
+                              PB=list(np.linspace(0.01, 0.99, 91)),
                               RA=list(100*np.linspace(0.05, 0.95, 91)),
                               RB=[100])
 
@@ -116,7 +116,8 @@ def test_model_design_integration_delayed_and_risky(model):
     Estimation'''
 
     design_thing = DARCDesign(max_trials=5,
-                              PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
+                              RA=list(100*np.linspace(0.05, 0.95, 91)),
+                              PB=list(np.linspace(0.01, 0.99, 91)))
 
     model = model(n_particles=1_000) 
     model = model.generate_faux_true_params()
