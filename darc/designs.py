@@ -121,6 +121,7 @@ class DARCDesignABC(DesignABC, ABC):
             '''now assume we are dealing with magnitude effect'''
 
             # create all designs, but using RA_over_RB
+            # NOTE: the order of the two lists below HAVE to be the same
             column_list = ['RA_over_RB', 'DA', 'PA', 'RB', 'DB', 'PB']
             list_of_lists = [self.RA_over_RB, self.DA, self.PA, self.RB, self.DB, self.PB]
             all_combinations = list(itertools.product(*list_of_lists))
@@ -283,7 +284,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         self.PB = PB
         self.RA_over_RB = RA_over_RB
         self.max_trials = max_trials
-        self.random_choice_dimension=None
+        self.random_choice_dimension = random_choice_dimension
 
         self.generate_all_possible_designs()
 
@@ -330,14 +331,14 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
             return None
         start_time = time.time()
         logging.info(f'Getting design for trial {self.trial}')
+
         allowable_designs = self.refine_design_space(model)
-        # BAYESIAN DESIGN OPTIMISATION here... calling optimisation.py
-        chosen_design, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
-        # convert from a 1-row pandas dataframe to a Design named tuple
-        chosen_design = df_to_design_tuple(chosen_design)
-        logging.debug(f'chosen design is: {chosen_design}')
+        chosen_design_df, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
+        chosen_design_named_tuple = df_to_design_tuple(chosen_design_df)
+        
+        logging.debug(f'chosen design is: {chosen_design_named_tuple}')
         logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
-        return chosen_design
+        return chosen_design_named_tuple
 
     def refine_design_space(self, model, NO_REPEATS=True):
         '''A series of filter operations to refine down the space of designs which we

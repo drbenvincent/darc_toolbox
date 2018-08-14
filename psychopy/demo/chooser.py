@@ -110,10 +110,12 @@ def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
             design_thing = DARCDesign(max_trials=expInfo['trials'],
                                       RB=[100, 500, 1_000],
-                                      RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
+                                      RA_over_RB=np.linspace(0.05, 0.95, 19).tolist(),
+                                      random_choice_dimension='RB')
         else:
             design_thing = DARCDesign(max_trials=expInfo['trials'],
-                                      RA=list(100*np.linspace(0.05, 0.95, 91)))
+                                      RA=list(100*np.linspace(0.05, 0.95, 91)),
+                                      random_choice_dimension='DB')
         
         # import the appropriate set of models
         from darc.delayed import models
@@ -125,14 +127,16 @@ def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
         design_thing = DARCDesign(max_trials=expInfo['trials'],
                                     DA=[0], DB=[0], PA=[1], PB=prob_list,
                                     RA=list(100*np.linspace(0.05, 0.95, 91)),
-                                    RB=[100])
+                                    RB=[100],
+                                    random_choice_dimension='PB')
         # import the appropriate set of models
         from darc.risky import models
 
     elif desired_experiment_type == 'delayed and risky':
         # create an appropriate design object
         design_thing = DARCDesign(max_trials=expInfo['trials'],
-                                    PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
+                                  PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                                  random_choice_dimension='DB')
         # import the appropriate set of models
         from darc.delayed_and_risky import models
 
