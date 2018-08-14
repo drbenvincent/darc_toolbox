@@ -62,6 +62,7 @@ ProportionalDifference | ✅ | González-Vallejo, C. (2002). Making trade-offs: 
 HyperbolicNonLinearUtility | ❌ | Cheng, J., & González-Vallejo, C. (2014). Hyperbolic Discounting: Value and Time Processes of Substance Abusers and Non-Clinical Individuals in Intertemporal Choice. PLoS ONE, 9(11), e111378–18. http://doi.org/10.1371/journal.pone.0111378
 ExponentialPower | ❌ | Takahashi, T., Oono, H., and Radford, M. H. B. (2008). Psychophysics of time perception and intertemporal choice models. 387(8-9):2066–2074.
 Rachlin hyperboloid | ❌ | Rachlin, H. (2006). Notes on Discounting. Journal of the experimental analysis of behavior, 85(3):425–435.
+Myerson hyperboloid | ✅ | Myerson, J. and Green, L. (1995). Discounting of delayed rewards: Models of individual choice. Journal of the experimental analysis of behavior, 64(3):263–276. 
 
 ## Risky reward paradigm models
 Model | Status | Info
