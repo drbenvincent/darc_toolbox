@@ -254,3 +254,16 @@ class Model(ABC):
         median_series = self.θ.median(axis=0)
         return median_series.to_frame().T
         
+
+    def generate_faux_true_params(self):
+        '''Generate some true parameters based on the model's priors. This
+        is used for doing testing parameter recovery where we need to generate
+        true parameters for any given concrete model class.'''
+       
+        θ_dict = {}
+        for key in self.parameter_names:
+            θ_dict[key] = [self.prior[key].mean()]
+
+        # θ_dict = {key: self.prior[key].median() for key in self.parameter_names}
+        self.θ_true = pd.DataFrame.from_dict(θ_dict)
+        return self

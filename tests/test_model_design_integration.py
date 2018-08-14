@@ -47,7 +47,8 @@ delayed_and_risky_models_list = [
 def simulated_experiment_trial_loop(design_thing, model):
     '''run a simulated experiment trial loop'''
     for trial in range(666):
-        design = design_thing.get_next_design(model, random_choice_dimension='DB')
+        #design = design_thing.get_next_design(model, random_choice_dimension='DB')
+        design = design_thing.get_next_design(model)
 
         if design is None:
             break
@@ -61,21 +62,23 @@ def simulated_experiment_trial_loop(design_thing, model):
         logging.info(f'Trial {trial} complete')
 
 
+# TESTS ------------------------------------------------------------------
+
+
 @pytest.mark.parametrize("model", delayed_models_list)
 def test_model_design_integration_delayed(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
     design_thing = DARCDesign(max_trials=5,
-                              RA=list(100*np.linspace(0.05, 0.95, 10)))
+                              RA=list(100*np.linspace(0.05, 0.95, 19)))
 
     model = models.Hyperbolic(n_particles=100) 
-
-    # Generate some made up true parameters by sampling from the model's priors
-    particles_dict = {key: model.prior[key].rvs(size=1) for key in model.parameter_names}
-    model.θ_true = pd.DataFrame.from_dict(particles_dict)
+    model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
+
+
 
 @pytest.mark.parametrize("model", delayed_models_list_ME)
 def test_model_design_integration_delayed_ME(model):
@@ -87,10 +90,7 @@ def test_model_design_integration_delayed_ME(model):
                                       RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
 
     model = models.Hyperbolic(n_particles=100) 
-
-    # Generate some made up true parameters by sampling from the model's priors
-    particles_dict = {key: model.prior[key].rvs(size=1) for key in model.parameter_names}
-    model.θ_true = pd.DataFrame.from_dict(particles_dict)
+    model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
 
@@ -107,10 +107,7 @@ def test_model_design_integration_risky(model):
                               RB=[100])
 
     model = models.Hyperbolic(n_particles=100) 
-
-    # Generate some made up true parameters by sampling from the model's priors
-    particles_dict = {key: model.prior[key].rvs(size=1) for key in model.parameter_names}
-    model.θ_true = pd.DataFrame.from_dict(particles_dict)
+    model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
 
@@ -124,9 +121,6 @@ def test_model_design_integration_delayed_and_risky(model):
                               PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
 
     model = models.Hyperbolic(n_particles=100) 
-
-    # Generate some made up true parameters by sampling from the model's priors
-    particles_dict = {key: model.prior[key].rvs(size=1) for key in model.parameter_names}
-    model.θ_true = pd.DataFrame.from_dict(particles_dict)
+    model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)

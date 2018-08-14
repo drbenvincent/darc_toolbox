@@ -78,15 +78,18 @@ def test_update_beliefs(model):
 
 
 @pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
+def test_generate_faux_true_params(model):
+    model_instance = model(n_particles=30)
+    model_instance = model_instance.generate_faux_true_params()
+    isinstance(model_instance.θ_true, dict)
+
+
+@pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
 def test_get_simulated_response(model):
     # set up model
     n_particles = 100
     model_instance = model(n_particles=n_particles)
-    
-    # Generate some made up true parameters by sampling from the model's priors
-    particles_dict = {key: model_instance.prior[key].rvs(
-        size=1) for key in model_instance.parameter_names}
-    model.θ_true = pd.DataFrame.from_dict(particles_dict)
+    model_instance = model_instance.generate_faux_true_params()
 
     faux_design = pd.DataFrame({'RA': [100], 'DA': [0], 'PA': [1],
                                 'RB': [150], 'DB': [14], 'PB': [1]})
