@@ -80,18 +80,12 @@ MultiplicativeHyperbolic | ✅ | Vanderveldt, A., Green, L., & Myerson, J. (2015
 Proportional difference | ❌ | [think, then implement]
 Probability and Time Trade-off model | ❌ | (Baucells & Heukamp)
 
-# Requirements (likely to change 🔥)
-NOTE: Advice on versions and compatibility etc will be improved over time.
 
-This code is being developed with:
-- Python 3
-- To run experiments you will also need [PsychoPy](http://www.psychopy.org), currently using their Python 3 release, version 1.90.1. I'll probably update to PsychoPy 3 before we make any kind of official release.
-
-# Installation instructions (likely to change 🔥)
-1. Ensure you have a Python 3.6 installation. I recommend https://www.anaconda.com/download/
-2. Install [PsychoPy](http://www.psychopy.org). Make sure you install a version that works with Python 3. 
+# Installation instructions
+1. Ensure you have a Python 3 installation. I recommend https://www.anaconda.com/download/. I have been testing the code with Python 3.6.6.
+2. Install [PsychoPy](http://www.psychopy.org). Make sure you install a version that works with Python 3. Testing has been conducted with PsychoPy 1.90.1.
 3. Download or clone this `darc-experiments-python` repository.
-4. Open up PsychoPy... Open the PsychoPy experiments `experiment.psyexp` in the builder view... Run the experiment with the green man symbol... check the auto-saved data in the `\data` folder.
+4. Open up PsychoPy... Open the PsychoPy experiment `psychopy/demo/experiment.psyexp` in the builder view... Run the experiment (with the green man symbol). You will get some GUI options to chose from before the experiment starts. After it is finished, check the auto-saved data in the `\data` folder. This includes log files, saved trial-level data, and exported figures which could be useful.
 
 
 # How to...
