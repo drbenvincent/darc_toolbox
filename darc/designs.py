@@ -90,8 +90,12 @@ class DARCDesignABC(DesignABC, ABC):
         all_data_plotter(self.all_data, filename) 
 
     def generate_all_possible_designs(self, assume_discounting=True):
-        '''Create a dataframe of all possible designs (one design is one row) based upon
-        the set of design variables (RA, DA, PA, RB, DB, PB) provided.
+        '''Create a dataframe of all possible designs (one design is one row)
+        based upon the set of design variables (RA, DA, PA, RB, DB, PB) 
+        provided. We do this generation process ONCE. There may be additional
+        trial-level processes which choose subsets of all of the possible 
+        designs. But here, we generate the largest set of designs that we 
+        will ever consider
         '''
 
         # Log the raw values to help with debugging
@@ -383,7 +387,7 @@ def remove_highly_predictable_designs(allowable_designs, model):
     # add p_chose_B as a column to allowable_designs
     allowable_designs['p_chose_B'] = pd.Series(p_chose_B)
     # label rows which are highly predictable
-    threshold = 0.011  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
+    threshold = 0.01  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
     highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
         allowable_designs['p_chose_B'] > 1 - threshold)
     allowable_designs['highly_predictable'] = pd.Series(highly_predictable)

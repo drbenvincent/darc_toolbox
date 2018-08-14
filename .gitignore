@@ -6,3 +6,4 @@ psychopy/demo/data/*
 *.pdf
 *.log
 .pytest_cache/*
+.idea/*

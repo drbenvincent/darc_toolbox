@@ -22,10 +22,10 @@ logging.basicConfig(filename='test.log', level=logging.DEBUG,
 delayed_models_list = [
     delayed_models.Hyperbolic,
     delayed_models.Exponential,
-    delayed_models.ConstantSensitivity,
+    #delayed_models.ConstantSensitivity,
     delayed_models.MyersonHyperboloid,
     delayed_models.ProportionalDifference,
-    delayed_models.HyperbolicNonLinearUtility
+    #delayed_models.HyperbolicNonLinearUtility
 ]
 
 delayed_models_list_ME = [
@@ -102,7 +102,7 @@ def test_model_design_integration_risky(model):
 
     design_thing = DARCDesign(max_trials=5,
                               DA=[0], DB=[0], PA=[1], 
-                              PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                              PB=[np.linspace(0.01, 0.99, 91)],
                               RA=list(100*np.linspace(0.05, 0.95, 91)),
                               RB=[100])
 
