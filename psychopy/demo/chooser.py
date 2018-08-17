@@ -11,10 +11,19 @@ exactly what you want to run.
 
 import logging
 import numpy as np
+from darc.designs import Kirby2009, Griskevicius2011delay, Griskevicius2011risk, Frye, DARCDesign
 
 
 # define what is available
-expt_type = {'Experiment type': ['delayed', 'risky', 'delayed and risky']}
+expt_type = {'Experiment type': 
+             ['delayed (Bayesian Adaptive Design)',
+             'risky (Bayesian Adaptive Design)', 
+             'delayed and risky (Bayesian Adaptive Design)',
+             'delayed Griskevicius', 
+             'delayed Kirby', 
+             'delayed Frye', 
+             'risky Griskevicius', 
+             ]}
 
 delay_models_available = ['Hyperbolic', 'Exponential',
                           'HyperbolicMagnitudeEffect',
@@ -31,7 +40,7 @@ risky_models_available = ['Hyperbolic',
 delayed_and_risky_models_available = ['MultiplicativeHyperbolic']
 
 
-def gui_chooser_for_demo(win, gui, core, event, DARCDesign, expInfo):
+def gui_chooser_for_demo(win, gui, core, event, expInfo):
     '''
     Get user choices about (design, model) combination and generate
     the appropriate objects
@@ -41,7 +50,7 @@ def gui_chooser_for_demo(win, gui, core, event, DARCDesign, expInfo):
     desired_experiment_type = gui_get_desired_experiment_type(gui, core)
     desired_model = gui_get_desired_model(gui, core)
     design_thing, model = act_on_choices(
-        desired_experiment_type, desired_model, DARCDesign, expInfo)
+        desired_experiment_type, desired_model, expInfo)
     show_window(win, mouse)
     return (design_thing, model)
 
@@ -76,13 +85,25 @@ def gui_get_desired_experiment_type(gui, core):
 
 
 def gui_get_desired_model(gui, core):
-    if expt_type['Experiment type'] is 'delayed':
+    if expt_type['Experiment type'] == 'delayed (Bayesian Adaptive Design)':
         models_available = delay_models_available
 
-    elif expt_type['Experiment type'] is 'risky':
+    elif expt_type['Experiment type'] == 'delayed Kirby':
+        models_available = delay_models_available
+
+    elif expt_type['Experiment type'] == 'delayed Griskevicius':
+        models_available = delay_models_available   
+
+    elif expt_type['Experiment type'] == 'delayed Frye':
+        models_available = delay_models_available 
+
+    elif expt_type['Experiment type'] == 'risky Griskevicius':
         models_available = risky_models_available
 
-    elif expt_type['Experiment type'] == 'delayed and risky':
+    elif expt_type['Experiment type'] == 'risky (Bayesian Adaptive Design)':
+        models_available = risky_models_available
+
+    elif expt_type['Experiment type'] == 'delayed and risky (Bayesian Adaptive Design)':
         models_available = delayed_and_risky_models_available
 
     else:
@@ -101,11 +122,11 @@ def gui_get_desired_model(gui, core):
     return desired_model
 
 
-def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
+def act_on_choices(desired_experiment_type, desired_model, expInfo):
 
     # create desired experiment object
 
-    if desired_experiment_type is 'delayed':
+    if desired_experiment_type == 'delayed (Bayesian Adaptive Design)':
         # regular, or magnitude effect
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
             design_thing = DARCDesign(max_trials=expInfo['trials'],
@@ -120,7 +141,25 @@ def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
         # import the appropriate set of models
         from darc.delayed import models
 
-    elif desired_experiment_type is 'risky':
+
+    elif desired_experiment_type == 'delayed Kirby':
+        design_thing = Kirby2009()
+        from darc.delayed import models
+
+
+    elif desired_experiment_type == 'delayed Griskevicius':
+        design_thing = Griskevicius2011delay()
+        from darc.delayed import models
+
+    elif desired_experiment_type == 'delayed Frye':
+        design_thing = Frye()
+        from darc.delayed import models    
+
+    elif desired_experiment_type == 'risky Griskevicius':
+        design_thing = Griskevicius2011risk()
+        from darc.risky import models
+
+    elif desired_experiment_type == 'risky (Bayesian Adaptive Design)':
         # create an appropriate design object
         prob_list = [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99]
 
@@ -132,7 +171,7 @@ def act_on_choices(desired_experiment_type, desired_model, DARCDesign, expInfo):
         # import the appropriate set of models
         from darc.risky import models
 
-    elif desired_experiment_type == 'delayed and risky':
+    elif desired_experiment_type == 'delayed and risky (Bayesian Adaptive Design)':
         # create an appropriate design object
         design_thing = DARCDesign(max_trials=expInfo['trials'],
                                   PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
