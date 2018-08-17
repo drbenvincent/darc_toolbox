@@ -25,17 +25,23 @@ expt_type = {'Experiment type':
              'risky Griskevicius', 
              ]}
 
+delayed_design_set = {'delayed (Bayesian Adaptive Design)', 'delayed Kirby',
+                      'delayed Griskevicius', 'delayed Frye'}
+
+risky_design_set = {'risky Griskevicius', 'risky (Bayesian Adaptive Design)'}
+
+delayed_and_risky_design_set = {'delayed and risky (Bayesian Adaptive Design)'}
+
 delay_models_available = ['Hyperbolic', 'Exponential',
                           'HyperbolicMagnitudeEffect',
                           'ExponentialMagnitudeEffect',
                           'MyersonHyperboloid',
                           'ProportionalDifference',
-                          #'HyperbolicNonLinearUtility',
                           ]
 
 risky_models_available = ['Hyperbolic',
                           'ProportionalDifference',
-                          'ProspectTheory']
+                          ]
 
 delayed_and_risky_models_available = ['MultiplicativeHyperbolic']
 
@@ -84,26 +90,15 @@ def gui_get_desired_experiment_type(gui, core):
     return desired_experiment_type
 
 
+
 def gui_get_desired_model(gui, core):
-    if expt_type['Experiment type'] == 'delayed (Bayesian Adaptive Design)':
+    if expt_type['Experiment type'] in delayed_design_set:
         models_available = delay_models_available
 
-    elif expt_type['Experiment type'] == 'delayed Kirby':
-        models_available = delay_models_available
-
-    elif expt_type['Experiment type'] == 'delayed Griskevicius':
-        models_available = delay_models_available   
-
-    elif expt_type['Experiment type'] == 'delayed Frye':
-        models_available = delay_models_available 
-
-    elif expt_type['Experiment type'] == 'risky Griskevicius':
+    elif expt_type['Experiment type'] in risky_design_set:
         models_available = risky_models_available
 
-    elif expt_type['Experiment type'] == 'risky (Bayesian Adaptive Design)':
-        models_available = risky_models_available
-
-    elif expt_type['Experiment type'] == 'delayed and risky (Bayesian Adaptive Design)':
+    elif expt_type['Experiment type'] in delayed_and_risky_design_set:
         models_available = delayed_and_risky_models_available
 
     else:
@@ -145,7 +140,6 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     elif desired_experiment_type == 'delayed Kirby':
         design_thing = Kirby2009()
         from darc.delayed import models
-
 
     elif desired_experiment_type == 'delayed Griskevicius':
         design_thing = Griskevicius2011delay()
@@ -192,9 +186,6 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
 
     elif desired_model is 'ProportionalDifference':
         model = models.ProportionalDifference(n_particles=expInfo['particles'])
-
-    elif desired_model is 'ProspectTheory':
-        model = models.ProspectTheory(n_particles=expInfo['particles'])
 
     elif desired_model is 'HyperbolicMagnitudeEffect':
         model = models.HyperbolicMagnitudeEffect(n_particles=expInfo['particles'])
