@@ -19,16 +19,16 @@ expt_type = {'Experiment type':
              ['delayed (Bayesian Adaptive Design)',
              'risky (Bayesian Adaptive Design)', 
              'delayed and risky (Bayesian Adaptive Design)',
-             'delayed Griskevicius', 
-             'delayed Kirby', 
-             'delayed Frye', 
-             'risky Griskevicius', 
+             'delayed (Griskevicius et al, 2011)', 
+             'delayed (Kirby 2009)', 
+             'delayed (Frye et al, 2016)', 
+             'risky (Griskevicius et al, 2011)', 
              ]}
 
-delayed_design_set = {'delayed (Bayesian Adaptive Design)', 'delayed Kirby',
-                      'delayed Griskevicius', 'delayed Frye'}
+delayed_design_set = {'delayed (Bayesian Adaptive Design)', 'delayed (Kirby 2009)',
+                      'delayed (Griskevicius et al, 2011)', 'delayed (Frye et al, 2016)'}
 
-risky_design_set = {'risky Griskevicius', 'risky (Bayesian Adaptive Design)'}
+risky_design_set = {'risky (Griskevicius et al, 2011)', 'risky (Bayesian Adaptive Design)'}
 
 delayed_and_risky_design_set = {'delayed and risky (Bayesian Adaptive Design)'}
 
@@ -137,19 +137,19 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         from darc.delayed import models
 
 
-    elif desired_experiment_type == 'delayed Kirby':
+    elif desired_experiment_type == 'delayed (Kirby 2009)':
         design_thing = Kirby2009()
         from darc.delayed import models
 
-    elif desired_experiment_type == 'delayed Griskevicius':
+    elif desired_experiment_type == 'delayed (Griskevicius et al, 2011)':
         design_thing = Griskevicius2011delay()
         from darc.delayed import models
 
-    elif desired_experiment_type == 'delayed Frye':
+    elif desired_experiment_type == 'delayed (Frye et al, 2016)':
         design_thing = Frye()
         from darc.delayed import models    
 
-    elif desired_experiment_type == 'risky Griskevicius':
+    elif desired_experiment_type == 'risky (Griskevicius et al, 2011)':
         design_thing = Griskevicius2011risk()
         from darc.risky import models
 
