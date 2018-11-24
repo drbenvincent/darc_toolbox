@@ -7,3 +7,4 @@ psychopy/demo/data/*
 *.log
 .pytest_cache/*
 .idea/*
+.ipynb_checkpoints*
