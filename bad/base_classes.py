@@ -253,7 +253,15 @@ class Model(ABC):
         '''return a point estimate (posterior median) for the model parameters'''
         median_series = self.θ.median(axis=0)
         return median_series.to_frame().T
-        
+    
+    def get_θ_summary_stats(self, param_name):
+        '''return summary stats for a given parameter'''
+        return {'median': self.θ[param_name].median(), 
+                'mean': self.θ[param_name].mean(),
+                'lower50': self.θ[param_name].quantile(0.25),
+                'upper50': self.θ[param_name].quantile(0.75),
+                'lower95': self.θ[param_name].quantile(0.025),
+                'upper95': self.θ[param_name].quantile(1-0.025)}
 
     def generate_faux_true_params(self):
         '''Generate some true parameters based on the model's priors. This
