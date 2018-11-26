@@ -213,7 +213,8 @@ class Griskevicius2011delay(DARCDesignABC):
     PA, PB = 1, 1
 
     def get_next_design(self, _):
-        # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
+        # NOTE: This is un-Pythonic as we are asking permission... 
+        # we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             logging.info(f'Getting design for trial {self.trial}')
             design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
@@ -245,7 +246,6 @@ class Griskevicius2011risk(DARCDesignABC):
     DB = 0
     PB = 0.5
     
-
     def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
@@ -255,6 +255,56 @@ class Griskevicius2011risk(DARCDesignABC):
             return design
         else:
             return None
+
+
+class Koffarnus_Bickel(DARCDesignABC):
+    '''
+    This function returns a function which returns designs according to the 
+    method described by:
+    Koffarnus, M. N., & Bickel, W. K. (2014). A 5-trial adjusting delay 
+    discounting task: Accurate discount rates in less than one minute. 
+    Experimental and Clinical Psychopharmacology, 22(3), 222-228. 
+    http://doi.org/10.1037/a0035973
+    '''
+
+    # NOTE: these should probably not be class attributes, but declared in the __init__ 
+    # only likely to be a problem if we have mulitple instances. We'd
+    # also have to explicitly call the superclass constructor at that point, I believe.
+    max_trials = 5
+    RB = 100
+    DA = 0
+    RA = RB*0.5
+    DB = np.concatenate([(1/24)*np.array([1, 2, 3, 4, 6, 9, 12]),
+         np.array([1, 1.5, 2, 3, 4]),
+         7*np.array([1, 1.5, 2, 3]),
+         29*np.array([1, 2, 3, 4, 6, 8]),
+         365*np.array([1, 2, 3, 4, 5, 8, 12, 18, 25])])
+    PA, PB = 1, 1
+    delay_index = 16-1 # this is always the initial delay used (equals 3 weeks)
+    index_increments = 8;
+    trial = 1
+
+    def get_next_design(self, _):
+
+        if self.trial > self.max_trials:
+            return None
+
+        if self.trial == 1:
+            design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
+                            ProspectB=Prospect(reward=self.RB, delay=self.DB[self.delay_index], prob=self.PB))
+        else:
+            if self.get_last_response_chose_B():
+                self.delay_index += self.index_increments
+            else:
+                self.delay_index -= self.index_increments
+
+        # each trial, the increments half, so will be: 8, 4, 2, 1
+        self.index_increments = int(max(self.index_increments/2, 1))
+
+        design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
+                        ProspectB=Prospect(reward=self.RB, delay=self.DB[self.delay_index], prob=self.PB))
+        self.trial += 1
+        return design
 
 
 class Frye(DARCDesignABC):

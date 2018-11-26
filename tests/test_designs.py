@@ -2,13 +2,18 @@ import sys
 sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 import numpy as np
-from darc.designs import Kirby2009, Griskevicius2011delay, Griskevicius2011risk, Frye, DARCDesign
+from darc.designs import Kirby2009, Griskevicius2011delay, Griskevicius2011risk, Frye, Koffarnus_Bickel, DARCDesign
 import pytest
 
 
 def test_Kirby_default_instantiation():
     design_thing = Kirby2009()
     assert isinstance(design_thing, Kirby2009)
+
+
+def test_Koffarnus_Bickel_default_instantiation():
+    design_thing = Koffarnus_Bickel()
+    assert isinstance(design_thing, Koffarnus_Bickel)
 
 
 def test_Griskevicius2011delay_default_instantiation():
