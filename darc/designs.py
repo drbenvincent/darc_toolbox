@@ -281,7 +281,7 @@ class Koffarnus_Bickel(DARCDesignABC):
          365*np.array([1, 2, 3, 4, 5, 8, 12, 18, 25])])
     PA, PB = 1, 1
     delay_index = 16-1 # this is always the initial delay used (equals 3 weeks)
-    index_increments = 8;
+    index_increments = 8
     trial = 1
 
     def get_next_design(self, _):
@@ -303,7 +303,6 @@ class Koffarnus_Bickel(DARCDesignABC):
 
         design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
                         ProspectB=Prospect(reward=self.RB, delay=self.DB[self.delay_index], prob=self.PB))
-        self.trial += 1
         return design
 
 
