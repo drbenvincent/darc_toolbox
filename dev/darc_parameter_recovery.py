@@ -45,8 +45,6 @@ def simulated_experiment_trial_loop(design_thing, model):
         design_df = darc.single_design_tuple_to_df(design)
         response = model.get_simulated_response(design_df)
 
-        # TODO: DOUBLE CHECK THIS IS ACTUALLY UPDATING STUFF!! OR DO WE NEED TO 
-        # SPECIFICALLY UPATE THE design_thing AND model ????
         design_thing.enter_trial_design_and_response(design, response)
 
         model.update_beliefs(design_thing.all_data)
