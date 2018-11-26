@@ -215,7 +215,7 @@ class Griskevicius2011delay(DARCDesignABC):
     def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission... 
         # we should just do it, and have a catch ??
-        if self.trial < self.max_trials - 1:
+        if self.trial < self.max_trials:
             logging.info(f'Getting design for trial {self.trial}')
             design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
                             ProspectB=Prospect(reward=self.RB[self.trial], delay=self.DB, prob=self.PB))
@@ -316,7 +316,7 @@ class Frye(DARCDesignABC):
     http://doi.org/10.3791/53584
     '''
     
-    def __init__(self, DB=[7, 30, 365], RB=100., trials_per_delay=5):
+    def __init__(self, DB=[7, 30, 30*3, 30*6, 365], RB=100., trials_per_delay=5):
         self.DA = 0
         self.DB = DB
         self.RB = RB
