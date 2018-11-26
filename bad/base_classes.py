@@ -256,12 +256,15 @@ class Model(ABC):
     
     def get_θ_summary_stats(self, param_name):
         '''return summary stats for a given parameter'''
-        return {'median': self.θ[param_name].median(), 
-                'mean': self.θ[param_name].mean(),
-                'lower50': self.θ[param_name].quantile(0.25),
-                'upper50': self.θ[param_name].quantile(0.75),
-                'lower95': self.θ[param_name].quantile(0.025),
-                'upper95': self.θ[param_name].quantile(1-0.025)}
+        summary_stats = {'median': [self.θ[param_name].median()], 
+                         'mean': [self.θ[param_name].mean()],
+                         'lower50': [self.θ[param_name].quantile(0.25)],
+                         'upper50': [self.θ[param_name].quantile(0.75)],
+                         'lower95': [self.θ[param_name].quantile(0.025)],
+                         'upper95': [self.θ[param_name].quantile(1-0.025)]}
+        summary_stats = pd.DataFrame.from_dict(summary_stats)
+        summary_stats = summary_stats.add_prefix(param_name + '_')
+        return summary_stats
 
     def generate_faux_true_params(self):
         '''Generate some true parameters based on the model's priors. This

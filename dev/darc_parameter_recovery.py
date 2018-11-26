@@ -6,7 +6,7 @@ import numpy as np
 from copy import copy
 
 
-def parameter_recovery_sweep(sweep_θ_true, model, design_thing):
+def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_name):
     print('starting parameter recovery sweep')
     rows, _ = sweep_θ_true.shape
     θ_estimated_list = []
@@ -18,7 +18,12 @@ def parameter_recovery_sweep(sweep_θ_true, model, design_thing):
         local_model.θ_true = sweep_θ_true.loc[[row]]  
 
         fitted_model = simulated_experiment_trial_loop(local_design_thing, local_model)
-        θ_estimated = fitted_model.get_θ_point_estimate()
+        
+        # This gets point estimate of all parameters
+        #θ_estimated = fitted_model.get_θ_point_estimate()
+
+        # get summary stats for the parameter of interest
+        θ_estimated = fitted_model.get_θ_summary_stats(target_param_name)
 
         θ_estimated_list.append(θ_estimated)
 
