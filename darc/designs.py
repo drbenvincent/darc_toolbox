@@ -85,9 +85,9 @@ class DARCDesignABC(DesignABC, ABC):
         self.all_data = self.all_data.append(pd.DataFrame(trial_data))
         return
 
-    def plot_all_data(self, filename):
+    def plot_all_data(self):
         '''Visualise data'''
-        all_data_plotter(self.all_data, filename) 
+        all_data_plotter(self.all_data) 
 
     def generate_all_possible_designs(self, assume_discounting=True):
         '''Create a dataframe of all possible designs (one design is one row)

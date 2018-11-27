@@ -3,10 +3,9 @@ import numpy as np
 import logging
 
 
-def all_data_plotter(all_data, filename):
-    '''Visualise data'''
-
-    f, axes = plt.subplots(1, 2, figsize=(9, 4), tight_layout=True)
+def all_data_plotter(all_data):
+    '''Our high level plotting function which dispatches to the appropriate
+    low-level plotting functions based upon the nature of the data'''
 
     RA = all_data.RA.values
     DA = all_data.DA.values
@@ -17,19 +16,49 @@ def all_data_plotter(all_data, filename):
     R = all_data.R.values
     n_points, _ = all_data.shape
 
-    # delay plot ===================================================
-    if np.any(DA > 0):
-        plot_delay_with_front_end_delays(axes[0], RA, DA, RB, DB, R)
+    # do interrogation of the data 
+    if np.any(PA < 1) or np.any(PB < 1):
+        risky_choices = True
     else:
-        plot_delay_without_front_end_delays(axes[0], RA, DA, RB, DB, R)
-        
-    # probability plot =============================================
-    plot_probability_data(axes[1], RA, PA, RB, PB, R)
+        risky_choices = False
     
-    # Exporting, etc
-    savename = filename + '_data_plot.pdf'
-    plt.savefig(savename)
-    logging.info(f'Data plot saved as: {savename}')
+    if np.any(DA > 0) or np.any(DB > 0):
+        delayed_choices = True
+        if np.any(DA > 0):
+            front_end_delays = True
+        else:
+            front_end_delays = False
+    else:
+        delayed_choices = False
+
+    # make plotting decisions
+    if delayed_choices and not risky_choices:
+        # delay based plot only
+        f, ax = plt.subplots(1, 1, figsize=(9, 4))
+        if front_end_delays:
+            plot_delay_with_front_end_delays(ax, RA, DA, RB, DB, R)
+        else:
+            plot_delay_without_front_end_delays(ax, RA, DA, RB, DB, R)
+
+    elif risky_choices and not delayed_choices:
+        # risky based plot only
+        f, ax = plt.subplots(1, 1, figsize=(9, 4))
+        plot_probability_data(ax, RA, PA, RB, PB, R)
+
+    elif delayed_choices and risky_choices:
+        # both risky and delayed plots
+        f, axes = plt.subplots(1, 2, figsize=(9, 4), tight_layout=True)
+        if front_end_delays:
+            plot_delay_with_front_end_delays(axes[0], RA, DA, RB, DB, R)
+        else:
+            plot_delay_without_front_end_delays(axes[0], RA, DA, RB, DB, R)
+
+        plot_probability_data(axes[1], RA, PA, RB, PB, R)
+
+    # if filename is not None:
+    #     savename = filename + '_data_plot.pdf'
+    #     plt.savefig(savename)
+    #     logging.info(f'Data plot saved as: {savename}')
 
 
 # DELAY PLOTS =========================================================
@@ -64,7 +93,7 @@ def plot_delay_without_front_end_delays(ax, RA, DA, RB, DB, R):
     ax.legend()
     ax.set_xlabel('delay (days)')
     ax.set_ylabel('RA/RB')
-    ax.set_xscale('log')
+    ax.set_xscale('linear')
     ax.set_title('Plot for data without front-end delays')
 
 
