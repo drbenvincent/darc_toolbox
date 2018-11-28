@@ -24,6 +24,11 @@ class DelaySlice(Model):
     '''This is an insane delay discounting model. It basically fits ONE indifference
     point. It amounts to fitting a psychometric function with the indifference point
     shifting the function and alpha determining the slope of the function.
+
+    Note: the α parameter in this model is on a different scale to the same parameter
+    in other models. Here we are doing inference over indifference points, so the whole
+    range typically spans 0-1. So it makes sense for this model that our prior over
+    α is more restricted to low values near zero
     '''
 
     prior = dict()
