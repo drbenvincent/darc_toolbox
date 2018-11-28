@@ -256,7 +256,9 @@ class Model(ABC):
     
     def get_θ_summary_stats(self, param_name):
         '''return summary stats for a given parameter'''
-        summary_stats = {'median': [self.θ[param_name].median()], 
+        
+        summary_stats = {'entropy': [self.get_θ_entropy(param_name)], 
+                         'median': [self.θ[param_name].median()], 
                          'mean': [self.θ[param_name].mean()],
                          'lower50': [self.θ[param_name].quantile(0.25)],
                          'upper50': [self.θ[param_name].quantile(0.75)],
@@ -265,6 +267,13 @@ class Model(ABC):
         summary_stats = pd.DataFrame.from_dict(summary_stats)
         summary_stats = summary_stats.add_prefix(param_name + '_')
         return summary_stats
+
+    def get_θ_entropy(self, param_name):
+        '''Calculate the entropy of the distribution of samples for the requested parameter.
+        Calculate this based upon the normal distribution.'''
+        samples = self.θ[param_name].values
+        distribution = norm # TODO: ASSSUMES A NORMAL DISTRIBUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return float(distribution.entropy(*distribution.fit(samples)))
 
     def generate_faux_true_params(self):
         '''Generate some true parameters based on the model's priors. This
