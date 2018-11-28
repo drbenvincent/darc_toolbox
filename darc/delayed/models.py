@@ -272,15 +272,9 @@ class ProportionalDifference(Model):
     def calc_decision_variable(self, θ, data):
         # organised so that higher values of the decision variable will 
         # mean higher probabability for the delayed option (prospect B)
-        
-        prop_reward = self._proportion(
-            data['RA'].values, data['RB'].values)
-
-        prop_delay = self._proportion(
-            data['DA'].values, data['DB'].values)
-        
-        prop_difference = prop_reward - prop_delay
-        decision_variable = prop_difference + θ['δ'].values
+        prop_reward = self._proportional_difference(data['RA'].values, data['RB'].values)
+        prop_delay = self._proportional_difference(data['DA'].values, data['DB'].values)
+        decision_variable = prop_reward - prop_delay + θ['δ'].values
         return decision_variable
 
     @staticmethod
@@ -291,9 +285,8 @@ class ProportionalDifference(Model):
     def _min_abs(x, y):
         return np.min(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
 
-    def _proportion(self, x, y):
-        diff = self._max_abs(x, y) - self._min_abs(x, y)
-        return diff / self._max_abs(x, y)
+    def _proportional_difference(self, x, y):
+        return (self._max_abs(x, y) - self._min_abs(x, y)) / self._max_abs(x, y)
 
 
 class HyperbolicNonLinearUtility(Model):
