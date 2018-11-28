@@ -28,7 +28,7 @@ class DelaySlice(Model):
 
     prior = dict()
     prior['indiff'] = uniform(0, 1)
-    prior['α'] = halfnorm(loc=0, scale=2)
+    prior['α'] = halfnorm(loc=0, scale=0.1)
     θ_fixed = {'ϵ': 0.001}
 
     def calc_decision_variable(self, θ, data):
