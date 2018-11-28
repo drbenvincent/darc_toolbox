@@ -386,7 +386,8 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
     def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100], 
                  RA_over_RB=list(), PA=[1], PB=[1], 
                  random_choice_dimension=None,
-                 max_trials=20):
+                 max_trials=20,
+                 NO_REPEATS=False):
         super().__init__()     
 
         self._input_type_validation(RA, DA, PA, RB, DB, PB, RA_over_RB)
@@ -401,6 +402,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         self.RA_over_RB = RA_over_RB
         self.max_trials = max_trials
         self.random_choice_dimension = random_choice_dimension
+        self.NO_REPEATS = NO_REPEATS
 
         self.generate_all_possible_designs()
 
@@ -456,14 +458,14 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design_named_tuple
 
-    def refine_design_space(self, model, NO_REPEATS=True):
+    def refine_design_space(self, model):
         '''A series of filter operations to refine down the space of designs which we
         do design optimisations on.'''
         
         allowable_designs = copy.copy(self.all_possible_designs)
         logging.debug(f'{allowable_designs.shape[0]} designs initially')
 
-        if NO_REPEATS and self.trial>1:
+        if self.NO_REPEATS and self.trial>1:
             allowable_designs = remove_trials_already_run(
                 allowable_designs, self.all_data.drop(columns=['R']))
 
