@@ -4,7 +4,7 @@ from darc.designs import Kirby2009, Frye, DARCDesign
 import pandas as pd
 import numpy as np
 from copy import copy
-
+from scipy.stats import norm
 
 def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_name):
     print('starting parameter recovery sweep')
@@ -36,7 +36,11 @@ def simulated_experiment_trial_loop(design_thing, model):
 
     # TODO: Add a check here to confirm that the model has some θ_true
 
+    # first row of summary_stats will represent the prior
+    summary_stats = model.get_θ_summary_stats('logk')
+
     for trial in range(666):
+
         design = design_thing.get_next_design(model)
 
         if design is None:
@@ -49,4 +53,8 @@ def simulated_experiment_trial_loop(design_thing, model):
 
         model.update_beliefs(design_thing.all_data)
     
-    return model
+        # add another row to summary_stats
+        summary_stats = summary_stats.append(model.get_θ_summary_stats('logk'),
+                                             ignore_index=True)
+
+    return model, summary_stats
