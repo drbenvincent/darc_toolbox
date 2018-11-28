@@ -101,7 +101,7 @@ class Hyperbolic(Model):
     '''
 
     prior = dict()
-    prior['logk'] = norm(loc=np.log(1/365), scale=1)
+    prior['logk'] = norm(loc=-4.5, scale=1)
     prior['α'] = halfnorm(loc=0, scale=2)
     θ_fixed = {'ϵ': 0.01}
 
