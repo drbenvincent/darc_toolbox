@@ -1,6 +1,7 @@
 import darc
 from darc.delayed import models
-from darc.designs import Kirby2009, Frye, DARCDesign
+from darc.designs import DARCDesign
+from darc.delayed.designs import Kirby2009, Frye
 import pandas as pd
 import numpy as np
 from copy import copy
