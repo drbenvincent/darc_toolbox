@@ -40,7 +40,7 @@ class Kirby2009(DARCDesignABC):
             return None
 
 
-class Griskevicius2011delay(DARCDesignABC):
+class Griskevicius2011(DARCDesignABC):
     '''
     A class to provide designs from the Griskevicius et al (2011) delay 
     discounting task.

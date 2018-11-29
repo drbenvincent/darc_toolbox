@@ -8,7 +8,7 @@ Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
 Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
 
 
-class Griskevicius2011risk(DARCDesignABC):
+class Griskevicius2011(DARCDesignABC):
     '''
     A class to provide designs from the Griskevicius et al (2011) risky
     choice task.
