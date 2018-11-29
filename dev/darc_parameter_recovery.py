@@ -34,30 +34,43 @@ def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_na
 
 
 
-def simulated_experiment_trial_loop(design_thing, model):
-    '''run a simulated experiment trial loop'''
+def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=None, track_this_parameter='logk'):
+    '''run a simulated experiment trial loop
+    If we provide an optional response_model then we use that in order to generate
+    response data. This allows responses to come from one model and the fitted model to 
+    be another type of model. This allows us to examine model misspecification.
+    However, if there is no response_model provided, then we generate data and fit with 
+    the same model.'''
 
-    # TODO: Add a check here to confirm that the model has some θ_true
+    if response_model is None:
+        response_model = fitted_model
 
-    # first row of summary_stats will represent the prior
-    summary_stats = model.get_θ_summary_stats('logk')
+    if response_model.θ_true is None:
+        raise ValueError('response_model must have θ_true values set')
+
+    if track_this_parameter is not None:
+        # first row of summary_stats will represent the prior
+        summary_stats = fitted_model.get_θ_summary_stats(track_this_parameter)
 
     for trial in range(666):
 
-        design = design_thing.get_next_design(model)
+        design = design_thing.get_next_design(fitted_model)
 
         if design is None:
             break
         
         design_df = darc.single_design_tuple_to_df(design)
-        response = model.get_simulated_response(design_df)
+        response = response_model.get_simulated_response(design_df)
 
         design_thing.enter_trial_design_and_response(design, response)
 
-        model.update_beliefs(design_thing.all_data)
+        fitted_model.update_beliefs(design_thing.all_data)
     
-        # add another row to summary_stats
-        summary_stats = summary_stats.append(model.get_θ_summary_stats('logk'),
-                                             ignore_index=True)
-
-    return model, summary_stats
+        if track_this_parameter is not None:
+            # add another row to summary_stats
+            summary_stats = summary_stats.append(fitted_model.get_θ_summary_stats(track_this_parameter),
+                                                ignore_index=True)
+    if track_this_parameter is None:
+        summary_stats = None
+    
+    return fitted_model, summary_stats
