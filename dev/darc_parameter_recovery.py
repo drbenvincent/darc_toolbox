@@ -9,7 +9,8 @@ from scipy.stats import norm
 def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_name):
     print('starting parameter recovery sweep')
     rows, _ = sweep_θ_true.shape
-    θ_estimated_list = []
+    summary_stats_final_trial = []
+    summary_stats_all_trials = []
     for row in range(rows):
         # make local copies
         local_model = copy(model)
@@ -17,17 +18,18 @@ def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_na
         # set true parameter values
         local_model.θ_true = sweep_θ_true.loc[[row]]  
 
-        fitted_model = simulated_experiment_trial_loop(local_design_thing, local_model)
+        fitted_model, summary_stats = simulated_experiment_trial_loop(local_design_thing, local_model)
         
         # This gets point estimate of all parameters
         #θ_estimated = fitted_model.get_θ_point_estimate()
 
         # get summary stats for the parameter of interest
         θ_estimated = fitted_model.get_θ_summary_stats(target_param_name)
+        summary_stats_final_trial.append(θ_estimated)
 
-        θ_estimated_list.append(θ_estimated)
+        summary_stats_all_trials.append(summary_stats)
 
-    return pd.concat(θ_estimated_list)
+    return (pd.concat(summary_stats_final_trial), summary_stats_all_trials)
 
 
 
