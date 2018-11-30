@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from bad.base_classes import DesignABC, BayesianAdaptiveDesign
+from bad.designs import DesignABC, BayesianAdaptiveDesign
 import pandas as pd
 import numpy as np
 import itertools

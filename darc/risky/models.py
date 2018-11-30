@@ -1,6 +1,6 @@
 from scipy.stats import norm, bernoulli, halfnorm
 import numpy as np
-from bad.base_classes import Model
+from bad.model import Model
 
 
 # TODO: THESE UTILITY FUNCTIONS ARE IN MULTIPLE PLACES !!!

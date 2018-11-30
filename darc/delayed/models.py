@@ -17,7 +17,7 @@ TODO: Can this be made easier/better?
 
 from scipy.stats import norm, bernoulli, halfnorm, uniform
 import numpy as np
-from bad.base_classes import Model
+from bad.model import Model
 
 
 class DelaySlice(Model):

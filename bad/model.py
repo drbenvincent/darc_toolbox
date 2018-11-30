@@ -1,92 +1,19 @@
 '''
-Provides base classes to be used by _any_ domain specific use of this Bayesian 
-Adaptive Design package.
+Model base class used by _any_ domain specific use of our Bayesian Adaptive Design package
 '''
 
 
 from abc import ABC, abstractmethod
-import pandas as pd
-import numpy as np
-import copy
+from bad.choice_functions import CumulativeNormalChoiceFunc
 from bad.inference import update_beliefs
 from scipy.stats import norm, bernoulli
-from random import random
-from bad.choice_functions import CumulativeNormalChoiceFunc
 import logging
 import time
+import copy
+import numpy as np
+import pandas as pd
+from random import random
 from bad.triplot import tri_plot
-
-
-# DESIGN RELATED ===================================================================
-
-class DesignABC(ABC):
-    '''
-    The top level Abstract Base class for designs. It is not functional in itself, 
-    but provides the template for handling designs for given contexts, such as DARC.
-
-    Core functionality is:
-    a) It pumps out experimental designs with the get_next_design() method.
-    b) It recieves the resulting (design, response) pair and stores a history of
-       designs and responses.
-    '''
-
-    # NOTE: these should probably not be class attributes, but declared in the __init__
-    trial = int(0)
-    all_data = pd.DataFrame()
-
-    @abstractmethod
-    def get_next_design(self, model):
-        ''' This method must be implemented in concrete classes. It should
-        output either a Design (a named tuple we are using), or a None when 
-        there are no more designs left.
-        '''
-        pass
-
-    def enter_trial_design_and_response(self, design, response):
-        self.update_all_data(design, response)
-        self.trial += 1
-        # we potentially manually call model to update beliefs here. But so far
-        # this is done manually in PsychoPy
-        return
-
-    @abstractmethod
-    def update_all_data(self, design, response):
-        pass
-
-    def get_last_response_chose_B(self):
-        '''return True if the last response was for the option B'''
-        if self.all_data.size == 0:
-            # no previous responses
-            return None
-
-        if list(self.all_data.R)[-1] == 1:  # TODO: do this better?
-            return True
-        else:
-            return False
-
-
-class BayesianAdaptiveDesign(ABC):
-    '''An abstract base class for Bayesian Adaptive Design'''
-
-    heuristic_order = None
-    all_possible_designs = pd.DataFrame()
-
-    @abstractmethod
-    def generate_all_possible_designs(self):
-        pass
-
-
-    @abstractmethod
-    def refine_design_space(self):
-        ''' In theory we could do design optimisation on ALL possible designs.
-        However, this is complex. You can imagine some sets of designs will map on to
-        very distinct values of the decision variable, but that there are many designs
-        which will be almost invariant to the decision variable. But we would like to
-        explore the design space sensibly. Our general approach is (on any given trial)
-        to take a subset of the possible designs and conduct design optimisation on this
-        reduced subset. Importantly, over different trials, we are chosing this subset
-        intelligently to maximise exploration over the design space.'''
-        pass
 
 
 # MODEL RELATED ====================================================================
@@ -105,14 +32,14 @@ class Model(ABC):
     '''
     Model abstract base class. It does nothing on it's own, but it sketches out the core
     elements of _any_ model which we could use. To be clear, a model could be pretty much
-    any computational/mathematical model which relates inputs (ie experimental designs) 
+    any computational/mathematical model which relates inputs (ie experimental designs)
     and model parameters to a behavioural response:
         response = f(design, parameters)
-    
+
     We are only considering experimental paradigms where we have two possible responses.
     This is a simplification, but it also covers a very wide range of experiment classes
     including:
-    a) psychophysics such as yes/no or 2AFC paradigms, 
+    a) psychophysics such as yes/no or 2AFC paradigms,
     b) decision making experiments with choices between 2 prospects
 
     I also impose that all of the models will involve a single decision variable. A choice
@@ -124,7 +51,7 @@ class Model(ABC):
     θ_fixed = dict()
     θ_true = None
 
-    # Decide on the choice function we are using. I am going to focus on 
+    # Decide on the choice function we are using. I am going to focus on
     # `CumulativeNormalChoiceFunc`, but if you want to use another choice function
     # for whatever reason, then it should be pretty obvious how to do this, using
     # `CumulativeNormalChoiceFunc` as an example. You obviously have to update
@@ -164,8 +91,8 @@ class Model(ABC):
         Calculate the log liklihood of the data for given theta parameters.
         Σ log(p(data|θ))
         We are going to iterate over trials. For each one, we take the trial
-        data and calculate the predictive_y. This gives us many values 
-        (correspoding to particles). We deal with these appropriately for 
+        data and calculate the predictive_y. This gives us many values
+        (correspoding to particles). We deal with these appropriately for
         'chose B' and 'chose A' trials. Then calculate the log
         likelihood, which involves summing the ll over trials so that we end
         up with a log likelihood value for all the particles.
@@ -173,7 +100,7 @@ class Model(ABC):
 
         n_trials, _ = data.shape
         n_particles, _ = θ.shape
-        
+
         # TODO safety check... if no data, return ll = 0
 
         p_chose_B = np.zeros((n_particles, n_trials))
@@ -190,7 +117,7 @@ class Model(ABC):
 
         ll = np.sum(np.log(p_chose_B), axis=1)
         return ll
-        
+
     def log_prior_pdf(self, θ):
         """Evaluate the log prior density, log(p(θ)), for the values θ
         θ: dictionary, each key is a parameter name
@@ -211,7 +138,7 @@ class Model(ABC):
         return pd.DataFrame.from_dict(particles_dict)
 
     def predictive_y(self, θ, data):
-        ''' 
+        '''
         Calculate the probability of chosing B. We need this to work in multiple
         contexts:
 
@@ -253,12 +180,12 @@ class Model(ABC):
         '''return a point estimate (posterior median) for the model parameters'''
         median_series = self.θ.median(axis=0)
         return median_series.to_frame().T
-    
+
     def get_θ_summary_stats(self, param_name):
         '''return summary stats for a given parameter'''
-        
-        summary_stats = {'entropy': [self.get_θ_entropy(param_name)], 
-                         'median': [self.θ[param_name].median()], 
+
+        summary_stats = {'entropy': [self.get_θ_entropy(param_name)],
+                         'median': [self.θ[param_name].median()],
                          'mean': [self.θ[param_name].mean()],
                          'lower50': [self.θ[param_name].quantile(0.25)],
                          'upper50': [self.θ[param_name].quantile(0.75)],
@@ -279,7 +206,7 @@ class Model(ABC):
         '''Generate some true parameters based on the model's priors. This
         is used for doing testing parameter recovery where we need to generate
         true parameters for any given concrete model class.'''
-       
+
         θ_dict = {}
         for key in self.parameter_names:
             θ_dict[key] = [self.prior[key].mean()]
