@@ -26,24 +26,24 @@ class Hyperbolic(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._odds_discount_func(data['PA'].values, θ)
-        VB = data['RB'].values * self._odds_discount_func(data['PB'].values, θ)
+        VA = data['RA'].values * self._odds_discount_func(data['PA'].values, θ['logh'].values)
+        VB = data['RB'].values * self._odds_discount_func(data['PB'].values, θ['logh'].values)
         return VB - VA
-    
+
     @staticmethod
-    def _odds_discount_func(probabilities, θ):
+    def _odds_discount_func(probabilities, logh):
         # transform logh to h
-        h = np.exp(θ['logh'].values)
+        h = np.exp(logh)
         # convert probability to odds against
         odds_against = prob_to_odds_against(probabilities)
-        return np.divide(1, (1 + h * odds_against))
+        return 1/(1 + h * odds_against)
 
 
 class ProportionalDifference(Model):
     '''Proportional difference model for risky rewards
-    
-    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and 
-    context-sensitive model of choice behavior. Psychological Review, 109(1), 
+
+    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and
+    context-sensitive model of choice behavior. Psychological Review, 109(1),
     137–155. http://doi.org/10.1037//0033-295X.109.1.137
     '''
 

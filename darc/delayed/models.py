@@ -3,8 +3,8 @@ about the design space and the model parameters.
 
 The main jobs of the model classes are:
 a) define priors over parameters - as scipy distribution objects
-b) implement the `calc_decision_variable` method. You can add 
-   whatever useful helper functions you wat in order to help with 
+b) implement the `calc_decision_variable` method. You can add
+   whatever useful helper functions you wat in order to help with
    that job.
 
 NOTE: There is some faff and checking required when we are doing
@@ -39,12 +39,12 @@ class DelaySlice(Model):
     def calc_decision_variable(self, θ, data):
         ''' The decision variable is difference between the indifference point and
         the 'stimulus intensity' which is RA/RB '''
-        return θ['indiff'].values - (data['RA'].values / data['RB'].values) 
+        return θ['indiff'].values - (data['RA'].values / data['RB'].values)
 
 
 # class DelaySlices(Model):
 #     '''This is a 'non-parametric' model which estimates indifference points (A/B)
-#     at a small number of specified delays. The parameters being inferred are the 
+#     at a small number of specified delays. The parameters being inferred are the
 #     indifference points for each delay level.
 #     '''
 
@@ -89,13 +89,13 @@ class DelaySlice(Model):
 #         # elif data['DB'].values == self.delays[3]:
 #         #     x = θ['indiff4'].values - (data['RA'].values / data['RB'].values)
 #         # return x
-    
+
 
 class Hyperbolic(Model):
     '''Hyperbolic time discounting model
-    
-    Mazur, J. E. (1987). An adjusting procedure for studying delayed 
-    re-inforcement. In Commons, M. L., Mazur, J. E., Nevin, J. A., and 
+
+    Mazur, J. E. (1987). An adjusting procedure for studying delayed
+    re-inforcement. In Commons, M. L., Mazur, J. E., Nevin, J. A., and
     Rachlin, H., editors, Quantitative Analyses of Behavior, pages 55–
     73. Erlbaum, Hillsdale, NJ.
     '''
@@ -106,15 +106,14 @@ class Hyperbolic(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
+        VA = data['RA'].values * self._time_discount_func(data['DA'].values, np.exp(θ['logk'].values))
+        VB = data['RB'].values * self._time_discount_func(data['DB'].values, np.exp(θ['logk'].values))
         return VB - VA
-    
+
     @staticmethod
-    def _time_discount_func(delay, θ):
-        k = np.exp(θ['logk'].values)
-        return np.divide(1, (1 + k * delay))
-        
+    def _time_discount_func(delay, k):
+        return 1/(1 + k * delay)
+
 
 class Exponential(Model):
     '''Exponential time discounting model'''
@@ -125,15 +124,14 @@ class Exponential(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
+        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['k'].values)
+        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['k'].values)
         return VB - VA
-    
-    @staticmethod
-    def _time_discount_func(delay, θ):
-        k = θ['k'].values
-        return np.exp((-k * delay).astype('float')) # TODO: I don't know why we need this astype here
 
+    @staticmethod
+    @np.vectorize
+    def _time_discount_func(delay, k):
+        return np.exp(-k * delay)
 
 class HyperbolicMagnitudeEffect(Model):
     '''Hyperbolic time discounting model + magnitude effect
@@ -151,23 +149,15 @@ class HyperbolicMagnitudeEffect(Model):
 
     def calc_decision_variable(self, θ, data):
         VA = self._present_subjective_value(
-            data['RA'].values, data['DA'].values, θ)
+            data['RA'].values, data['DA'].values, θ['m'].values, θ['c'].values)
         VB = self._present_subjective_value(
-            data['RB'].values, data['DA'].values, θ)
+            data['RB'].values, data['DB'].values, θ['m'].values, θ['c'].values)
         return VB-VA
 
     @staticmethod
-    def _present_subjective_value(reward, delay, θ):
-        # process inputs
-        delay = delay.astype('float')
-        reward = reward.astype('float')
-        m = θ['m'].values
-        c = θ['c'].values
-        # magnitude effect
+    def _present_subjective_value(reward, delay, m, c):
         k = np.exp( m * np.log(reward) + c )
-        # HYPERBOLIC discounting of time
         discount_fraction = 1 / (1 + k * delay)
-        # subjective value function
         V = reward * discount_fraction
         return V
 
@@ -188,23 +178,16 @@ class ExponentialMagnitudeEffect(Model):
 
     def calc_decision_variable(self, θ, data):
         VA = self._present_subjective_value(
-            data['RA'].values, data['DA'].values, θ)
+            data['RA'].values, data['DA'].values, θ['m'].values, θ['c'].values)
         VB = self._present_subjective_value(
-            data['RB'].values, data['DB'].values, θ)
+            data['RB'].values, data['DB'].values, θ['m'].values, θ['c'].values)
         return VB-VA
 
     @staticmethod
-    def _present_subjective_value(reward, delay, θ):
-        # process inputs
-        delay = delay.astype('float')
-        reward = reward.astype('float')
-        m = θ['m'].values
-        c = θ['c'].values
-        # magnitude effect
+    @np.vectorize
+    def _present_subjective_value(reward, delay, m, c):
         k = np.exp(m * np.log(reward) + c)
-        # EXPONENTIAL discounting of time
-        discount_fraction = np.exp((-k * delay)) #.astype('float'))
-        # subjective value function
+        discount_fraction = np.exp(-k * delay)
         V = reward * discount_fraction
         return V
 
@@ -212,7 +195,7 @@ class ExponentialMagnitudeEffect(Model):
 class ConstantSensitivity(Model):
     '''The constant sensitivity time discounting model
 
-    Ebert & Prelec (2007) The Fragility of Time: Time-Insensitivity and Valuation 
+    Ebert & Prelec (2007) The Fragility of Time: Time-Insensitivity and Valuation
     of the Near and Far Future. Management Science, 53(9):1423–1438.
     '''
 
@@ -223,19 +206,17 @@ class ConstantSensitivity(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
+        VA = data['RA'].values * \
+            self._time_discount_func(
+                data['DA'].values, θ['a'].values, θ['b'].values)
+        VB = data['RB'].values * self._time_discount_func(
+                data['DB'].values, θ['a'].values, θ['b'].values)
         return VB-VA
 
     @ staticmethod
-    def _time_discount_func(delay, θ):
-        # NOTE: we want params as a row matrix, and delays as a column matrix to do the
-        # appropriate array broadcasting.
-        a = θ['a'].values
-        b = θ['b'].values
-        temp = np.power(a * delay, b)
-        return np.exp(-temp.astype('float'))
-
+    def _time_discount_func(delay, a, b):
+        # NOTE: we want params as a row matrix, and delays as a column matrix to do the appropriate array broadcasting.
+        return np.exp(-np.power(a * delay, b))
 
 class MyersonHyperboloid(Model):
     '''Myerson style hyperboloid
@@ -248,24 +229,23 @@ class MyersonHyperboloid(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ)
+        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['logk'].values, θ['s'].values)
+        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['logk'].values, θ['s'].values)
         return VB-VA
 
     @staticmethod
-    def _time_discount_func(delay, θ):
-        # NOTE: we want k as a row matrix, and delays as a column matrix to do the
+    def _time_discount_func(delay, logk, s):
+        # NOTE: we want logk as a row matrix, and delays as a column matrix to do the
         # appropriate array broadcasting.
-        k = np.exp(θ['logk'].values)
-        s = θ['s'].values
+        k = np.exp(logk)
         return 1 / np.power(1 + k * delay, s)
 
 
 class ProportionalDifference(Model):
     '''Proportional difference model applied to delay discounting
-    
-    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and 
-    context-sensitive model of choice behavior. Psychological Review, 109(1), 
+
+    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and
+    context-sensitive model of choice behavior. Psychological Review, 109(1),
     137–155. http://doi.org/10.1037//0033-295X.109.1.137
     '''
 
@@ -275,7 +255,7 @@ class ProportionalDifference(Model):
     θ_fixed = {'ϵ': 0.01}
 
     def calc_decision_variable(self, θ, data):
-        # organised so that higher values of the decision variable will 
+        # organised so that higher values of the decision variable will
         # mean higher probabability for the delayed option (prospect B)
         prop_reward = self._proportional_difference(data['RA'].values, data['RB'].values)
         prop_delay = self._proportional_difference(data['DA'].values, data['DB'].values)
@@ -310,11 +290,11 @@ class HyperbolicNonLinearUtility(Model):
 
     def calc_decision_variable(self, θ, data):
         a = np.exp(θ['a'].values)
-        VA = np.power(data['RA'].values,a) * self._time_discount_func(data['DA'].values, θ)
-        VB = np.power(data['RB'].values,a) * self._time_discount_func(data['DB'].values, θ)
+        VA = np.power(data['RA'].values,a) * self._time_discount_func(data['DA'].values, θ['logk'].values)
+        VB = np.power(data['RB'].values,a) * self._time_discount_func(data['DB'].values, θ['logk'].values)
         return VB-VA
 
     @staticmethod
-    def _time_discount_func(delay, θ):
-        k = np.exp(θ['logk'].values)
-        return np.divide(1, (1 + k * delay))
+    def _time_discount_func(delay, logk):
+        k = np.exp(logk)
+        return 1/(1 + k * delay)

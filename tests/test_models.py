@@ -52,8 +52,8 @@ def test_calc_decision_variable(model):
     n_particles = 10
     model_instance = model(n_particles=n_particles)
 
-    faux_design = pd.DataFrame({'RA': [100], 'DA': [0], 'PA': [1],
-                                'RB': [150], 'DB': [14], 'PB': [1]})
+    faux_design = pd.DataFrame({'RA': [100.], 'DA': [0.], 'PA': [1.],
+                                'RB': [150.], 'DB': [14.], 'PB': [1.]})
     dv = model_instance.calc_decision_variable(model_instance.θ, faux_design)
     assert isinstance(dv, np.ndarray)
 
@@ -68,8 +68,8 @@ def test_update_beliefs(model):
     # set up faux all_data
     data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
     all_data = pd.DataFrame(columns=data_columns)
-    faux_trial_data = {'RA': [100], 'DA': [0], 'PA': [1.],
-                       'RB': [160], 'DB': [60], 'PB': [1.],
+    faux_trial_data = {'RA': [100.], 'DA': [0.], 'PA': [1.],
+                       'RB': [160.], 'DB': [60.], 'PB': [1.],
                        'R': [int(False)]}
     all_data = all_data.append(pd.DataFrame(faux_trial_data))
     model_instance.update_beliefs(all_data)
@@ -91,8 +91,8 @@ def test_get_simulated_response(model):
     model_instance = model(n_particles=n_particles)
     model_instance = model_instance.generate_faux_true_params()
 
-    faux_design = pd.DataFrame({'RA': [100], 'DA': [0], 'PA': [1],
-                                'RB': [150], 'DB': [14], 'PB': [1]})
+    faux_design = pd.DataFrame({'RA': [100.], 'DA': [0.], 'PA': [1.],
+                                'RB': [150.], 'DB': [14.], 'PB': [1.]})
 
     response = model_instance.get_simulated_response(faux_design)
     isinstance(response, bool)

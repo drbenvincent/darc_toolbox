@@ -15,18 +15,14 @@ from darc.delayed_and_risky import models as delayed_and_risky_models
 import pytest
 
 
-logging.basicConfig(filename='test.log', level=logging.DEBUG, 
+logging.basicConfig(filename='test.log', level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(funcName)s:%(message)s')
 
 
 delayed_models_list = [
     delayed_models.Hyperbolic,
     delayed_models.Exponential,
-    #delayed_models.ConstantSensitivity,
-    delayed_models.MyersonHyperboloid,
-    delayed_models.ProportionalDifference,
-    #delayed_models.HyperbolicNonLinearUtility
-]
+    delayed_models.MyersonHyperboloid]
 
 delayed_models_list_ME = [
     delayed_models.HyperbolicMagnitudeEffect,
@@ -34,13 +30,10 @@ delayed_models_list_ME = [
 
 risky_models_list = [
     risky_models.Hyperbolic,
-    risky_models.ProportionalDifference,
-    #risky_models.ProspectTheory
-]
+    risky_models.ProportionalDifference]
 
 delayed_and_risky_models_list = [
-    delayed_and_risky_models.MultiplicativeHyperbolic
-]
+    delayed_and_risky_models.MultiplicativeHyperbolic]
 
 max_trials = 2
 n_particles = 2_000  # needs to be highish to ensure reliable test outcome
@@ -55,7 +48,7 @@ def simulated_experiment_trial_loop(design_thing, model):
 
         if design is None:
             break
-        
+
         design_df = darc.single_design_tuple_to_df(design)
         response = model.get_simulated_response(design_df)
         design_thing.enter_trial_design_and_response(design, response)
@@ -77,7 +70,7 @@ def test_model_design_integration_delayed(model):
                               RA=list(100*np.linspace(0.05, 0.95, 19)),
                               random_choice_dimension='DB')
 
-    model = model(n_particles=n_particles) 
+    model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -90,11 +83,11 @@ def test_model_design_integration_delayed_ME(model):
     Estimation'''
 
     design_thing = DARCDesign(max_trials=max_trials,
-                              RB=[100, 500, 1_000],
+                              RB=[100., 500., 1_000.],
                               RA_over_RB=np.linspace(0.05, 0.95, 19).tolist(),
                               random_choice_dimension='RB')
 
-    model = model(n_particles=n_particles) 
+    model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -106,13 +99,13 @@ def test_model_design_integration_risky(model):
     Estimation'''
 
     design_thing = DARCDesign(max_trials=max_trials,
-                              DA=[0], DB=[0], PA=[1], 
+                              DA=[0.], DB=[0.], PA=[1.],
                               PB=list(np.linspace(0.01, 0.99, 91)),
                               RA=list(100*np.linspace(0.05, 0.95, 19)),
-                              RB=[100],
+                              RB=[100.],
                               random_choice_dimension='PB')
 
-    model = model(n_particles=n_particles) 
+    model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
@@ -128,7 +121,7 @@ def test_model_design_integration_delayed_and_risky(model):
                               PB=list(np.linspace(0.01, 0.99, 19)),
                               random_choice_dimension='PB')
 
-    model = model(n_particles=n_particles) 
+    model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
 
     simulated_experiment_trial_loop(design_thing, model)
