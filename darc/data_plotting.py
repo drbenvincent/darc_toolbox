@@ -63,7 +63,7 @@ def all_data_plotter(all_data):
 
 # DELAY PLOTS =========================================================
 
-def plot_delay_with_front_end_delays(ax, alldata):
+def plot_delay_with_front_end_delays(ax, all_data):
 
     RA = all_data.RA.values
     DA = all_data.DA.values
@@ -118,7 +118,7 @@ def plot_delay_without_front_end_delays(ax, all_data):
 # RISKY PLOTS =========================================================
 
 
-def plot_probability_data(ax, alldata):
+def plot_probability_data(ax, all_data):
 
     RA = all_data.RA.values
     DA = all_data.DA.values
