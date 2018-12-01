@@ -20,7 +20,7 @@ DEFAULT_DB = np.concatenate([
     np.array([2, 3, 4])*7,
     np.array([3, 4, 5, 6, 8, 9])*30,
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365]).tolist()
-       
+
 # define useful data structures
 Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
 Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
@@ -70,11 +70,11 @@ class DARCDesignABC(DesignABC, ABC):
         self.all_data = pd.DataFrame(columns=data_columns)
 
     def update_all_data(self, design, response):
-        # TODO: need to specify types here I think... then life might be 
+        # TODO: need to specify types here I think... then life might be
         # easier to decant the data out at another point
         # trial_df = design_to_df(design)
         # self.all_data = self.all_data.append(trial_df)
-        
+
         trial_data = {'RA': design.ProspectA.reward,
                       'DA': design.ProspectA.delay,
                       'PA': design.ProspectA.prob,
@@ -87,14 +87,14 @@ class DARCDesignABC(DesignABC, ABC):
 
     def plot_all_data(self):
         '''Visualise data'''
-        all_data_plotter(self.all_data) 
+        all_data_plotter(self.all_data)
 
     def generate_all_possible_designs(self, assume_discounting=True):
         '''Create a dataframe of all possible designs (one design is one row)
-        based upon the set of design variables (RA, DA, PA, RB, DB, PB) 
+        based upon the set of design variables (RA, DA, PA, RB, DB, PB)
         provided. We do this generation process ONCE. There may be additional
-        trial-level processes which choose subsets of all of the possible 
-        designs. But here, we generate the largest set of designs that we 
+        trial-level processes which choose subsets of all of the possible
+        designs. But here, we generate the largest set of designs that we
         will ever consider
         '''
 
@@ -132,15 +132,15 @@ class DARCDesignABC(DesignABC, ABC):
             D = D.drop(columns=['RA_over_RB'])
 
         else:
-            logging.error('Failed to work out what we want. Confusion over RA and RA_over_RB')            
+            logging.error('Failed to work out what we want. Confusion over RA and RA_over_RB')
 
-        
+
         logging.debug(f'{D.shape[0]} designs generated initially')
 
         # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
         D.drop(D[D.DA > D.DB].index, inplace=True)
         logging.debug(f'{D.shape[0]} left after dropping DA>DB')
-        
+
         if assume_discounting:
             D.drop(D[D.RB < D.RA].index, inplace=True)
             logging.debug(f'{D.shape[0]} left after dropping RB<RA')
@@ -158,17 +158,17 @@ class DARCDesignABC(DesignABC, ABC):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
+class BADDesignGenerator(DARCDesignABC, BayesianAdaptiveDesign):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
 
-    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100], 
-                 RA_over_RB=list(), PA=[1], PB=[1], 
+    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100],
+                 RA_over_RB=list(), PA=[1], PB=[1],
                  random_choice_dimension=None,
                  max_trials=20,
                  NO_REPEATS=False):
-        super().__init__()     
+        super().__init__()
 
         self._input_type_validation(RA, DA, PA, RB, DB, PB, RA_over_RB)
         self._input_value_validation(PA, PB, DA, DB, RA_over_RB)
@@ -198,10 +198,10 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         assert isinstance(RA_over_RB, list), "RA_over_RB should be a list"
 
         # we expect EITHER values in RA OR values in RA_over_RB
-        # assert (not RA) ^ (not RA_over_RB), "Expecting EITHER RA OR RA_over_RB as an" 
+        # assert (not RA) ^ (not RA_over_RB), "Expecting EITHER RA OR RA_over_RB as an"
         if not RA:
             assert not RA_over_RB is False, "If not providing list for RA, we expect a list for RA_over_RB"
-        
+
         if not RA_over_RB:
             assert not RA is False, "If not providing list for RA_over_RB, we expect a list for RA"
 
@@ -233,7 +233,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
         allowable_designs = self.refine_design_space(model)
         chosen_design_df, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
         chosen_design_named_tuple = df_to_design_tuple(chosen_design_df)
-        
+
         logging.debug(f'chosen design is: {chosen_design_named_tuple}')
         logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design_named_tuple
@@ -241,7 +241,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
     def refine_design_space(self, model):
         '''A series of filter operations to refine down the space of designs which we
         do design optimisations on.'''
-        
+
         allowable_designs = copy.copy(self.all_possible_designs)
         logging.debug(f'{allowable_designs.shape[0]} designs initially')
 
@@ -271,7 +271,7 @@ class DARCDesign(DARCDesignABC, BayesianAdaptiveDesign):
 
 def remove_trials_already_run(design_set, exclude_these):
     '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)
-    Dropping duplicates will work in this situation because `exclude_these` is going to 
+    Dropping duplicates will work in this situation because `exclude_these` is going to
     be a subset of `design_set`'''
     # see https://stackoverflow.com/a/40209800/5172570
     allowable_designs = pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
@@ -319,8 +319,8 @@ def choose_one_along_design_dimension(allowable_designs, design_dim_name):
     '''We are going to take one design dimension given by `design_dim_name` and randomly
     pick one of it's values and hold it constant by removing all others from the list of
     allowable_designs.
-    The purpose of this is to promote variation along the chosen design dimension. 
-    Cutting down the set of allowable_designs which we do design optimisation on is a 
+    The purpose of this is to promote variation along the chosen design dimension.
+    Cutting down the set of allowable_designs which we do design optimisation on is a
     nice side-effect rather than a direct goal.
     '''
     unique_values = allowable_designs[design_dim_name].unique()

@@ -1,8 +1,8 @@
-''' 
+'''
 Allow an appropriate (design, model) combination to be chosen by the experimenter,
 using a simple GUI.
 
-This code is only intended to be used for the PsychoPy demo, to make it easy. 
+This code is only intended to be used for the PsychoPy demo, to make it easy.
 When you run proper experiments, then you should define your (design, model)
 combination in the code to avoid GUI input errors to ensure you are running
 exactly what you want to run.
@@ -15,14 +15,14 @@ import darc
 
 
 # define what is available
-expt_type = {'Experiment type': 
+expt_type = {'Experiment type':
              ['delayed (Bayesian Adaptive Design)',
-             'risky (Bayesian Adaptive Design)', 
+             'risky (Bayesian Adaptive Design)',
              'delayed and risky (Bayesian Adaptive Design)',
-             'delayed (Griskevicius et al, 2011)', 
-             'delayed (Kirby 2009)', 
-             'delayed (Frye et al, 2016)', 
-             'risky (Griskevicius et al, 2011)', 
+             'delayed (Griskevicius et al, 2011)',
+             'delayed (Kirby 2009)',
+             'delayed (Frye et al, 2016)',
+             'risky (Griskevicius et al, 2011)',
              ]}
 
 delayed_design_set = {'delayed (Bayesian Adaptive Design)', 'delayed (Kirby 2009)',
@@ -64,7 +64,7 @@ def gui_chooser_for_demo(win, gui, core, event, expInfo):
 def hide_window(win, mouse):
     mouse.setVisible(1)  # ensure mouse is visible
     win.fullscr = False  # not sure if this is necessary
-    win.winHandle.set_fullscreen(False) 
+    win.winHandle.set_fullscreen(False)
     win.winHandle.minimize()
     win.flip()
 
@@ -110,7 +110,7 @@ def gui_get_desired_model(gui, core):
     model_type = {'Model': models_available}
     dlg = gui.DlgFromDict(dictionary=model_type, title='Choose your model')
     if dlg.OK == False:
-        core.quit()  # user pressed cancel 
+        core.quit()  # user pressed cancel
 
     desired_model = model_type['Model']
     logging.debug(desired_model)
@@ -124,15 +124,15 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     if desired_experiment_type == 'delayed (Bayesian Adaptive Design)':
         # regular, or magnitude effect
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
-            design_thing = darc.designs.DARCDesign(max_trials=expInfo['trials'],
+            design_thing = darc.designs.BADDesignGenerator(max_trials=expInfo['trials'],
                                       RB=[100, 500, 1_000],
                                       RA_over_RB=np.linspace(0.05, 0.95, 19).tolist(),
                                       random_choice_dimension='RB')
         else:
-            design_thing = darc.designs.DARCDesign(max_trials=expInfo['trials'],
+            design_thing = darc.designs.BADDesignGenerator(max_trials=expInfo['trials'],
                                       RA=list(100*np.linspace(0.05, 0.95, 91)),
                                       random_choice_dimension='DB')
-        
+
         # import the appropriate set of models
         from darc.delayed import models
 
@@ -147,7 +147,7 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
 
     elif desired_experiment_type == 'delayed (Frye et al, 2016)':
         design_thing = darc.delayed.designs.Frye()
-        from darc.delayed import models    
+        from darc.delayed import models
 
     elif desired_experiment_type == 'risky (Griskevicius et al, 2011)':
         design_thing = darc.risky.designs.Griskevicius2011()
@@ -157,7 +157,7 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         # create an appropriate design object
         prob_list = [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99]
 
-        design_thing = darc.designs.DARCDesign(max_trials=expInfo['trials'],
+        design_thing = darc.designs.BADDesignGenerator(max_trials=expInfo['trials'],
                                     DA=[0], DB=[0], PA=[1], PB=prob_list,
                                     RA=list(100*np.linspace(0.05, 0.95, 91)),
                                     RB=[100],
@@ -167,7 +167,7 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
 
     elif desired_experiment_type == 'delayed and risky (Bayesian Adaptive Design)':
         # create an appropriate design object
-        design_thing = darc.designs.DARCDesign(max_trials=expInfo['trials'],
+        design_thing = darc.designs.BADDesignGenerator(max_trials=expInfo['trials'],
                                   PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
                                   random_choice_dimension='DB')
         # import the appropriate set of models
@@ -197,7 +197,7 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     elif desired_model is 'HyperbolicNonLinearUtility':
         model = models.HyperbolicNonLinearUtility(
             n_particles=expInfo['particles'])
-    
+
     elif desired_model is 'MultiplicativeHyperbolic':
         model = models.MultiplicativeHyperbolic(
             n_particles=expInfo['particles'])
