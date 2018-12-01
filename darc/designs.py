@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from bad.designs import DesignABC, BayesianAdaptiveDesign
+from bad.designs import DesignGeneratorABC, BayesianAdaptiveDesign
 import pandas as pd
 import numpy as np
 import itertools
@@ -51,7 +51,7 @@ def df_to_design_tuple(df):
 
 ## ANOTHER BASE CLASS: Users not to change this
 
-class DARCDesignGeneratorABC(DesignABC, ABC):
+class DARCDesignGeneratorABC(DesignGeneratorABC, ABC):
     '''
     Another abstract base class which extends the basic design class, adding
     specialisations for our DARC domain. This includes:

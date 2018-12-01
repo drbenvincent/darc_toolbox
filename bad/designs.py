@@ -1,5 +1,5 @@
 '''
-Provides base classes related to experimental designs to be used by _any_ 
+Provides base classes related to experimental designs to be used by _any_
 domain specific use of this Bayesian Adaptive Design package.
 '''
 
@@ -9,9 +9,9 @@ import pandas as pd
 import logging
 
 
-class DesignABC(ABC):
+class DesignGeneratorABC(ABC):
     '''
-    The top level Abstract Base class for designs. It is not functional in itself, 
+    The top level Abstract Base class for designs. It is not functional in itself,
     but provides the template for handling designs for given contexts, such as DARC.
 
     Core functionality is:
@@ -27,7 +27,7 @@ class DesignABC(ABC):
     @abstractmethod
     def get_next_design(self, model):
         ''' This method must be implemented in concrete classes. It should
-        output either a Design (a named tuple we are using), or a None when 
+        output either a Design (a named tuple we are using), or a None when
         there are no more designs left.
         '''
         pass
