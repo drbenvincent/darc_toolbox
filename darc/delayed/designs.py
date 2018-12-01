@@ -20,21 +20,21 @@ class Kirby2009(DARCDesignGeneratorABC):
     # only likely to be a problem if we have mulitple Kirby2009 object instances. We'd
     # also have to explicitly call the superclass constructor at that point, I believe.
     max_trials = 27
-    RA = [80, 34, 25, 11, 49, 41, 34, 31, 19, 22, 55, 28, 47,
+    _RA = [80, 34, 25, 11, 49, 41, 34, 31, 19, 22, 55, 28, 47,
           14, 54, 69, 54, 25, 27, 40, 54, 15, 33, 24, 78, 67, 20]
-    DA = 0
-    RB = [85, 50, 60, 30, 60, 75, 35, 85, 25, 25, 75, 30, 50,
+    _DA = 0
+    _RB = [85, 50, 60, 30, 60, 75, 35, 85, 25, 25, 75, 30, 50,
           25, 80, 85, 55, 30, 50, 55, 60, 35, 80, 35, 80, 75, 55]
-    DB = [157, 30, 14, 7, 89, 20, 186, 7, 53, 136, 61, 179, 160, 19,
+    _DB = [157, 30, 14, 7, 89, 20, 186, 7, 53, 136, 61, 179, 160, 19,
           30, 91, 117, 80, 21, 62, 111, 13, 14, 29, 162, 119, 7]
-    PA, PB = 1, 1
+    _PA, _PB = 1, 1
 
     def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             logging.info(f'Getting design for trial {self.trial}')
-            design = Design(ProspectA=Prospect(reward=self.RA[self.trial], delay=self.DA, prob=self.PA),
-                            ProspectB=Prospect(reward=self.RB[self.trial], delay=self.DB[self.trial], prob=self.PB))
+            design = Design(ProspectA=Prospect(reward=self._RA[self.trial], delay=self._DA, prob=self._PA),
+                            ProspectB=Prospect(reward=self._RB[self.trial], delay=self._DB[self.trial], prob=self._PB))
             return design
         else:
             return None
@@ -55,19 +55,19 @@ class Griskevicius2011(DARCDesignGeneratorABC):
     # only likely to be a problem if we have mulitple instances. We'd
     # also have to explicitly call the superclass constructor at that point, I believe.
     max_trials = 7
-    RA = 100
-    DA = 0
-    RB = [110, 120, 130, 140, 150, 160, 170]
-    DB = 90
-    PA, PB = 1, 1
+    _RA = 100
+    _DA = 0
+    _RB = [110, 120, 130, 140, 150, 160, 170]
+    _DB = 90
+    _PA, _PB = 1, 1
 
     def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission...
         # we should just do it, and have a catch ??
         if self.trial < self.max_trials:
             logging.info(f'Getting design for trial {self.trial}')
-            design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
-                            ProspectB=Prospect(reward=self.RB[self.trial], delay=self.DB, prob=self.PB))
+            design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
+                            ProspectB=Prospect(reward=self._RB[self.trial], delay=self._DB, prob=self._PB))
             return design
         else:
             return None
@@ -87,18 +87,18 @@ class Koffarnus_Bickel(DARCDesignGeneratorABC):
     # only likely to be a problem if we have mulitple instances. We'd
     # also have to explicitly call the superclass constructor at that point, I believe.
     max_trials = 5
-    RB = 100
-    DA = 0
-    RA = RB*0.5
-    DB = np.concatenate([(1/24)*np.array([1, 2, 3, 4, 6, 9, 12]),
+    _RB = 100
+    _DA = 0
+    _RA = _RB*0.5
+    _DB = np.concatenate([(1/24)*np.array([1, 2, 3, 4, 6, 9, 12]),
          np.array([1, 1.5, 2, 3, 4]),
          7*np.array([1, 1.5, 2, 3]),
          29*np.array([1, 2, 3, 4, 6, 8]),
          365*np.array([1, 2, 3, 4, 5, 8, 12, 18, 25])])
-    PA, PB = 1, 1
-    delay_index = 16-1 # this is always the initial delay used (equals 3 weeks)
-    index_increments = 8
-    trial = 1
+    _PA, _PB = 1, 1
+    _delay_index = 16-1 # this is always the initial delay used (equals 3 weeks)
+    _index_increments = 8
+    # trial = 1
 
     def get_next_design(self, _):
 
@@ -106,19 +106,19 @@ class Koffarnus_Bickel(DARCDesignGeneratorABC):
             return None
 
         if self.trial == 1:
-            design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
-                            ProspectB=Prospect(reward=self.RB, delay=self.DB[self.delay_index], prob=self.PB))
+            design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
+                            ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB))
         else:
             if self.get_last_response_chose_B():
-                self.delay_index += self.index_increments
+                self._delay_index += self._index_increments
             else:
-                self.delay_index -= self.index_increments
+                self._delay_index -= self._index_increments
 
         # each trial, the increments half, so will be: 8, 4, 2, 1
-        self.index_increments = int(max(self.index_increments/2, 1))
+        self._index_increments = int(max(self._index_increments/2, 1))
 
-        design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
-                        ProspectB=Prospect(reward=self.RB, delay=self.DB[self.delay_index], prob=self.PB))
+        design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
+                        ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB))
         return design
 
 
@@ -133,36 +133,37 @@ class Frye(DARCDesignGeneratorABC):
     '''
 
     def __init__(self, DB=[7, 30, 30*3, 30*6, 365], RB=100., trials_per_delay=5):
-        self.DA = 0
-        self.DB = DB
-        self.RB = RB
-        self.R_A = RB * 0.5
-        self.post_choice_adjustment = 0.25
-        self.trials_per_delay = trials_per_delay
-        self.trial_per_delay_counter = 0
-        self.delay_counter = 0
-        self.PA = 1
-        self.PB = 1
+        self._DA = 0
+        self._DB = DB
+        self._RB = RB
+        self._R_A = RB * 0.5
+        self._post_choice_adjustment = 0.25
+        self._trials_per_delay = trials_per_delay
+        self._trial_per_delay_counter = 0
+        self._delay_counter = 0
+        self._PA = 1
+        self._PB = 1
+        self.max_trials = len(self._DB) * self._trials_per_delay
         # call the superclass constructor
         super().__init__()
 
     def get_next_design(self, _):
         """return the next design as a tuple of prospects"""
 
-        if self.delay_counter == len(self.DB):
+        if self._delay_counter == len(self._DB):
             return None
 
         logging.info(f'Getting design for trial {self.trial}')
         last_response_chose_B = self.get_last_response_chose_B()
 
-        if self.trial_per_delay_counter is 0:
-            self.RA = self.RB * 0.5
+        if self._trial_per_delay_counter is 0:
+            self._RA = self._RB * 0.5
         else:
             self._update_RA_given_last_response(last_response_chose_B)
-            self.post_choice_adjustment *= 0.5
+            self._post_choice_adjustment *= 0.5
 
-        design = Design(ProspectA=Prospect(reward=self.RA, delay=self.DA, prob=self.PA),
-                        ProspectB=Prospect(reward=self.RB, delay=self.DB[self.delay_counter], prob=self.PB))
+        design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
+                        ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB))
         self._increment_counter()
         return design
 
@@ -170,21 +171,21 @@ class Frye(DARCDesignGeneratorABC):
 
     def _increment_counter(self):
         """Increment trial counter, and increment delay counter if we have done all the trials per delay"""
-        self.trial_per_delay_counter += 1
+        self._trial_per_delay_counter += 1
         # reset trial_per_delay_counter if need be
-        if self.trial_per_delay_counter > self.trials_per_delay-1:
+        if self._trial_per_delay_counter > self._trials_per_delay-1:
             self._increment_delay()
 
 
     def _increment_delay(self):
         """ Done trials_per_delay trials for this delay, so we'll move on to the next delay level now"""
-        self.delay_counter += 1
-        self.trial_per_delay_counter = 0
-        self.post_choice_adjustment = 0.25
+        self._delay_counter += 1
+        self._trial_per_delay_counter = 0
+        self._post_choice_adjustment = 0.25
 
     def _update_RA_given_last_response(self, last_response_chose_B):
         # change things depending upon last response
         if last_response_chose_B:
-            self.RA = self.RA + (self.RB * self.post_choice_adjustment)
+            self._RA = self._RA + (self._RB * self._post_choice_adjustment)
         else:
-            self.RA = self.RA - (self.RB * self.post_choice_adjustment)
+            self._RA = self._RA - (self._RB * self._post_choice_adjustment)

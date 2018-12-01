@@ -60,9 +60,9 @@ class DARCDesignGeneratorABC(DesignGeneratorABC, ABC):
     - some basic plotting of the raw data
     '''
 
-    RA, DA, PA = list(), list(), list()
-    RB, DB, PB = list(), list(), list()
-    RA_over_RB = list()
+    _RA, _DA, _PA = list(), list(), list()
+    _RB, _DB, _PB = list(), list(), list()
+    _RA_over_RB = list()
 
     def __init__(self):
         # generate empty `all_data`
@@ -99,31 +99,31 @@ class DARCDesignGeneratorABC(DesignGeneratorABC, ABC):
         '''
 
         # Log the raw values to help with debugging
-        logging.debug(f'provided RA = {self.RA}')
-        logging.debug(f'provided DA = {self.DA}')
-        logging.debug(f'provided PA = {self.PA}')
-        logging.debug(f'provided RB = {self.RB}')
-        logging.debug(f'provided DB = {self.DB}')
-        logging.debug(f'provided PB = {self.PB}')
-        logging.debug(f'provided RA_over_RB = {self.RA_over_RB}')
+        logging.debug(f'provided RA = {self._RA}')
+        logging.debug(f'provided DA = {self._DA}')
+        logging.debug(f'provided PA = {self._PA}')
+        logging.debug(f'provided RB = {self._RB}')
+        logging.debug(f'provided DB = {self._DB}')
+        logging.debug(f'provided PB = {self._PB}')
+        logging.debug(f'provided RA_over_RB = {self._RA_over_RB}')
 
-        if not self.RA_over_RB:
+        if not self._RA_over_RB:
             '''assuming we are not doing magnitude effect, as this is
             when we normally would be providing RA_over_RB values'''
 
             # NOTE: the order of the two lists below HAVE to be the same
             column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
-            list_of_lists = [self.RA, self.DA, self.PA, self.RB, self.DB, self.PB]
+            list_of_lists = [self._RA, self._DA, self._PA, self._RB, self._DB, self._PB]
             all_combinations = list(itertools.product(*list_of_lists))
             D = pd.DataFrame(all_combinations, columns=column_list)
 
-        elif not self.RA:
+        elif not self._RA:
             '''now assume we are dealing with magnitude effect'''
 
             # create all designs, but using RA_over_RB
             # NOTE: the order of the two lists below HAVE to be the same
             column_list = ['RA_over_RB', 'DA', 'PA', 'RB', 'DB', 'PB']
-            list_of_lists = [self.RA_over_RB, self.DA, self.PA, self.RB, self.DB, self.PB]
+            list_of_lists = [self._RA_over_RB, self._DA, self._PA, self._RB, self._DB, self._PB]
             all_combinations = list(itertools.product(*list_of_lists))
             D = pd.DataFrame(all_combinations, columns=column_list)
 
@@ -173,13 +173,13 @@ class BADDesignGenerator(DARCDesignGeneratorABC, BayesianAdaptiveDesign):
         self._input_type_validation(RA, DA, PA, RB, DB, PB, RA_over_RB)
         self._input_value_validation(PA, PB, DA, DB, RA_over_RB)
 
-        self.DA = DA
-        self.DB = DB
-        self.RA = RA
-        self.RB = RB
-        self.PA = PA
-        self.PB = PB
-        self.RA_over_RB = RA_over_RB
+        self._DA = DA
+        self._DB = DB
+        self._RA = RA
+        self._RB = RB
+        self._PA = PA
+        self._PB = PB
+        self._RA_over_RB = RA_over_RB
         self.max_trials = max_trials
         self.random_choice_dimension = random_choice_dimension
         self.NO_REPEATS = NO_REPEATS

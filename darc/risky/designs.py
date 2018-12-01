@@ -23,19 +23,19 @@ class Griskevicius2011(DARCDesignGeneratorABC):
     # only likely to be a problem if we have mulitple instances. We'd
     # also have to explicitly call the superclass constructor at that point, I believe.
     max_trials = 7
-    RA = [100, 200, 300, 400, 500, 600, 700]
-    DA = 0
-    PA = 1
-    RB = 800
-    DB = 0
-    PB = 0.5
+    _RA = [100, 200, 300, 400, 500, 600, 700]
+    _DA = 0
+    _PA = 1
+    _RB = 800
+    _DB = 0
+    _PB = 0.5
 
     def get_next_design(self, _):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             logging.info(f'Getting design for trial {self.trial}')
-            design = Design(ProspectA=Prospect(reward=self.RA[self.trial], delay=self.DA, prob=self.PA),
-                            ProspectB=Prospect(reward=self.RB, delay=self.DB, prob=self.PB))
+            design = Design(ProspectA=Prospect(reward=self._RA[self.trial], delay=self._DA, prob=self._PA),
+                            ProspectB=Prospect(reward=self._RB, delay=self._DB, prob=self._PB))
             return design
         else:
             return None
