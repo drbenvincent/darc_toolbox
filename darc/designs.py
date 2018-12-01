@@ -51,7 +51,7 @@ def df_to_design_tuple(df):
 
 ## ANOTHER BASE CLASS: Users not to change this
 
-class DARCDesignABC(DesignABC, ABC):
+class DARCDesignGeneratorABC(DesignABC, ABC):
     '''
     Another abstract base class which extends the basic design class, adding
     specialisations for our DARC domain. This includes:
@@ -158,7 +158,7 @@ class DARCDesignABC(DesignABC, ABC):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class BADDesignGenerator(DARCDesignABC, BayesianAdaptiveDesign):
+class BADDesignGenerator(DARCDesignGeneratorABC, BayesianAdaptiveDesign):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
