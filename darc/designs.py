@@ -89,72 +89,6 @@ class DARCDesignGeneratorABC(DesignGeneratorABC, ABC):
         '''Visualise data'''
         all_data_plotter(self.all_data)
 
-    def generate_all_possible_designs(self, assume_discounting=True):
-        '''Create a dataframe of all possible designs (one design is one row)
-        based upon the set of design variables (RA, DA, PA, RB, DB, PB)
-        provided. We do this generation process ONCE. There may be additional
-        trial-level processes which choose subsets of all of the possible
-        designs. But here, we generate the largest set of designs that we
-        will ever consider
-        '''
-
-        # Log the raw values to help with debugging
-        logging.debug(f'provided RA = {self._RA}')
-        logging.debug(f'provided DA = {self._DA}')
-        logging.debug(f'provided PA = {self._PA}')
-        logging.debug(f'provided RB = {self._RB}')
-        logging.debug(f'provided DB = {self._DB}')
-        logging.debug(f'provided PB = {self._PB}')
-        logging.debug(f'provided RA_over_RB = {self._RA_over_RB}')
-
-        if not self._RA_over_RB:
-            '''assuming we are not doing magnitude effect, as this is
-            when we normally would be providing RA_over_RB values'''
-
-            # NOTE: the order of the two lists below HAVE to be the same
-            column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
-            list_of_lists = [self._RA, self._DA, self._PA, self._RB, self._DB, self._PB]
-            all_combinations = list(itertools.product(*list_of_lists))
-            D = pd.DataFrame(all_combinations, columns=column_list)
-
-        elif not self._RA:
-            '''now assume we are dealing with magnitude effect'''
-
-            # create all designs, but using RA_over_RB
-            # NOTE: the order of the two lists below HAVE to be the same
-            column_list = ['RA_over_RB', 'DA', 'PA', 'RB', 'DB', 'PB']
-            list_of_lists = [self._RA_over_RB, self._DA, self._PA, self._RB, self._DB, self._PB]
-            all_combinations = list(itertools.product(*list_of_lists))
-            D = pd.DataFrame(all_combinations, columns=column_list)
-
-            # now we will convert RA_over_RB to RA for each design then remove it
-            D['RA'] = D['RB'] * D['RA_over_RB']
-            D = D.drop(columns=['RA_over_RB'])
-
-        else:
-            logging.error('Failed to work out what we want. Confusion over RA and RA_over_RB')
-
-
-        logging.debug(f'{D.shape[0]} designs generated initially')
-
-        # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
-        D.drop(D[D.DA > D.DB].index, inplace=True)
-        logging.debug(f'{D.shape[0]} left after dropping DA>DB')
-
-        if assume_discounting:
-            D.drop(D[D.RB < D.RA].index, inplace=True)
-            logging.debug(f'{D.shape[0]} left after dropping RB<RA')
-
-        # NOTE: we may want to do further trimming and refining of the possible
-        # set of designs, based upon domain knowledge etc.
-
-        # check we actually have some designs!
-        if D.shape[0] == 0:
-            logging.error(f'No ({D.shape[0]}) designs generated!')
-
-        # set the values
-        self.all_possible_designs = D
-
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
@@ -267,6 +201,73 @@ class BADDesignGenerator(DARCDesignGeneratorABC, BayesianAdaptiveDesign):
             logging.warning(f'Very few ({allowable_designs.shape[0]}) designs left')
 
         return allowable_designs
+
+
+    def generate_all_possible_designs(self, assume_discounting=True):
+        '''Create a dataframe of all possible designs (one design is one row)
+        based upon the set of design variables (RA, DA, PA, RB, DB, PB)
+        provided. We do this generation process ONCE. There may be additional
+        trial-level processes which choose subsets of all of the possible
+        designs. But here, we generate the largest set of designs that we
+        will ever consider
+        '''
+
+        # Log the raw values to help with debugging
+        logging.debug(f'provided RA = {self._RA}')
+        logging.debug(f'provided DA = {self._DA}')
+        logging.debug(f'provided PA = {self._PA}')
+        logging.debug(f'provided RB = {self._RB}')
+        logging.debug(f'provided DB = {self._DB}')
+        logging.debug(f'provided PB = {self._PB}')
+        logging.debug(f'provided RA_over_RB = {self._RA_over_RB}')
+
+        if not self._RA_over_RB:
+            '''assuming we are not doing magnitude effect, as this is
+            when we normally would be providing RA_over_RB values'''
+
+            # NOTE: the order of the two lists below HAVE to be the same
+            column_list = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
+            list_of_lists = [self._RA, self._DA, self._PA, self._RB, self._DB, self._PB]
+            all_combinations = list(itertools.product(*list_of_lists))
+            D = pd.DataFrame(all_combinations, columns=column_list)
+
+        elif not self._RA:
+            '''now assume we are dealing with magnitude effect'''
+
+            # create all designs, but using RA_over_RB
+            # NOTE: the order of the two lists below HAVE to be the same
+            column_list = ['RA_over_RB', 'DA', 'PA', 'RB', 'DB', 'PB']
+            list_of_lists = [self._RA_over_RB, self._DA, self._PA, self._RB, self._DB, self._PB]
+            all_combinations = list(itertools.product(*list_of_lists))
+            D = pd.DataFrame(all_combinations, columns=column_list)
+
+            # now we will convert RA_over_RB to RA for each design then remove it
+            D['RA'] = D['RB'] * D['RA_over_RB']
+            D = D.drop(columns=['RA_over_RB'])
+
+        else:
+            logging.error('Failed to work out what we want. Confusion over RA and RA_over_RB')
+
+
+        logging.debug(f'{D.shape[0]} designs generated initially')
+
+        # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
+        D.drop(D[D.DA > D.DB].index, inplace=True)
+        logging.debug(f'{D.shape[0]} left after dropping DA>DB')
+
+        if assume_discounting:
+            D.drop(D[D.RB < D.RA].index, inplace=True)
+            logging.debug(f'{D.shape[0]} left after dropping RB<RA')
+
+        # NOTE: we may want to do further trimming and refining of the possible
+        # set of designs, based upon domain knowledge etc.
+
+        # check we actually have some designs!
+        if D.shape[0] == 0:
+            logging.error(f'No ({D.shape[0]}) designs generated!')
+
+        # set the values
+        self.all_possible_designs = D
 
 
 def remove_trials_already_run(design_set, exclude_these):
