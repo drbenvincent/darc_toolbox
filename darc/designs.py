@@ -139,7 +139,7 @@ class BADDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
 
         if self.NO_REPEATS and self.trial>1:
             allowable_designs = remove_trials_already_run(
-                allowable_designs, self.all_data.drop(columns=['R']))
+                allowable_designs, self.data.df.drop(columns=['R'])) # TODO: resolve this
 
         # apply a heuristic here to promote good spread of designs based on domain-specific
         # knowledge for DARC

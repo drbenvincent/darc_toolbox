@@ -4,7 +4,7 @@ domain specific use of this Bayesian Adaptive Design package.
 '''
 
 
-from darc.data_plotting import all_data_plotter
+from darc.data_plotting import data_plotter
 from abc import ABC, abstractmethod
 import pandas as pd
 import logging
@@ -15,7 +15,6 @@ class TrialData():
 
     def __init__(self):
         # generate empty dataframe
-        print('A new TrialData object has been made')
         data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
         self.df = pd.DataFrame(columns=data_columns)
 
@@ -30,11 +29,11 @@ class TrialData():
         else:
             return False
 
-    def update_all_data(self, design, response):
+    def update_data(self, design, response):
         # TODO: need to specify types here I think... then life might be
         # easier to decant the data out at another point
         # trial_df = design_to_df(design)
-        # self.all_data = self.all_data.append(trial_df)
+        # self.data = self.data.append(trial_df)
 
         trial_data = {'RA': design.ProspectA.reward,
                     'DA': design.ProspectA.delay,
@@ -46,9 +45,9 @@ class TrialData():
         self.df = self.df.append(pd.DataFrame(trial_data))
         return
 
-    def plot_all_data(self):
+    def plot_data(self):
         '''Visualise data'''
-        all_data_plotter(self.df)
+        data_plotter(self.df)
 
     # TODO: look up how to do getters in a Pythonic way.
     def get_df(self):
@@ -70,7 +69,7 @@ class DesignGeneratorABC(ABC):
 
     def __init__(self):
         self.trial = int(0)
-        self.all_data = TrialData()
+        self.data = TrialData()
 
     @abstractmethod
     def get_next_design(self, model):
@@ -83,17 +82,17 @@ class DesignGeneratorABC(ABC):
     # MIDDLE MAN METHODS ===========================================================
     def enter_trial_design_and_response(self, design, response):
         '''middle-man method'''
-        self.all_data.update_all_data(design, response)
+        self.data.update_data(design, response)
         self.trial += 1
         # we potentially manually call model to update beliefs here. But so far
         # this is done manually in PsychoPy
         return
 
     def get_last_response_chose_B(self):
-        return self.all_data.get_last_response_chose_B()
+        return self.data.get_last_response_chose_B()
 
     def get_df(self):
-        return self.all_data.get_df()
+        return self.data.get_df()
 
 
 class BayesianAdaptiveDesign(ABC):

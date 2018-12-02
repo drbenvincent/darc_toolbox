@@ -241,39 +241,6 @@ class MyersonHyperboloid(Model):
         return 1 / np.power(1 + k * delay, s)
 
 
-class ProportionalDifference(Model):
-    '''Proportional difference model applied to delay discounting
-
-    González-Vallejo, C. (2002). Making trade-offs: A probabilistic and
-    context-sensitive model of choice behavior. Psychological Review, 109(1),
-    137–155. http://doi.org/10.1037//0033-295X.109.1.137
-    '''
-
-    prior = dict()
-    prior['δ'] = norm(loc=0, scale=10)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-
-    def calc_decision_variable(self, θ, data):
-        # organised so that higher values of the decision variable will
-        # mean higher probabability for the delayed option (prospect B)
-        prop_reward = self._proportional_difference(data['RA'].values, data['RB'].values)
-        prop_delay = self._proportional_difference(data['DA'].values, data['DB'].values)
-        decision_variable = prop_reward - prop_delay + θ['δ'].values
-        return decision_variable
-
-    @staticmethod
-    def _max_abs(x, y):
-        return np.max(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
-
-    @staticmethod
-    def _min_abs(x, y):
-        return np.min(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
-
-    def _proportional_difference(self, x, y):
-        return (self._max_abs(x, y) - self._min_abs(x, y)) / self._max_abs(x, y)
-
-
 class HyperbolicNonLinearUtility(Model):
     '''Hyperbolic time discounting + non-linear utility model.
     The a-model from ...

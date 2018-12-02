@@ -111,15 +111,11 @@ class Koffarnus_Bickel(DesignGeneratorABC):
         else:
 
             if self.get_last_response_chose_B():
-                print(f'incrementing delay_index by {self._index_increments}')
                 self._delay_index += self._index_increments
             else:
-
-                print(f'decrementing delay_index by {self._index_increments}')
                 self._delay_index -= self._index_increments
 
             # each trial, the increments half, so will be: 8, 4, 2, 1
-            print(f'_index_increments = {self._index_increments}')
             self._index_increments = int(max(self._index_increments/2, 1))
 
         design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),

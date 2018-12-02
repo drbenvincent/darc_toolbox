@@ -3,18 +3,18 @@ import numpy as np
 import logging
 
 
-def all_data_plotter(all_data):
+def data_plotter(data):
     '''Our high level plotting function which dispatches to the appropriate
     low-level plotting functions based upon the nature of the data'''
 
-    RA = all_data.RA.values
-    DA = all_data.DA.values
-    PA = all_data.PA.values
-    RB = all_data.RB.values
-    DB = all_data.DB.values
-    PB = all_data.PB.values
-    R = all_data.R.values
-    n_points, _ = all_data.shape
+    RA = data.RA.values
+    DA = data.DA.values
+    PA = data.PA.values
+    RB = data.RB.values
+    DB = data.DB.values
+    PB = data.PB.values
+    R = data.R.values
+    n_points, _ = data.shape
 
     # do interrogation of the data
     if np.any(PA < 1) or np.any(PB < 1):
@@ -36,24 +36,24 @@ def all_data_plotter(all_data):
         # delay based plot only
         f, ax = plt.subplots(1, 1, figsize=(9, 4))
         if front_end_delays:
-            plot_delay_with_front_end_delays(ax, all_data)
+            plot_delay_with_front_end_delays(ax, data)
         else:
-            plot_delay_without_front_end_delays(ax, all_data)
+            plot_delay_without_front_end_delays(ax, data)
 
     elif risky_choices and not delayed_choices:
         # risky based plot only
         f, ax = plt.subplots(1, 1, figsize=(9, 4))
-        plot_probability_data(ax, all_data)
+        plot_probability_data(ax, data)
 
     elif delayed_choices and risky_choices:
         # both risky and delayed plots
         f, axes = plt.subplots(1, 2, figsize=(9, 4), tight_layout=True)
         if front_end_delays:
-            plot_delay_with_front_end_delays(axes[0], all_data)
+            plot_delay_with_front_end_delays(axes[0], data)
         else:
-            plot_delay_without_front_end_delays(axes[0], all_data)
+            plot_delay_without_front_end_delays(axes[0], data)
 
-        plot_probability_data(axes[1], all_data)
+        plot_probability_data(axes[1], data)
 
     # if filename is not None:
     #     savename = filename + '_data_plot.pdf'
@@ -63,15 +63,15 @@ def all_data_plotter(all_data):
 
 # DELAY PLOTS =========================================================
 
-def plot_delay_with_front_end_delays(ax, all_data):
+def plot_delay_with_front_end_delays(ax, data):
 
-    RA = all_data.RA.values
-    DA = all_data.DA.values
-    PA = all_data.PA.values
-    RB = all_data.RB.values
-    DB = all_data.DB.values
-    PB = all_data.PB.values
-    R = all_data.R.values
+    RA = data.RA.values
+    DA = data.DA.values
+    PA = data.PA.values
+    RB = data.RB.values
+    DB = data.DB.values
+    PB = data.PB.values
+    R = data.R.values
 
     # plot lines between pairs of prospects
     n_points = len(R)
@@ -94,15 +94,15 @@ def plot_delay_with_front_end_delays(ax, all_data):
     #ax.set_title('Plot for data with front-end delays')
 
 
-def plot_delay_without_front_end_delays(ax, all_data):
+def plot_delay_without_front_end_delays(ax, data):
 
-    RA = all_data.RA.values
-    DA = all_data.DA.values
-    PA = all_data.PA.values
-    RB = all_data.RB.values
-    DB = all_data.DB.values
-    PB = all_data.PB.values
-    R = all_data.R.values
+    RA = data.RA.values
+    DA = data.DA.values
+    PA = data.PA.values
+    RB = data.RB.values
+    DB = data.DB.values
+    PB = data.PB.values
+    R = data.R.values
 
     ax.scatter(x=DB[R == 0], y=RA[R == 0] / RB[R == 0],
                c='b', alpha=0.5, label='chose A')
@@ -118,15 +118,15 @@ def plot_delay_without_front_end_delays(ax, all_data):
 # RISKY PLOTS =========================================================
 
 
-def plot_probability_data(ax, all_data):
+def plot_probability_data(ax, data):
 
-    RA = all_data.RA.values
-    DA = all_data.DA.values
-    PA = all_data.PA.values
-    RB = all_data.RB.values
-    DB = all_data.DB.values
-    PB = all_data.PB.values
-    R = all_data.R.values
+    RA = data.RA.values
+    DA = data.DA.values
+    PA = data.PA.values
+    RB = data.RB.values
+    DB = data.DB.values
+    PB = data.PB.values
+    R = data.R.values
 
     ax.scatter(x=PB[R == 0], y=RA[R == 0] / RB[R == 0],
                c='b', alpha=0.5, label='chose A')

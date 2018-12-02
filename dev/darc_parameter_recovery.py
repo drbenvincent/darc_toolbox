@@ -49,7 +49,6 @@ def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=N
         summary_stats = fitted_model.get_θ_summary_stats(track_this_parameter)
 
     for trial in range(666):
-        print(f'trial: {trial}')
 
         design = design_thing.get_next_design(fitted_model)
 
