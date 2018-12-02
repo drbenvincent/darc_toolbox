@@ -19,9 +19,8 @@ delayed_models_list = [
     delayed_models.Exponential,
     delayed_models.HyperbolicMagnitudeEffect,
     delayed_models.ExponentialMagnitudeEffect,
-    #delayed_models.ConstantSensitivity,
+    delayed_models.ModifiedRachlin,
     delayed_models.MyersonHyperboloid,
-    delayed_models.ProportionalDifference,
     #delayed_models.HyperbolicNonLinearUtility
 ]
 

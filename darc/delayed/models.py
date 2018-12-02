@@ -241,6 +241,42 @@ class MyersonHyperboloid(Model):
         return 1 / np.power(1 + k * delay, s)
 
 
+class ModifiedRachlin(Model):
+    '''The Rachlin (2006) discount function, modified by Vincent &
+    Stewart (2018). This has a better parameterisation.
+
+    Rachlin, H. (2006, May). Notes on Discounting. Journal of the
+        Experimental Analysis of Behavior, 85(3), 425–435.
+    Vincent, B. T., & Stewart, N. (2018, October 16). The case of muddled
+        units in temporal discounting.
+        https://doi.org/10.31234/osf.io/29sgd
+    '''
+
+    prior = dict()
+    prior['logk'] = norm(loc=np.log(1 / 365), scale=2)
+    prior['s'] = halfnorm(loc=1, scale=2) # TODO: needs to be a positive value, with mode of 1.
+    prior['α'] = halfnorm(loc=0, scale=3)
+    θ_fixed = {'ϵ': 0.01}
+
+    def calc_decision_variable(self, θ, data):
+        VA = data['RA'].values * self._time_discount_func(
+            data['DA'].values, θ['logk'].values, θ['s'].values)
+        VB = data['RB'].values * self._time_discount_func(
+            data['DB'].values, θ['logk'].values, θ['s'].values)
+        return VB-VA
+
+    @staticmethod
+    @np.vectorize
+    def _time_discount_func(delay, logk, s):
+        # NOTE: we want logk as a row matrix, and delays as a column matrix to do the
+        # appropriate array broadcasting.
+        if delay == 0:
+            return 1
+        else:
+            k = np.exp(logk)
+            return 1 / (1 + np.power(k * delay, s))
+
+
 class HyperbolicNonLinearUtility(Model):
     '''Hyperbolic time discounting + non-linear utility model.
     The a-model from ...
