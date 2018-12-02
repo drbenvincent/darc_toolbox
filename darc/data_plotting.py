@@ -16,12 +16,12 @@ def all_data_plotter(all_data):
     R = all_data.R.values
     n_points, _ = all_data.shape
 
-    # do interrogation of the data 
+    # do interrogation of the data
     if np.any(PA < 1) or np.any(PB < 1):
         risky_choices = True
     else:
         risky_choices = False
-    
+
     if np.any(DA > 0) or np.any(DB > 0):
         delayed_choices = True
         if np.any(DA > 0):
@@ -104,7 +104,7 @@ def plot_delay_without_front_end_delays(ax, all_data):
     PB = all_data.PB.values
     R = all_data.R.values
 
-    ax.scatter(x=DB[R == 0], y=RA[R == 0] / RB[R == 0], 
+    ax.scatter(x=DB[R == 0], y=RA[R == 0] / RB[R == 0],
                c='b', alpha=0.5, label='chose A')
     ax.scatter(x=DB[R == 1], y=RA[R == 1] / RB[R == 1],
                c='r', alpha=0.5, label='chose B')

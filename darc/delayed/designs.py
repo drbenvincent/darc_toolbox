@@ -1,14 +1,14 @@
 import numpy as np
 from collections import namedtuple
 import logging
-from darc.designs import DARCDesignGeneratorABC
+from darc.designs import DesignGeneratorABC
 
 # define useful data structures
 Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
 Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
 
 
-class Kirby2009(DARCDesignGeneratorABC):
+class Kirby2009(DesignGeneratorABC):
     '''
     A class to provide designs from the Kirby (2009) delay discounting task.
 
@@ -40,7 +40,7 @@ class Kirby2009(DARCDesignGeneratorABC):
             return None
 
 
-class Griskevicius2011(DARCDesignGeneratorABC):
+class Griskevicius2011(DesignGeneratorABC):
     '''
     A class to provide designs from the Griskevicius et al (2011) delay
     discounting task.
@@ -73,7 +73,7 @@ class Griskevicius2011(DARCDesignGeneratorABC):
             return None
 
 
-class Koffarnus_Bickel(DARCDesignGeneratorABC):
+class Koffarnus_Bickel(DesignGeneratorABC):
     '''
     This function returns a function which returns designs according to the
     method described by:
@@ -102,27 +102,32 @@ class Koffarnus_Bickel(DARCDesignGeneratorABC):
 
     def get_next_design(self, _):
 
-        if self.trial > self.max_trials:
+        if self.trial >= self.max_trials:
             return None
 
-        if self.trial == 1:
+        if self.trial == 0:
             design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
                             ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB))
         else:
+
             if self.get_last_response_chose_B():
+                print(f'incrementing delay_index by {self._index_increments}')
                 self._delay_index += self._index_increments
             else:
+
+                print(f'decrementing delay_index by {self._index_increments}')
                 self._delay_index -= self._index_increments
 
-        # each trial, the increments half, so will be: 8, 4, 2, 1
-        self._index_increments = int(max(self._index_increments/2, 1))
+            # each trial, the increments half, so will be: 8, 4, 2, 1
+            print(f'_index_increments = {self._index_increments}')
+            self._index_increments = int(max(self._index_increments/2, 1))
 
         design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
                         ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB))
         return design
 
 
-class Frye(DARCDesignGeneratorABC):
+class Frye(DesignGeneratorABC):
     '''
     A class to provide designs based on the Frye et al (2016) protocol.
 

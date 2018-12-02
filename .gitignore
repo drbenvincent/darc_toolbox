@@ -8,3 +8,5 @@ psychopy/demo/data/*
 .pytest_cache/*
 .idea/*
 .ipynb_checkpoints*
+dev/model testing scratchpad.ipynb
+dev/broadcasting tests.ipynb

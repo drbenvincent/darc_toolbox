@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import copy
 import logging
 import time
-from darc.data_plotting import all_data_plotter
 import random
 
 
@@ -49,50 +48,9 @@ def df_to_design_tuple(df):
     return chosen_design
 
 
-## ANOTHER BASE CLASS: Users not to change this
-
-class DARCDesignGeneratorABC(DesignGeneratorABC, ABC):
-    '''
-    Another abstract base class which extends the basic design class, adding
-    specialisations for our DARC domain. This includes:
-    - the design space variables
-    - how to update (design, response) pairs from an experimental trial
-    - some basic plotting of the raw data
-    '''
-
-    _RA, _DA, _PA = list(), list(), list()
-    _RB, _DB, _PB = list(), list(), list()
-    _RA_over_RB = list()
-
-    def __init__(self):
-        # generate empty `all_data`
-        data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
-        self.all_data = pd.DataFrame(columns=data_columns)
-
-    def update_all_data(self, design, response):
-        # TODO: need to specify types here I think... then life might be
-        # easier to decant the data out at another point
-        # trial_df = design_to_df(design)
-        # self.all_data = self.all_data.append(trial_df)
-
-        trial_data = {'RA': design.ProspectA.reward,
-                      'DA': design.ProspectA.delay,
-                      'PA': design.ProspectA.prob,
-                      'RB': design.ProspectB.reward,
-                      'DB': design.ProspectB.delay,
-                      'PB': design.ProspectB.prob,
-                      'R': [int(response)]}
-        self.all_data = self.all_data.append(pd.DataFrame(trial_data))
-        return
-
-    def plot_all_data(self):
-        '''Visualise data'''
-        all_data_plotter(self.all_data)
-
-
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class BADDesignGenerator(DARCDesignGeneratorABC, BayesianAdaptiveDesign):
+class BADDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''

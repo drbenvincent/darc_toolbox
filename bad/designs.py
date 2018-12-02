@@ -4,9 +4,56 @@ domain specific use of this Bayesian Adaptive Design package.
 '''
 
 
+from darc.data_plotting import all_data_plotter
 from abc import ABC, abstractmethod
 import pandas as pd
 import logging
+
+
+class TrialData():
+    '''A class to hold trial data from real (or simulated) experiments'''
+
+    def __init__(self):
+        # generate empty dataframe
+        print('A new TrialData object has been made')
+        data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
+        self.df = pd.DataFrame(columns=data_columns)
+
+    def get_last_response_chose_B(self):
+        '''return True if the last response was for the option B'''
+        if self.df.size == 0:
+            # no previous responses
+            return None
+
+        if list(self.df.R)[-1] == 1:  # TODO: do this better?
+            return True
+        else:
+            return False
+
+    def update_all_data(self, design, response):
+        # TODO: need to specify types here I think... then life might be
+        # easier to decant the data out at another point
+        # trial_df = design_to_df(design)
+        # self.all_data = self.all_data.append(trial_df)
+
+        trial_data = {'RA': design.ProspectA.reward,
+                    'DA': design.ProspectA.delay,
+                    'PA': design.ProspectA.prob,
+                    'RB': design.ProspectB.reward,
+                    'DB': design.ProspectB.delay,
+                    'PB': design.ProspectB.prob,
+                    'R': [int(response)]}
+        self.df = self.df.append(pd.DataFrame(trial_data))
+        return
+
+    def plot_all_data(self):
+        '''Visualise data'''
+        all_data_plotter(self.df)
+
+    # TODO: look up how to do getters in a Pythonic way.
+    def get_df(self):
+        '''return dataframe of data'''
+        return self.df
 
 
 class DesignGeneratorABC(ABC):
@@ -20,9 +67,10 @@ class DesignGeneratorABC(ABC):
        designs and responses.
     '''
 
-    # NOTE: these should probably not be class attributes, but declared in the __init__
-    trial = int(0)
-    all_data = pd.DataFrame()
+
+    def __init__(self):
+        self.trial = int(0)
+        self.all_data = TrialData()
 
     @abstractmethod
     def get_next_design(self, model):
@@ -32,27 +80,20 @@ class DesignGeneratorABC(ABC):
         '''
         pass
 
+    # MIDDLE MAN METHODS ===========================================================
     def enter_trial_design_and_response(self, design, response):
-        self.update_all_data(design, response)
+        '''middle-man method'''
+        self.all_data.update_all_data(design, response)
         self.trial += 1
         # we potentially manually call model to update beliefs here. But so far
         # this is done manually in PsychoPy
         return
 
-    @abstractmethod
-    def update_all_data(self, design, response):
-        pass
-
     def get_last_response_chose_B(self):
-        '''return True if the last response was for the option B'''
-        if self.all_data.size == 0:
-            # no previous responses
-            return None
+        return self.all_data.get_last_response_chose_B()
 
-        if list(self.all_data.R)[-1] == 1:  # TODO: do this better?
-            return True
-        else:
-            return False
+    def get_df(self):
+        return self.all_data.get_df()
 
 
 class BayesianAdaptiveDesign(ABC):

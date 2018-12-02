@@ -1,10 +1,7 @@
 import darc
-# from darc.delayed import models
-# from darc.designs import BADDesignGenerator
-# from darc.delayed.designs import Kirby2009, Frye
 import pandas as pd
 import numpy as np
-from copy import copy
+import copy
 from scipy.stats import norm
 import random
 
@@ -16,15 +13,12 @@ def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_na
     summary_stats_all_trials = []
     for row in range(rows):
         # make local copies
-        local_model = copy(model)
-        local_design_thing = copy(design_thing)
+        local_model = copy.copy(model)
+        local_design_thing = copy.deepcopy(design_thing)
         # set true parameter values
         local_model.θ_true = sweep_θ_true.loc[[row]]
 
         fitted_model, summary_stats = simulated_experiment_trial_loop(local_design_thing, local_model)
-
-        # This gets point estimate of all parameters
-        #θ_estimated = fitted_model.get_θ_point_estimate()
 
         # get summary stats for the parameter of interest
         θ_estimated = fitted_model.get_θ_summary_stats(target_param_name)
@@ -55,6 +49,7 @@ def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=N
         summary_stats = fitted_model.get_θ_summary_stats(track_this_parameter)
 
     for trial in range(666):
+        print(f'trial: {trial}')
 
         design = design_thing.get_next_design(fitted_model)
 
@@ -66,7 +61,7 @@ def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=N
 
         design_thing.enter_trial_design_and_response(design, response)
 
-        fitted_model.update_beliefs(design_thing.all_data)
+        fitted_model.update_beliefs(design_thing.get_df())
 
         if track_this_parameter is not None:
             # add another row to summary_stats
@@ -103,6 +98,6 @@ def simulated_multi_experiment(design_thing, models_to_fit, response_model):
         design_thing.enter_trial_design_and_response(design, response)
 
         # update beliefs of all models
-        [model.update_beliefs(design_thing.all_data) for model in models_to_fit]
+        [model.update_beliefs(design_thing.get_df()) for model in models_to_fit]
 
     return models_to_fit, design_thing

@@ -1,6 +1,6 @@
 from collections import namedtuple
 import logging
-from darc.designs import DARCDesignGeneratorABC
+from darc.designs import DesignGeneratorABC
 
 
 # define useful data structures
@@ -8,7 +8,7 @@ Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
 Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
 
 
-class Griskevicius2011(DARCDesignGeneratorABC):
+class Griskevicius2011(DesignGeneratorABC):
     '''
     A class to provide designs from the Griskevicius et al (2011) risky
     choice task.
