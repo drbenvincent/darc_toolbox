@@ -36,8 +36,7 @@ delay_models_available = ['Hyperbolic', 'Exponential',
                           'HyperbolicMagnitudeEffect',
                           'ExponentialMagnitudeEffect',
                           'MyersonHyperboloid',
-                          'ProportionalDifference',
-                          ]
+                          'ModifiedRachlin']
 
 risky_models_available = ['Hyperbolic',
                           'ProportionalDifference',
@@ -184,8 +183,8 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     elif desired_model is 'MyersonHyperboloid':
         model = models.MyersonHyperboloid(n_particles=expInfo['particles'])
 
-    elif desired_model is 'ProportionalDifference':
-        model = models.ProportionalDifference(n_particles=expInfo['particles'])
+    elif desired_model is 'ModifiedRachlin':
+        model = models.ModifiedRachlin(n_particles=expInfo['particles'])
 
     elif desired_model is 'HyperbolicMagnitudeEffect':
         model = models.HyperbolicMagnitudeEffect(n_particles=expInfo['particles'])
