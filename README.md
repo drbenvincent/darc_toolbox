@@ -1,6 +1,6 @@
 # darc-experiments-python
 
-**Status:  🔥 Under active development. This is pre-alpha code. 🔥** 
+**Status:  🔥 Under active development. This is pre-alpha code. 🔥**
 
 This code relates to the following pre-print. But, the pre-print is likely to appear in quite a different form when finally published.
 > Vincent, B. T., & Rainforth, T. (2017, October 20). The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design. Retrieved from psyarxiv.com/yehjb
@@ -56,13 +56,13 @@ Model | Status | Info
 Exponential | ✅ | Samuelson, P. A. (1937). A note on measurement of utility. The Review of Economic Studies, 4(2), 155. http://doi.org/10.2307/2967612
 Hyperbolic | ✅ | Mazur, J. E. (1987). An adjusting procedure for studying delayed reinforcement. In M. L. Commons, J. A. Nevin, & H. Rachlin (Eds.), Quantitative Analyses of Behavior (pp. 55–73). Hillsdale, NJ: Erlbaum.
 HyperbolicMagnitudeEffect | ✅ | Vincent, B. T. (2016). Hierarchical Bayesian estimation and hypothesis testing for delay discounting tasks. Behavior Research Methods, 48(4), 1608–1620. http://doi.org/10.3758/s13428-015-0672-2
-ExponentialMagnitudeEffect | ✅ | 
+ExponentialMagnitudeEffect | ✅ |
 ConstantSensitivity | ❌ | * Negative b values causing errors *
-ProportionalDifference | ✅ | González-Vallejo, C. (2002). Making trade-offs: A probabilistic and context-sensitive model of choice behavior. Psychological Review, 109(1), 137–155. http://doi.org/10.1037//0033-295X.109.1.137
 HyperbolicNonLinearUtility | ❌ | Cheng, J., & González-Vallejo, C. (2014). Hyperbolic Discounting: Value and Time Processes of Substance Abusers and Non-Clinical Individuals in Intertemporal Choice. PLoS ONE, 9(11), e111378–18. http://doi.org/10.1371/journal.pone.0111378
 ExponentialPower | ❌ | Takahashi, T., Oono, H., and Radford, M. H. B. (2008). Psychophysics of time perception and intertemporal choice models. 387(8-9):2066–2074.
-Rachlin hyperboloid | ❌ | Rachlin, H. (2006). Notes on Discounting. Journal of the experimental analysis of behavior, 85(3):425–435.
-Myerson hyperboloid | ✅ | Myerson, J. and Green, L. (1995). Discounting of delayed rewards: Models of individual choice. Journal of the experimental analysis of behavior, 64(3):263–276. 
+Rachlin hyperboloid | ❌ will not implement. See Modified Rachlin hyperboloid | Rachlin, H. (2006). Notes on Discounting. Journal of the experimental analysis of behavior, 85(3):425–435.
+Modified Rachlin hyperboloid | ✅ | Vincent, B. T., & Stewart, N. (2018, October 16). The case of muddled units in temporal discounting. https://doi.org/10.31234/osf.io/29sgd
+Myerson hyperboloid | ✅ | Myerson, J. and Green, L. (1995). Discounting of delayed rewards: Models of individual choice. Journal of the experimental analysis of behavior, 64(3):263–276.
 
 ## Risky reward paradigm models
 Model | Status | Info
@@ -70,14 +70,14 @@ Model | Status | Info
 Hyperbolic | ✅ | Hyperbolic discounting of odds against reward
 Generalized hyperbolic | ❌ |
 Prelec (1998) | ❌ |
-Prospect Theory | ❌ | 
+Prospect Theory | ❌ |
 Proportional difference | ✅ | González-Vallejo, C. (2002). Making trade-offs: A probabilistic and context-sensitive model of choice behavior. Psychological Review, 109(1), 137–155. http://doi.org/10.1037//0033-295X.109.1.137
 
 ## Delayed and risky reward paradigm models
 Model | Status | Info
 --- | --- | ---
 AdditiveHyperbolic | ❌ | Yi, R., la Piedad, de, X., & Bickel, W. K. (2006). The combined effects of delay and probability in discounting. Behavioural Processes, 73(2), 149–155. http://doi.org/10.1016/j.beproc.2006.05.001
-MultiplicativeHyperbolic | ✅ | Vanderveldt, A., Green, L., & Myerson, J. (2015). Discounting of monetary rewards that are both delayed and probabilistic: delay and probability combine multiplicatively, not additively. Journal of Experimental Psychology: Learning, Memory, and Cognition, 41(1), 148–162. http://doi.org/10.1037/xlm0000029 
+MultiplicativeHyperbolic | ✅ | Vanderveldt, A., Green, L., & Myerson, J. (2015). Discounting of monetary rewards that are both delayed and probabilistic: delay and probability combine multiplicatively, not additively. Journal of Experimental Psychology: Learning, Memory, and Cognition, 41(1), 148–162. http://doi.org/10.1037/xlm0000029
 Proportional difference | ❌ | [think, then implement]
 Probability and Time Trade-off model | ❌ | (Baucells & Heukamp)
 
@@ -98,7 +98,7 @@ Probability and Time Trade-off model | ❌ | (Baucells & Heukamp)
 
 - [PsychoPy](http://www.psychopy.org) as the main experiment environment
 
-Various Python packages such as: 
+Various Python packages such as:
 - Numpy
 - Pandas
 - SciPy.stats. We use the scipy distributions to represent our prior beliefs over model parameters, and to draw samples from those prior beliefs. See [the full list of distributions here](https://docs.scipy.org/doc/scipy/reference/stats.html)
