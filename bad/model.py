@@ -57,7 +57,7 @@ class Model(ABC):
         # NOTE `prior` and `θ_fixed` must be defined in the concrete model class before
         # we call this. I've not figures out how to demand these exist in this ABC yet
         self.parameter_names = self.prior.keys()
-        self.θ = self._θ_initial()
+        self.θ = self._sample_from_prior()
 
     def update_beliefs(self, data):
         '''simply call the low-level `update_beliefs` function'''
@@ -118,7 +118,7 @@ class Model(ABC):
         log_prior = np.sum(log_prior, axis=1)  # sum over columns (parameters)
         return log_prior
 
-    def _θ_initial(self):
+    def _sample_from_prior(self):
         """Generate initial θ particles, by sampling from the prior"""
         particles_dict = {key: self.prior[key].rvs(size=self.n_particles)
             for key in self.parameter_names}
