@@ -1,6 +1,7 @@
 from scipy.stats import norm, bernoulli, halfnorm
 import numpy as np
 from bad.model import Model
+from bad.choice_functions import CumulativeNormalChoiceFunc
 
 
 # TODO: THESE UTILITY FUNCTIONS ARE IN MULTIPLE PLACES !!!
@@ -24,8 +25,14 @@ class Hyperbolic(Model):
     prior['logh'] = norm(loc=0, scale=1)
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._odds_discount_func(data['PA'].values, θ['logh'].values)
         VB = data['RB'].values * self._odds_discount_func(data['PB'].values, θ['logh'].values)
         return VB - VA
@@ -51,8 +58,14 @@ class ProportionalDifference(Model):
     prior['δ'] = norm(loc=0, scale=10)
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         # organised so that higher values of the decision variable will
         # mean higher probabability for the delayed option (prospect B)
 

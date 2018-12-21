@@ -4,7 +4,6 @@ Model base class used by _any_ domain specific use of our Bayesian Adaptive Desi
 
 
 from abc import ABC, abstractmethod
-from bad.choice_functions import CumulativeNormalChoiceFunc
 from bad.inference import update_beliefs
 from scipy.stats import norm, bernoulli
 import logging
@@ -51,14 +50,6 @@ class Model(ABC):
     θ_fixed = dict()
     θ_true = None
 
-    # Decide on the choice function we are using. I am going to focus on
-    # `CumulativeNormalChoiceFunc`, but if you want to use another choice function
-    # for whatever reason, then it should be pretty obvious how to do this, using
-    # `CumulativeNormalChoiceFunc` as an example. You obviously have to update
-    # to any new or renamed parameters and ensure you provide either fixed values
-    # or a prior over non-fixed parameters.
-    choiceFunction = CumulativeNormalChoiceFunc
-
     def __init__(self, n_particles):
         self.n_particles = int(n_particles)
         logging.debug(f'number of particles = {self.n_particles}')
@@ -67,10 +58,6 @@ class Model(ABC):
         # we call this. I've not figures out how to demand these exist in this ABC yet
         self.parameter_names = self.prior.keys()
         self.θ = self._θ_initial()
-
-    @abstractmethod
-    def calc_decision_variable(self, θ, data):
-        pass
 
     def update_beliefs(self, data):
         '''simply call the low-level `update_beliefs` function'''
@@ -137,6 +124,7 @@ class Model(ABC):
             for key in self.parameter_names}
         return pd.DataFrame.from_dict(particles_dict)
 
+    @abstractmethod
     def predictive_y(self, θ, data):
         '''
         Calculate the probability of chosing B. We need this to work in multiple
@@ -151,13 +139,8 @@ class Model(ABC):
         input: θ has N rows (eg N=500)
         input: data has N rows
         DESIRED output: p_chose_B is a N x 1 array
-
-        TODO: do some assertions on sizes of inputs/outputs here to catch errors
         '''
-        decision_variable = self.calc_decision_variable(θ, data)
-        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
-        return p_chose_B
-
+        pass
 
     def get_simulated_response(self, design_df):
         '''

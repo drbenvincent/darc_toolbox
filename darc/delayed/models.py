@@ -3,7 +3,7 @@ about the design space and the model parameters.
 
 The main jobs of the model classes are:
 a) define priors over parameters - as scipy distribution objects
-b) implement the `calc_decision_variable` method. You can add
+b) implement the `predictive_y` method. You can add
    whatever useful helper functions you wat in order to help with
    that job.
 
@@ -18,6 +18,7 @@ TODO: Can this be made easier/better?
 from scipy.stats import norm, bernoulli, halfnorm, uniform
 import numpy as np
 from bad.model import Model
+from bad.choice_functions import CumulativeNormalChoiceFunc
 
 
 class DelaySlice(Model):
@@ -35,8 +36,14 @@ class DelaySlice(Model):
     prior['indiff'] = uniform(0, 1)
     prior['α'] = halfnorm(loc=0, scale=0.1)
     θ_fixed = {'ϵ': 0.001}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         ''' The decision variable is difference between the indifference point and
         the 'stimulus intensity' which is RA/RB '''
         return θ['indiff'].values - (data['RA'].values / data['RB'].values)
@@ -69,7 +76,7 @@ class DelaySlice(Model):
 #         return x
 
 
-#     def calc_decision_variable(self, θ, data):
+#     def _calc_decision_variable(self, θ, data):
 #         ''' The decision variable is difference between the indifference point and
 #         the 'stimulus intensity' which is RA/RB '''
 
@@ -100,12 +107,17 @@ class Hyperbolic(Model):
     73. Erlbaum, Hillsdale, NJ.
     '''
 
-    prior = dict()
-    prior['logk'] = norm(loc=-4.5, scale=1)
-    prior['α'] = halfnorm(loc=0, scale=2)
+    prior = {'logk': norm(loc=-4.5, scale=1),
+             'α': halfnorm(loc=0, scale=2)}
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._time_discount_func(data['DA'].values, np.exp(θ['logk'].values))
         VB = data['RB'].values * self._time_discount_func(data['DB'].values, np.exp(θ['logk'].values))
         return VB - VA
@@ -122,8 +134,14 @@ class Exponential(Model):
     prior['k'] = norm(loc=0.01, scale=0.1)
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['k'].values)
         VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['k'].values)
         return VB - VA
@@ -146,8 +164,14 @@ class HyperbolicMagnitudeEffect(Model):
     prior['c'] = norm(loc=0, scale=100) # <------ TODO: improve this
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = self._present_subjective_value(
             data['RA'].values, data['DA'].values, θ['m'].values, θ['c'].values)
         VB = self._present_subjective_value(
@@ -175,8 +199,14 @@ class ExponentialMagnitudeEffect(Model):
     prior['c'] = norm(loc=0, scale=100)  # <------ TODO: improve this
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = self._present_subjective_value(
             data['RA'].values, data['DA'].values, θ['m'].values, θ['c'].values)
         VB = self._present_subjective_value(
@@ -204,8 +234,14 @@ class ConstantSensitivity(Model):
     prior['b'] = halfnorm(loc=0.001, scale=3) # TODO: Improve this prior! make it centered on 1, maybe lognormal
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * \
             self._time_discount_func(
                 data['DA'].values, θ['a'].values, θ['b'].values)
@@ -227,8 +263,14 @@ class MyersonHyperboloid(Model):
     prior['s'] = halfnorm(loc=0, scale=2)
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['logk'].values, θ['s'].values)
         VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['logk'].values, θ['s'].values)
         return VB-VA
@@ -257,8 +299,14 @@ class ModifiedRachlin(Model):
     prior['s'] = halfnorm(loc=1, scale=2) # TODO: needs to be a positive value, with mode of 1.
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * self._time_discount_func(
             data['DA'].values, θ['logk'].values, θ['s'].values)
         VB = data['RB'].values * self._time_discount_func(
@@ -290,8 +338,14 @@ class HyperbolicNonLinearUtility(Model):
     prior['logk'] = norm(loc=np.log(1/365), scale=2)
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
 
-    def calc_decision_variable(self, θ, data):
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
         a = np.exp(θ['a'].values)
         VA = np.power(data['RA'].values,a) * self._time_discount_func(data['DA'].values, θ['logk'].values)
         VB = np.power(data['RB'].values,a) * self._time_discount_func(data['DB'].values, θ['logk'].values)

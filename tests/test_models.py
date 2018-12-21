@@ -44,16 +44,16 @@ def test_model_creation(model):
     assert isinstance(model_instance, model)
 
 
-# test calc_decision_variable() method of model classes ==========
+# test predictive_y() method of model classes ==========
 
 @pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
-def test_calc_decision_variable(model):
+def test_predictive_y(model):
     n_particles = 10
     model_instance = model(n_particles=n_particles)
 
     faux_design = pd.DataFrame({'RA': [100.], 'DA': [0.], 'PA': [1.],
                                 'RB': [150.], 'DB': [14.], 'PB': [1.]})
-    dv = model_instance.calc_decision_variable(model_instance.θ, faux_design)
+    dv = model_instance._calc_decision_variable(model_instance.θ, faux_design)
     assert isinstance(dv, np.ndarray)
 
 
