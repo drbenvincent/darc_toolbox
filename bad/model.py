@@ -58,6 +58,7 @@ class Model(ABC):
         # we call this. I've not figures out how to demand these exist in this ABC yet
         self.parameter_names = self.prior.keys()
         self.θ = self._sample_from_prior()
+        self.n_free_parameters = len(self.θ.columns)
 
     def update_beliefs(self, data):
         '''simply call the low-level `update_beliefs` function'''
