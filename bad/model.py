@@ -79,7 +79,7 @@ class Model(ABC):
         Σ log(p(data|θ))
         We are going to iterate over trials. For each one, we take the trial
         data and calculate the predictive_y. This gives us many values
-        (correspoding to particles). We deal with these appropriately for
+        (corresponding to particles). We deal with these appropriately for
         'chose B' and 'chose A' trials. Then calculate the log
         likelihood, which involves summing the ll over trials so that we end
         up with a log likelihood value for all the particles.
@@ -91,19 +91,17 @@ class Model(ABC):
         # TODO safety check... if no data, return ll = 0
 
         p_chose_B = np.zeros((n_particles, n_trials))
-        R = data.R.values
+        ll = np.zeros((n_particles, n_trials))
+        responses = data.R.values
 
         for trial in range(n_trials):
             trial_data = data.take([trial])
-            if R[trial] is 1:  # meaning they chose option B
-                p_chose_B[:, trial] = self.predictive_y( θ, trial_data)
-            elif R[trial] is 0:  # meaning they chose option A
-                p_chose_B[:, trial] = 1 - self.predictive_y(θ, trial_data)
-            else:
-                raise ValueError('Failing to identify response')
+            p_chose_B[:, trial] = self.predictive_y(θ, trial_data)
+            ll[:, trial] = bernoulli.logpmf(responses[trial], p_chose_B[:, trial])
 
-        ll = np.sum(np.log(p_chose_B), axis=1)
+        ll = np.sum(ll, axis=1)  # sum over trials
         return ll
+
 
     def log_prior_pdf(self, θ):
         """Evaluate the log prior density, log(p(θ)), for the values θ
