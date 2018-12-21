@@ -85,7 +85,7 @@ def test_generate_faux_true_params(model):
 
 
 @pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
-def test_get_simulated_response(model):
+def test_simulate_y(model):
     # set up model
     n_particles = 100
     model_instance = model(n_particles=n_particles)
@@ -94,6 +94,6 @@ def test_get_simulated_response(model):
     faux_design = pd.DataFrame({'RA': [100.], 'DA': [0.], 'PA': [1.],
                                 'RB': [150.], 'DB': [14.], 'PB': [1.]})
 
-    response = model_instance.get_simulated_response(faux_design)
+    response = model_instance.simulate_y(faux_design)
     isinstance(response, bool)
 

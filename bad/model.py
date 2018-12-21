@@ -142,7 +142,7 @@ class Model(ABC):
         '''
         pass
 
-    def get_simulated_response(self, design_df):
+    def simulate_y(self, design_df):
         '''
         Get simulated response for a given set of true parameter.
         This functionality is only needed when we are simulating experiment. It is not

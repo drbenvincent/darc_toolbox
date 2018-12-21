@@ -50,7 +50,7 @@ def simulated_experiment_trial_loop(design_thing, model):
             break
 
         design_df = darc.single_design_tuple_to_df(design)
-        response = model.get_simulated_response(design_df)
+        response = model.simulate_y(design_df)
         design_thing.enter_trial_design_and_response(design, response)
 
         model.update_beliefs(design_thing.get_df())
