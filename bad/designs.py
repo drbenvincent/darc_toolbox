@@ -93,28 +93,3 @@ class DesignGeneratorABC(ABC):
 
     def get_df(self):
         return self.data.get_df()
-
-
-class BayesianAdaptiveDesign(ABC):
-    '''An abstract base class for Bayesian Adaptive Design'''
-
-    heuristic_order = None
-    all_possible_designs = pd.DataFrame()
-
-    @abstractmethod
-    def generate_all_possible_designs(self):
-        pass
-
-    @abstractmethod
-    def refine_design_space(self):
-        ''' In theory we could do design optimisation on ALL possible designs.
-        However, this is complex. You can imagine some sets of designs will map on to
-        very distinct values of the decision variable, but that there are many designs
-        which will be almost invariant to the decision variable. But we would like to
-        explore the design space sensibly. Our general approach is (on any given trial)
-        to take a subset of the possible designs and conduct design optimisation on this
-        reduced subset. Importantly, over different trials, we are chosing this subset
-        intelligently to maximise exploration over the design space.'''
-        pass
-
-

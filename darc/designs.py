@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from bad.designs import DesignGeneratorABC, BayesianAdaptiveDesign
+from bad.designs import DesignGeneratorABC
 import pandas as pd
 import numpy as np
 import itertools
@@ -50,7 +50,7 @@ def df_to_design_tuple(df):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class DARCDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
+class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
@@ -76,7 +76,33 @@ class DARCDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
         self.random_choice_dimension = random_choice_dimension
         self.NO_REPEATS = NO_REPEATS
 
-        self.generate_all_possible_designs()
+        self._generate_all_possible_designs()
+
+
+    def get_next_design(self, model):
+
+        if self.trial > self.max_trials - 1:
+            return None
+        start_time = time.time()
+        logging.info(f'Getting design for trial {self.trial}')
+
+        allowable_designs = copy.copy(self.all_possible_designs)
+        logging.debug(f'{allowable_designs.shape[0]} designs initially')
+
+        allowable_designs = _remove_highly_predictable_designs(allowable_designs,
+                                                               model)
+
+        allowable_designs = self._refine_design_space(model,
+                                                      allowable_designs)
+        chosen_design_df, _ = design_optimisation(allowable_designs,
+                                                  model.predictive_y,
+                                                  model.θ)
+        chosen_design_named_tuple = df_to_design_tuple(chosen_design_df)
+
+        logging.debug(f'chosen design is: {chosen_design_named_tuple}')
+        logging.info(
+            f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
+        return chosen_design_named_tuple
 
 
     def _input_type_validation(self, RA, DA, PA, RB, DB, PB, RA_over_RB):
@@ -115,42 +141,27 @@ class DARCDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
         if np.any((np.array(RA_over_RB) < 0) | (np.array(RA_over_RB) > 1)):
             raise ValueError('Expect all values of RA_over_RB to be between 0-1')
 
-    def get_next_design(self, model):
-
-        if self.trial > self.max_trials - 1:
-            return None
-        start_time = time.time()
-        logging.info(f'Getting design for trial {self.trial}')
-
-        allowable_designs = self.refine_design_space(model)
-        chosen_design_df, _ = design_optimisation(allowable_designs, model.predictive_y, model.θ)
-        chosen_design_named_tuple = df_to_design_tuple(chosen_design_df)
-
-        logging.debug(f'chosen design is: {chosen_design_named_tuple}')
-        logging.info(f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
-        return chosen_design_named_tuple
-
-    def refine_design_space(self, model):
+    def _refine_design_space(self, model, allowable_designs):
         '''A series of filter operations to refine down the space of designs which we
         do design optimisations on.'''
 
-        allowable_designs = copy.copy(self.all_possible_designs)
-        logging.debug(f'{allowable_designs.shape[0]} designs initially')
+        # allowable_designs = copy.copy(self.all_possible_designs)
+        # logging.debug(f'{allowable_designs.shape[0]} designs initially')
 
         if self.NO_REPEATS and self.trial>1:
-            allowable_designs = remove_trials_already_run(
+            allowable_designs = _remove_trials_already_run(
                 allowable_designs, self.data.df.drop(columns=['R'])) # TODO: resolve this
 
         # apply a heuristic here to promote good spread of designs based on domain-specific
         # knowledge for DARC
         if self.random_choice_dimension is not None:
-            allowable_designs = choose_one_along_design_dimension(
+            allowable_designs = _choose_one_along_design_dimension(
                 allowable_designs, self.random_choice_dimension)
             logging.debug(
-                f'{allowable_designs.shape[0]} designs remain after choose_one_along_design_dimension with {self.random_choice_dimension}')
+                f'{allowable_designs.shape[0]} designs remain after _choose_one_along_design_dimension with {self.random_choice_dimension}')
 
-        allowable_designs = remove_highly_predictable_designs(
-            allowable_designs, model)
+        # allowable_designs = _remove_highly_predictable_designs(
+        #     allowable_designs, model)
 
         if allowable_designs.shape[0] == 0:
             logging.error(f'No ({allowable_designs.shape[0]}) designs left')
@@ -161,7 +172,7 @@ class DARCDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
         return allowable_designs
 
 
-    def generate_all_possible_designs(self, assume_discounting=True):
+    def _generate_all_possible_designs(self, assume_discounting=True):
         '''Create a dataframe of all possible designs (one design is one row)
         based upon the set of design variables (RA, DA, PA, RB, DB, PB)
         provided. We do this generation process ONCE. There may be additional
@@ -228,7 +239,7 @@ class DARCDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
         self.all_possible_designs = D
 
 
-def remove_trials_already_run(design_set, exclude_these):
+def _remove_trials_already_run(design_set, exclude_these):
     '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)
     Dropping duplicates will work in this situation because `exclude_these` is going to
     be a subset of `design_set`'''
@@ -238,7 +249,22 @@ def remove_trials_already_run(design_set, exclude_these):
     return allowable_designs
 
 
-def remove_highly_predictable_designs(allowable_designs, model):
+def _choose_one_along_design_dimension(allowable_designs, design_dim_name):
+    '''We are going to take one design dimension given by `design_dim_name` and randomly
+    pick one of it's values and hold it constant by removing all others from the list of
+    allowable_designs.
+    The purpose of this is to promote variation along the chosen design dimension.
+    Cutting down the set of allowable_designs which we do design optimisation on is a
+    nice side-effect rather than a direct goal.
+    '''
+    unique_values = allowable_designs[design_dim_name].unique()
+    chosen_value = random.choice(unique_values)
+    # filter by chosen value of this dimension
+    allowable_designs = allowable_designs.loc[allowable_designs[design_dim_name] == chosen_value]
+    return allowable_designs
+
+
+def _remove_highly_predictable_designs(allowable_designs, model):
     ''' Eliminate designs which are highly predictable as these will not be very informative '''
     θ_point_estimate = model.get_θ_point_estimate()
 
@@ -252,7 +278,8 @@ def remove_highly_predictable_designs(allowable_designs, model):
         allowable_designs['p_chose_B'] > 1 - threshold)
     allowable_designs['highly_predictable'] = pd.Series(highly_predictable)
 
-    n_not_predictable = allowable_designs.size - sum(allowable_designs.highly_predictable)
+    n_not_predictable = allowable_designs.size - \
+        sum(allowable_designs.highly_predictable)
     if n_not_predictable > 10:
         # drop the offending designs (rows)
         allowable_designs = allowable_designs.drop(
@@ -264,26 +291,14 @@ def remove_highly_predictable_designs(allowable_designs, model):
         # NOTE: This is not exactly the same as Tom's implementation which examines
         # VB-VA (which is the design variable axis) and also VA+VB (orthogonal to
         # the design variable axis)
-        logging.warning('not many unpredictable designs, so taking the 10 closest to unpredictable')
-        allowable_designs['badness'] = np.abs(0.5- allowable_designs.p_chose_B)
+        logging.warning(
+            'not many unpredictable designs, so taking the 10 closest to unpredictable')
+        allowable_designs['badness'] = np.abs(
+            0.5 - allowable_designs.p_chose_B)
         allowable_designs.sort_values(by=['badness'], inplace=True)
         allowable_designs = allowable_designs[:10]
 
     allowable_designs.drop(columns=['p_chose_B'])
-    logging.debug(f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
-    return allowable_designs
-
-
-def choose_one_along_design_dimension(allowable_designs, design_dim_name):
-    '''We are going to take one design dimension given by `design_dim_name` and randomly
-    pick one of it's values and hold it constant by removing all others from the list of
-    allowable_designs.
-    The purpose of this is to promote variation along the chosen design dimension.
-    Cutting down the set of allowable_designs which we do design optimisation on is a
-    nice side-effect rather than a direct goal.
-    '''
-    unique_values = allowable_designs[design_dim_name].unique()
-    chosen_value = random.choice(unique_values)
-    # filter by chosen value of this dimension
-    allowable_designs = allowable_designs.loc[allowable_designs[design_dim_name] == chosen_value]
+    logging.debug(
+        f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
     return allowable_designs
