@@ -50,7 +50,7 @@ def df_to_design_tuple(df):
 
 # CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
 
-class BADDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
+class DARCDesignGenerator(BayesianAdaptiveDesign, DesignGeneratorABC):
     '''
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''

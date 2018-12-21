@@ -4,7 +4,7 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 
 from darc.delayed import models
-from darc.designs import BADDesignGenerator
+from darc.designs import DARCDesignGenerator
 import numpy as np
 import pandas as pd
 import logging
@@ -66,7 +66,7 @@ def test_model_design_integration_delayed(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BADDesignGenerator(max_trials=max_trials,
+    design_thing = DARCDesignGenerator(max_trials=max_trials,
                               RA=list(100*np.linspace(0.05, 0.95, 19)),
                               random_choice_dimension='DB')
 
@@ -82,7 +82,7 @@ def test_model_design_integration_delayed_ME(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BADDesignGenerator(max_trials=max_trials,
+    design_thing = DARCDesignGenerator(max_trials=max_trials,
                               RB=[100., 500., 1_000.],
                               RA_over_RB=np.linspace(0.05, 0.95, 19).tolist(),
                               random_choice_dimension='RB')
@@ -98,7 +98,7 @@ def test_model_design_integration_risky(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BADDesignGenerator(max_trials=max_trials,
+    design_thing = DARCDesignGenerator(max_trials=max_trials,
                               DA=[0.], DB=[0.], PA=[1.],
                               PB=list(np.linspace(0.01, 0.99, 91)),
                               RA=list(100*np.linspace(0.05, 0.95, 19)),
@@ -116,7 +116,7 @@ def test_model_design_integration_delayed_and_risky(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BADDesignGenerator(max_trials=max_trials,
+    design_thing = DARCDesignGenerator(max_trials=max_trials,
                               RA=list(100*np.linspace(0.05, 0.95, 91)),
                               PB=list(np.linspace(0.01, 0.99, 19)),
                               random_choice_dimension='PB')
