@@ -49,55 +49,6 @@ class DelaySlice(Model):
         return θ['indiff'].values - (data['RA'].values / data['RB'].values)
 
 
-# class DelaySlices(Model):
-#     '''This is a 'non-parametric' model which estimates indifference points (A/B)
-#     at a small number of specified delays. The parameters being inferred are the
-#     indifference points for each delay level.
-#     '''
-
-#     prior = dict()
-#     prior['indiff1'] = uniform(loc=0, scale=1)
-#     prior['indiff2'] = uniform(loc=0, scale=1)
-#     prior['indiff3'] = uniform(loc=0, scale=1)
-#     prior['indiff4'] = uniform(loc=0, scale=1)
-#     prior['α'] = halfnorm(loc=0, scale=2)
-#     θ_fixed = {'ϵ': 0.01}
-
-#     @staticmethod
-#     def my_func(DB, RA, RB,  delays, θ):
-#         if DB == delays[0]:
-#             x = θ['indiff1'].values - (RA/RB)
-#         elif DB == delays[1]:
-#             x = θ['indiff2'].values - (RA/RB)
-#         elif DB == delays[2]:
-#             x = θ['indiff3'].values - (RA/RB)
-#         elif DB == delays[3]:
-#             x = θ['indiff4'].values - (RA/RB)
-#         return x
-
-
-#     def _calc_decision_variable(self, θ, data):
-#         ''' The decision variable is difference between the indifference point and
-#         the 'stimulus intensity' which is RA/RB '''
-
-#         v_my_func = np.vectorize(self.my_func, excluded=['delays', 'θ'])
-
-#         x = v_my_func(data['DB'].values, data['RA'].values, data['RA'].values,  self.delays, θ)
-#         return x
-#         # print(self.delays[0])
-#         # print(data['DB'].values)
-#         # TODO: FIX THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#         # if data['DB'].values == self.delays[0]:
-#         #     x = θ['indiff1'].values - (data['RA'].values / data['RB'].values)
-#         # elif data['DB'].values == self.delays[1]:
-#         #     x = θ['indiff2'].values - (data['RA'].values / data['RB'].values)
-#         # elif data['DB'].values == self.delays[2]:
-#         #     x = θ['indiff3'].values - (data['RA'].values / data['RB'].values)
-#         # elif data['DB'].values == self.delays[3]:
-#         #     x = θ['indiff4'].values - (data['RA'].values / data['RB'].values)
-#         # return x
-
-
 class Hyperbolic(Model):
     '''Hyperbolic time discounting model
 
@@ -150,6 +101,7 @@ class Exponential(Model):
     @np.vectorize
     def _time_discount_func(delay, k):
         return np.exp(-k * delay)
+
 
 class HyperbolicMagnitudeEffect(Model):
     '''Hyperbolic time discounting model + magnitude effect
@@ -253,6 +205,7 @@ class ConstantSensitivity(Model):
     def _time_discount_func(delay, a, b):
         # NOTE: we want params as a row matrix, and delays as a column matrix to do the appropriate array broadcasting.
         return np.exp(-np.power(a * delay, b))
+
 
 class MyersonHyperboloid(Model):
     '''Myerson style hyperboloid
