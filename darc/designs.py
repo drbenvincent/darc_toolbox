@@ -52,8 +52,8 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
     A class for running DARC choice tasks with Bayesian Adaptive Design.
     '''
 
-    def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100],
-                 RA_over_RB=list(), PA=[1], PB=[1],
+    def __init__(self, DA=[0.], DB=DEFAULT_DB, RA=list(), RB=[100.],
+                 RA_over_RB=list(), PA=[1.], PB=[1.],
                  max_trials=20,
                  NO_REPEATS=False):
         super().__init__()
@@ -218,6 +218,10 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         # check we actually have some designs!
         if D.shape[0] == 0:
             logging.error(f'No ({D.shape[0]}) designs generated!')
+
+        # convert all columns to float64.
+        for col_name in D.columns:
+            D[col_name] = D[col_name].astype('float64')
 
         # set the values
         self.all_possible_designs = D
