@@ -71,7 +71,7 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         self.max_trials = max_trials
         self.NO_REPEATS = NO_REPEATS
 
-        self._generate_all_possible_designs()
+        self.all_possible_designs = self._generate_all_possible_designs()
 
 
     def get_next_design(self, model):
@@ -89,9 +89,11 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
 
         allowable_designs = self._refine_design_space(model,
                                                       allowable_designs)
+
         chosen_design_df, _ = design_optimisation(allowable_designs,
                                                   model.predictive_y,
                                                   model.θ)
+
         chosen_design_named_tuple = df_to_design_tuple(chosen_design_df)
 
         logging.debug(f'chosen design is: {chosen_design_named_tuple}')
@@ -223,8 +225,7 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         for col_name in D.columns:
             D[col_name] = D[col_name].astype('float64')
 
-        # set the values
-        self.all_possible_designs = D
+        return D
 
 
 def _remove_trials_already_run(design_set, exclude_these):
