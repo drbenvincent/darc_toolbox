@@ -28,8 +28,8 @@ Feature | Status | Info
 --- | --- | ---
 Customise your prior beliefs over parameters | ✅ | This is a key feature of running efficient adaptive experiments. At the moment you have to edit priors in our Python code.
 Basic results visualization | ✅ | So far we've got basic visualisation of the marginal posteriors over parameters, and also some basic plotting of the (design, response) data collected.
-Run simulated experiments | in progress | This is of use to people wanting to develop/impliment their own models, to check it works.
-Interleave multiple adaptive experiments | ❌ | If you want to do interesting mixed-block experiments or react to the current estimates of model parameters (e.g. discount rates) then you can do that.
+Run simulated experiments | ✅ | This is primarily used for code testing during development, but could also be useful to people wanting to conduct parameter recovery simulations on new models they develop.
+Simultaneously fit mulitple models | ✅ | This is detailed in an example notebook. Currently it is an advanced feature without a PsychoPy demo.
 Inject custom trials | ❌ | Left to it's own devices, an experiment will choose it's own set of designs. But if you have particular experimental needs, you can inject your own (manually specified) designs amongst automatically run trials.
 
 ## Customise your adaptive experiment for your purposes: choosing a design + model combination
