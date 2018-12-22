@@ -3,7 +3,7 @@ import numpy as np
 import logging
 
 
-def data_plotter(data):
+def data_plotter(data, filename=None):
     '''Our high level plotting function which dispatches to the appropriate
     low-level plotting functions based upon the nature of the data'''
 
@@ -55,10 +55,10 @@ def data_plotter(data):
 
         plot_probability_data(axes[1], data)
 
-    # if filename is not None:
-    #     savename = filename + '_data_plot.pdf'
-    #     plt.savefig(savename)
-    #     logging.info(f'Data plot saved as: {savename}')
+    if filename is not None:
+        savename = filename + '_data_plot.pdf'
+        plt.savefig(savename)
+        logging.info(f'Data plot saved as: {savename}')
 
 
 # DELAY PLOTS =========================================================
