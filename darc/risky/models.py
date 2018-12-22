@@ -71,6 +71,34 @@ class PrelecOneParameter(Model):
         return np.exp(- (-np.log(p))**γ )
 
 
+class LinearInLogOdds(Model):
+    '''Prelec (1998) one parameter probability bias model.
+    Gonzalez, R., & Wu, G. (1999). On the shape of the probability weighting
+    function. Cognitive Psychology, 38(1), 129–166.
+    http://doi.org/10.1006/cogp.1998.0710
+    '''
+
+    prior = {'β': beta(1, 1),  # TODO: What prior??????????????????????????????????
+             's': beta(1, 1),  # TODO: What prior??????????????????????????????????
+             'α': halfnorm(loc=0, scale=3)}
+    θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
+
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
+        VA = data['RA'].values * self._w(data['PA'].values, θ['s'].values, θ['β'].values)
+        VB = data['RB'].values * self._w(data['PB'].values, θ['s'].values, θ['β'].values)
+        return VB - VA
+
+    @staticmethod
+    def _w(p, s, β):
+        return s * p**β / (s * p**β + (1-p)**β)
+
+
 class ProportionalDifference(Model):
     '''Proportional difference model for risky rewards
 
