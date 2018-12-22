@@ -118,7 +118,7 @@ def gui_get_desired_model(gui, core):
 
 def act_on_choices(desired_experiment_type, desired_model, expInfo):
 
-    # create desired experiment object
+    # create desired experiment object ========================================
 
     if desired_experiment_type == 'delayed (Bayesian Adaptive Design)':
         from darc.designs import BayesianAdaptiveDesignGeneratorDARC
@@ -126,12 +126,10 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
             design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
                                       RB=[100, 500, 1_000],
-                                      RA_over_RB=np.linspace(0.05, 0.95, 19).tolist(),
-                                      random_choice_dimension='RB')
+                                      RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
         else:
             design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
-                                      RA=list(100*np.linspace(0.05, 0.95, 91)),
-                                      random_choice_dimension='DB')
+                                      RA=list(100*np.linspace(0.05, 0.95, 91)))
 
         # import the appropriate set of models
         from darc.delayed import models
@@ -161,25 +159,25 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         from darc.designs import BayesianAdaptiveDesignGeneratorDARC
         # create an appropriate design object
         prob_list = [0.1, 0.25, 0.5, 0.75, 0.8, 0.9]
-        design_thing = darc.designs.BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
-                                    DA=[0], DB=[0], PA=[1], PB=prob_list,
-                                    RA=list(100*np.linspace(0.05, 0.95, 91)),
-                                    RB=[100],
-                                    random_choice_dimension='PB')
+        design_thing = BayesianAdaptiveDesignGeneratorDARC(
+            max_trials=expInfo['trials'],
+            DA=[0], DB=[0], PA=[1], PB=prob_list,
+            RA=list(100*np.linspace(0.05, 0.95, 91)),
+                                    RB=[100])
         # import the appropriate set of models
         from darc.risky import models
 
     elif desired_experiment_type == 'delayed and risky (Bayesian Adaptive Design)':
         from darc.designs import BayesianAdaptiveDesignGeneratorDARC
         # create an appropriate design object
-        design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
-                                                           PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                                                           random_choice_dimension='DB')
+        design_thing = BayesianAdaptiveDesignGeneratorDARC(
+            max_trials=expInfo['trials'],
+            PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99])
         # import the appropriate set of models
         from darc.delayed_and_risky import models
 
 
-    # chose the desired model here
+    # chose the desired model here ============================================
     if desired_model is 'Hyperbolic':
         model = models.Hyperbolic(n_particles=expInfo['particles'])
 
