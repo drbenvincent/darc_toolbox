@@ -1,4 +1,4 @@
-from scipy.stats import norm, bernoulli, halfnorm
+from scipy.stats import norm, bernoulli, halfnorm, beta
 import numpy as np
 from bad.model import Model
 from bad.choice_functions import CumulativeNormalChoiceFunc
@@ -44,6 +44,31 @@ class Hyperbolic(Model):
         # convert probability to odds against
         odds_against = prob_to_odds_against(probabilities)
         return 1/(1 + h * odds_against)
+
+
+class PrelecOneParameter(Model):
+    '''Prelec (1998) one parameter probability bias model
+    Prelec, D. (1998). The probability weighting function. Econometrica, 66, 497–527.
+    '''
+
+    prior = {'γ': beta(1,1),
+             'α': halfnorm(loc=0, scale=3)}
+    θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
+
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
+        VA = data['RA'].values * self._w(data['PA'].values, θ['γ'].values)
+        VB = data['RB'].values * self._w(data['PB'].values, θ['γ'].values)
+        return VB - VA
+
+    @staticmethod
+    def _w(p, γ):
+        return np.exp(- (-np.log(p))**γ )
 
 
 class ProportionalDifference(Model):

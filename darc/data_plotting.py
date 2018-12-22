@@ -160,7 +160,9 @@ def plot_probability_data(ax, data):
                label='response data')
 
     ax.set_xlabel('$P^B$')
-    ax.set_ylabel('$R^A/R^B$')
+    ax.set_ylabel('$\pi(P^B)$')
+    ax.set_xlim([0, 1])
+    ax.set_ylim([0, 1])
 
 
 def convert_risk_data(data):
