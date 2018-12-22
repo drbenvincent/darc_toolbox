@@ -1,11 +1,6 @@
-from collections import namedtuple
 import logging
 from darc.designs import DesignGeneratorABC
-
-
-# define useful data structures
-Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
-Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
+from darc import Prospect, Design
 
 
 class Griskevicius2011(DesignGeneratorABC):

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from collections import namedtuple
 from bad.designs import DesignGeneratorABC
+from darc import Prospect, Design
 import pandas as pd
 import numpy as np
 import itertools
@@ -20,9 +20,6 @@ DEFAULT_DB = np.concatenate([
     np.array([3, 4, 5, 6, 8, 9])*30,
     np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 25])*365]).tolist()
 
-# define useful data structures
-Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
-Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
 
 # helper functions
 def design_tuple_to_df(design):

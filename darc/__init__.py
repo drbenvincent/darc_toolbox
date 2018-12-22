@@ -1,4 +1,5 @@
 import pandas as pd
+from collections import namedtuple
 
 
 def single_design_tuple_to_df(design_tuple):
@@ -11,3 +12,8 @@ def single_design_tuple_to_df(design_tuple):
                   'PB': [design_tuple.ProspectB.prob]}
     design_df = pd.DataFrame.from_dict(trial_data)
     return design_df
+
+
+# define useful data structures
+Prospect = namedtuple('Prospect', ['reward', 'delay', 'prob'])
+Design = namedtuple('Design', ['ProspectA', 'ProspectB'])
