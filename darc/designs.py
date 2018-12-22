@@ -54,7 +54,6 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
 
     def __init__(self, DA=[0], DB=DEFAULT_DB, RA=list(), RB=[100],
                  RA_over_RB=list(), PA=[1], PB=[1],
-                 random_choice_dimension=None,
                  max_trials=20,
                  NO_REPEATS=False):
         super().__init__()
@@ -70,7 +69,6 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         self._PB = PB
         self._RA_over_RB = RA_over_RB
         self.max_trials = max_trials
-        self.random_choice_dimension = random_choice_dimension
         self.NO_REPEATS = NO_REPEATS
 
         self._generate_all_possible_designs()
@@ -148,17 +146,6 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         if self.NO_REPEATS and self.trial>1:
             allowable_designs = _remove_trials_already_run(
                 allowable_designs, self.data.df.drop(columns=['R'])) # TODO: resolve this
-
-        # apply a heuristic here to promote good spread of designs based on domain-specific
-        # knowledge for DARC
-        if self.random_choice_dimension is not None:
-            allowable_designs = _choose_one_along_design_dimension(
-                allowable_designs, self.random_choice_dimension)
-            logging.debug(
-                f'{allowable_designs.shape[0]} designs remain after _choose_one_along_design_dimension with {self.random_choice_dimension}')
-
-        # allowable_designs = _remove_highly_predictable_designs(
-        #     allowable_designs, model)
 
         if allowable_designs.shape[0] == 0:
             logging.error(f'No ({allowable_designs.shape[0]}) designs left')
