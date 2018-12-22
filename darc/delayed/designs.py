@@ -156,33 +156,22 @@ class Frye(DesignGeneratorABC):
         if self._trial_per_delay_counter is 0:
             self._RA = self._RB * 0.5
         else:
-            self._update_RA_given_last_response(last_response_chose_B)
+            # update RA depending upon last response
+            if last_response_chose_B:
+                self._RA = self._RA + (self._RB * self._post_choice_adjustment)
+            else:
+                self._RA = self._RA - (self._RB * self._post_choice_adjustment)
+
             self._post_choice_adjustment *= 0.5
 
         design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
                         ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB))
-        self._increment_counter()
+
+        self._trial_per_delay_counter += 1
+        if self._trial_per_delay_counter > self._trials_per_delay-1:
+            # done trials for this delay, so move on to next
+            self._delay_counter += 1
+            self._trial_per_delay_counter = 0
+            self._post_choice_adjustment = 0.25
         return design
 
-    # Below are helper functions
-
-    def _increment_counter(self):
-        """Increment trial counter, and increment delay counter if we have done all the trials per delay"""
-        self._trial_per_delay_counter += 1
-        # reset trial_per_delay_counter if need be
-        if self._trial_per_delay_counter > self._trials_per_delay-1:
-            self._increment_delay()
-
-
-    def _increment_delay(self):
-        """ Done trials_per_delay trials for this delay, so we'll move on to the next delay level now"""
-        self._delay_counter += 1
-        self._trial_per_delay_counter = 0
-        self._post_choice_adjustment = 0.25
-
-    def _update_RA_given_last_response(self, last_response_chose_B):
-        # change things depending upon last response
-        if last_response_chose_B:
-            self._RA = self._RA + (self._RB * self._post_choice_adjustment)
-        else:
-            self._RA = self._RA - (self._RB * self._post_choice_adjustment)
