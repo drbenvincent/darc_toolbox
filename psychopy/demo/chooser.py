@@ -121,14 +121,15 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     # create desired experiment object
 
     if desired_experiment_type == 'delayed (Bayesian Adaptive Design)':
+        from darc.designs import BayesianAdaptiveDesignGeneratorDARC
         # regular, or magnitude effect
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
-            design_thing = darc.designs.BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
+            design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
                                       RB=[100, 500, 1_000],
                                       RA_over_RB=np.linspace(0.05, 0.95, 19).tolist(),
                                       random_choice_dimension='RB')
         else:
-            design_thing = darc.designs.BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
+            design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
                                       RA=list(100*np.linspace(0.05, 0.95, 91)),
                                       random_choice_dimension='DB')
 
@@ -137,19 +138,23 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
 
 
     elif desired_experiment_type == 'delayed (Kirby 2009)':
-        design_thing = darc.delayed.designs.Kirby2009()
+        from darc.delayed.designs import Kirby2009
+        design_thing = Kirby2009()
         from darc.delayed import models
 
     elif desired_experiment_type == 'delayed (Griskevicius et al, 2011)':
-        design_thing = darc.delayed.designs.Griskevicius2011()
+
+        design_thing = Griskevicius2011()
         from darc.delayed import models
 
     elif desired_experiment_type == 'delayed (Frye et al, 2016)':
-        design_thing = darc.delayed.designs.Frye()
+        from darc.delayed.designs import Frye
+        design_thing = Frye()
         from darc.delayed import models
 
     elif desired_experiment_type == 'risky (Griskevicius et al, 2011)':
-        design_thing = darc.risky.designs.Griskevicius2011()
+        from darc.risky.designs import Griskevicius2011
+        design_thing = Griskevicius2011()
         from darc.risky import models
 
     elif desired_experiment_type == 'risky (Bayesian Adaptive Design)':
@@ -165,10 +170,11 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         from darc.risky import models
 
     elif desired_experiment_type == 'delayed and risky (Bayesian Adaptive Design)':
+        from darc.designs import BayesianAdaptiveDesignGeneratorDARC
         # create an appropriate design object
-        design_thing = darc.designs.BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
-                                  PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                                  random_choice_dimension='DB')
+        design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=expInfo['trials'],
+                                                           PB=[0.1, 0.2, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                                                           random_choice_dimension='DB')
         # import the appropriate set of models
         from darc.delayed_and_risky import models
 
