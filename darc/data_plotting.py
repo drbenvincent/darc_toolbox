@@ -150,22 +150,35 @@ def freq_to_area(freq):
 
 def plot_probability_data(ax, data):
 
-    RA = data.RA.values
-    DA = data.DA.values
-    PA = data.PA.values
-    RB = data.RB.values
-    DB = data.DB.values
-    PB = data.PB.values
-    R = data.R.values
+    data = convert_risk_data(data)
 
-    ax.scatter(x=PB[R == 0], y=RA[R == 0] / RB[R == 0],
-               c='b', alpha=0.5, label='chose A')
-    ax.scatter(x=PB[R == 1], y=RA[R == 1] / RB[R == 1],
-                c='r', alpha=0.5, label='chose B')
-    ax.set_xlabel('probability (PB)')
-    ax.set_ylabel('RA/RB')
-    ax.legend()
-    ax.set_title('Plot by reward probability (Assumes PA=1=riskless)')
+    ax.scatter(data['x'], data['y'],
+               s=freq_to_area(data['freq']),
+               c=data['prop'],
+               cmap='Greys',
+               edgecolor='k',
+               label='response data')
+
+    ax.set_xlabel('$P^B$')
+    ax.set_ylabel('$R^A/R^B$')
 
 
+def convert_risk_data(data):
+    ''' Convert raw data (dataframe) into a new data frame with:
+    x = RB
+    y = RA/RB
+    freq = frequency of this design
+    prop = average response to each unique design
+    '''
 
+    # define columns that define a unique design
+    cols = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
+    # new dataframe of unique designs with additional freq count column
+    new = data.groupby(cols).size().reset_index(name='freq')
+    # add average response to each unique design
+    new['prop'] = data.groupby(
+        cols)['R'].mean().reset_index(name='prop')['prop']
+    new['x'] = new['PB']
+    new['y'] = new['RA']/new['RB']
+    new = new[['x', 'y', 'freq', 'prop']]
+    return new
