@@ -43,6 +43,10 @@ class TrialData():
                     'PB': design.ProspectB.prob,
                     'R': [int(response)]}
         self.df = self.df.append(pd.DataFrame(trial_data))
+
+        # a bit clumsy but...
+        self.df['R'] = self.df['R'].astype('int64')
+
         return
 
     def plot_data(self):
