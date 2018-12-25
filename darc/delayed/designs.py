@@ -185,7 +185,7 @@ class DuGreenMyerson2002(DesignGeneratorABC):
     Record.
     '''
 
-    def __init__(self, DB=[30, 30*3, 30*9, 365*2, 365*5, 365*10, 365*20], RB=100., trials_per_delay=5):
+    def __init__(self, DB=[30, 30*3, 30*9, 365*2, 365*5, 365*10, 365*20], RB=100., trials_per_delay=7):
         self._DA = 0
         self._DB = DB
         self._RB = RB
