@@ -175,3 +175,57 @@ class Frye(DesignGeneratorABC):
             self._post_choice_adjustment = 0.25
         return design
 
+
+class DuGreenMyerson2002(DesignGeneratorABC):
+    '''
+    A class to provide designs based on the Du et al (2002) protocol.
+
+    Du, W., Green, L., & Myerson, J. (2002). Cross-cultural comparisons
+    of discounting delayed and probabilistic rewards. The Psychological
+    Record.
+    '''
+
+    def __init__(self, DB=[30, 30*3, 30*9, 365*2, 365*5, 365*10, 365*20], RB=100., trials_per_delay=5):
+        self._DA = 0
+        self._DB = DB
+        self._RB = RB
+        self._R_A = RB * 0.5
+        self._trials_per_delay = trials_per_delay
+        self._trial_per_delay_counter = 0
+        self._delay_counter = 0
+        self._PA = 1
+        self._PB = 1
+        self.max_trials = len(self._DB) * self._trials_per_delay
+        # call the superclass constructor
+        super().__init__()
+
+    def get_next_design(self, _):
+        """return the next design as a tuple of prospects"""
+
+        if self._delay_counter == len(self._DB):
+            return None
+
+        logging.info(f'Getting design for trial {self.trial}')
+        last_response_chose_B = self.get_last_response_chose_B()
+
+        if self._trial_per_delay_counter is 0:
+            self._RA = self._RB * 0.5
+        else:
+            # update RA depending upon last response
+            if last_response_chose_B:
+                self._RA = self._RA + (self._RB-self._RA)/2
+            else:
+                self._RA = self._RA - (self._RB-self._RA)/2
+
+
+        design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
+                        ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB))
+
+        self._trial_per_delay_counter += 1
+        if self._trial_per_delay_counter > self._trials_per_delay-1:
+            # done trials for this delay, so move on to next
+            self._delay_counter += 1
+            self._trial_per_delay_counter = 0
+            self._post_choice_adjustment = 0.25
+        return design
+
