@@ -70,7 +70,6 @@ class DuGreenMyerson2002(DesignGeneratorABC):
         last_response_chose_B = self.get_last_response_chose_B()
 
         if self._trial_per_prob_counter is 0:
-            print('self._trial_per_prob_counter is 0')
             self._RA = self._RB * 0.5
             self._post_choice_adjustment = (self._RB - self._RA) * 0.5
         else:
