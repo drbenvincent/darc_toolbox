@@ -45,45 +45,49 @@ class DuGreenMyerson2002(DesignGeneratorABC):
     Record.
     '''
 
-    def __init__(self, PB=[0.05, 0.1, 0.3, 0.5, 0.7, 0.9, 0.95], RB=100., trials_per_delay=7):
+    def __init__(self, PB=[0.95, 0.9, 0.7, 0.5, 0.3, 0.1, 0.05], RB=100.):
         self._DA = 0
         self._DB = 0
         self._RB = RB
-        self._R_A = RB * 0.5
-        self._trials_per_delay = trials_per_delay
-        self._trial_per_delay_counter = 0
-        self._delay_counter = 0
+        self._RA = self._RB * 0.5
+        # self._post_choice_adjustment = (self._RB - self._RA) * 0.5
+        self._trials_per_prob = 6
+        self._trial_per_prob_counter = 0
+        self._prob_counter = 0
         self._PA = 1
         self._PB = PB
-        self.max_trials = len(self._DB) * self._trials_per_delay
+        self.max_trials = len(self._PB) * self._trials_per_prob
         # call the superclass constructor
         super().__init__()
 
     def get_next_design(self, _):
         """return the next design as a tuple of prospects"""
 
-        if self._delay_counter == len(self._DB):
+        if self._prob_counter == len(self._PB):
             return None
 
         logging.info(f'Getting design for trial {self.trial}')
         last_response_chose_B = self.get_last_response_chose_B()
 
-        if self._trial_per_delay_counter is 0:
+        if self._trial_per_prob_counter is 0:
+            print('self._trial_per_prob_counter is 0')
             self._RA = self._RB * 0.5
+            self._post_choice_adjustment = (self._RB - self._RA) * 0.5
         else:
             # update RA depending upon last response
             if last_response_chose_B:
-                self._RA = self._RA + (self._RB-self._RA)/2
+                self._RA += self._post_choice_adjustment
             else:
-                self._RA = self._RA - (self._RB-self._RA)/2
+                self._RA -= self._post_choice_adjustment
+
+            self._post_choice_adjustment *= 0.5
 
         design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-                        ProspectB=Prospect(reward=self._RB, delay=self._DB, prob=self._PB[self._delay_counter]))
+                        ProspectB=Prospect(reward=self._RB, delay=self._DB, prob=self._PB[self._prob_counter]))
 
-        self._trial_per_delay_counter += 1
-        if self._trial_per_delay_counter > self._trials_per_delay-1:
-            # done trials for this delay, so move on to next
-            self._delay_counter += 1
-            self._trial_per_delay_counter = 0
-            self._post_choice_adjustment = 0.25
+        self._trial_per_prob_counter += 1
+        if self._trial_per_prob_counter > self._trials_per_prob-1:
+            # done trials for this prob level, so move on to next
+            self._prob_counter += 1
+            self._trial_per_prob_counter = 0
         return design
