@@ -1,4 +1,4 @@
-from scipy.stats import norm, bernoulli, halfnorm, beta
+from scipy.stats import norm, bernoulli, halfnorm, beta, truncnorm
 import numpy as np
 from bad.model import Model
 from bad.choice_functions import CumulativeNormalChoiceFunc
@@ -78,8 +78,15 @@ class LinearInLogOdds(Model):
     http://doi.org/10.1006/cogp.1998.0710
     '''
 
-    prior = {'β': beta(1, 1),  # TODO: What prior??????????????????????????????????
-             's': beta(1, 1),  # TODO: What prior??????????????????????????????????
+    # frustrating but necessary stuff for a truncated normal
+    myclip_a = 0
+    myclip_b = 100
+    my_mean = 1
+    my_std = 3
+    a, b = (myclip_a - my_mean) / my_std, (myclip_b - my_mean) / my_std
+
+    prior = {'γ': truncnorm(a, b, loc=my_mean, scale=my_std),  # curvature
+             'δ': truncnorm(a, b, loc=my_mean, scale=my_std),  # elevation
              'α': halfnorm(loc=0, scale=3)}
     θ_fixed = {'ϵ': 0.01}
     choiceFunction = CumulativeNormalChoiceFunc
@@ -90,13 +97,17 @@ class LinearInLogOdds(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._w(data['PA'].values, θ['s'].values, θ['β'].values)
-        VB = data['RB'].values * self._w(data['PB'].values, θ['s'].values, θ['β'].values)
+        VA = data['RA'].values * self._w(data['PA'].values, θ['δ'].values, θ['γ'].values)
+        VB = data['RB'].values * self._w(data['PB'].values, θ['δ'].values, θ['γ'].values)
         return VB - VA
 
     @staticmethod
-    def _w(p, s, β):
-        return s * p**β / (s * p**β + (1-p)**β)
+    @np.vectorize
+    def _w(p, δ, γ):
+        if p == 0.0 or p == 1.0:
+            return p
+
+        return (δ*p**γ) / ((δ*p**γ) + (1-p)**γ)
 
 
 class ProportionalDifference(Model):
