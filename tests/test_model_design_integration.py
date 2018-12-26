@@ -30,7 +30,8 @@ delayed_models_list_ME = [
 
 risky_models_list = [
     risky_models.Hyperbolic,
-    risky_models.ProportionalDifference]
+    risky_models.ProportionalDifference,
+    risky_models.LinearInLogOdds]
 
 delayed_and_risky_models_list = [
     delayed_and_risky_models.MultiplicativeHyperbolic]

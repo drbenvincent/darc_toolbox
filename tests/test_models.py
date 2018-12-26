@@ -23,7 +23,7 @@ delayed_models_list = [
 risky_models_list = [
     risky_models.Hyperbolic,
     risky_models.ProportionalDifference,
-    #risky_models.ProspectTheory
+    risky_models.LinearInLogOdds
 ]
 
 delayed_and_risky_models_list = [
