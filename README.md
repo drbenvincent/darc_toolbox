@@ -38,11 +38,22 @@ When you run an adaptive experiment, it can be viewed as a combination of a **de
 So the experimenter must choose a design paradigm + cognitive model combination which will suit their purposes. This is actually a pretty straight-forward task. Your reasearch goals will dictate your design paradigm (eg delayed choice). You can use a default cognitive model (such as Hyperbolic discounting) or one of the other delay discounting models which you might be particularly interested in.
 
 # Design paradigms
-One of the core components of this package is to provide designs chosen through Bayesian Adaptive Design, as outlined in our prepint (Vincent & Rainforth, 2017). However, we also provide the ability to run the Kirby 27-item task as well as the Frye et al adpative procedure. The core classes of design we focus on are:
+One of the core components of this package is to provide designs chosen through Bayesian Adaptive Design, as outlined in our prepint (Vincent & Rainforth, 2017). The core classes of design we focus on are:
 
 - **Delayed choice tasks (aka inter-temporal choice):** you can choose between various protocols such as: front-end delays, fixed delayed reward, fixed immediate reward, fixed delay, etc.
 - **Risky choice tasks:** Ahoose your range of reward probabilities. These can also be seen as a transformed version of odds against recieving a reward.
 - **Simultaneous delayed and risky choice tasks:** Again, you can customise the range of delays and reward probability (risk) levels used in your experiment.
+
+You can run experiments using any of the following design protocols:
+
+Model | Type | Reference
+--- | --- | ---
+Kirby2009 | delayed | Kirby, K. N. (2009). One-year temporal stability of delay-discount rates. Psychonomic Bulletin & Review, 16(3):457–462.
+Koffarnus_Bickel | delayed | Koffarnus, M. N., & Bickel, W. K. (2014). A 5-trial adjusting delay discounting task: Accurate discount rates in less than one minute. Experimental and Clinical Psychopharmacology, 22(3), 222-228.
+Frye | delayed | Frye, C. C. J., Galizio, A., Friedel, J. E., DeHart, W. B., & Odum, A. L. (2016). Measuring Delay Discounting in Humans Using an Adjusting Amount Task. Journal of Visualized Experiments, (107), 1-8.
+Griskevicius2011 | delayed or risky | Kirby, K. N. (2009). Griskevicius, V., Tybur, J. M., Delton, A. W., & Robertson, T. E. (2011). The influence of mortality and socioeconomic status on risk and delayed rewards: A life history theory approach. Journal of Personality and Social Psychology, 100(6), 1015–26.
+DuGreenMyerson2002 | delayed or risky | Du, W., Green, L., & Myerson, J. (2002). Cross-cultural comparisons of discounting delayed and probabilistic rewards. The Psychological Record.
+BayesianAdaptiveDesignGeneratorDARC | delayed and/or risky | Vincent & Rainforth (2017)
 
 Below, we outline the cognitive models which we have implemented, for each of these classes of paradigms.
 
