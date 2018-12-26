@@ -4,7 +4,7 @@ import numpy as np
 import logging
 
 
-def data_plotter(data, filename=None):
+def data_plotter(data, filename=None, ax=None):
     '''Our high level plotting function which dispatches to the appropriate
     low-level plotting functions based upon the nature of the data'''
 
@@ -35,7 +35,8 @@ def data_plotter(data, filename=None):
     # make plotting decisions
     if delayed_choices and not risky_choices:
         # delay based plot only
-        f, ax = plt.subplots(1, 1, figsize=(9, 4))
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(9, 4))
         if front_end_delays:
             plot_delay_with_front_end_delays(ax, data)
         else:
@@ -43,7 +44,8 @@ def data_plotter(data, filename=None):
 
     elif risky_choices and not delayed_choices:
         # risky based plot only
-        f, ax = plt.subplots(1, 1, figsize=(9, 4))
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(9, 4))
         plot_probability_data(ax, data)
 
     elif delayed_choices and risky_choices:
