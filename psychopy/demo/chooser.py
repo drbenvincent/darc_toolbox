@@ -47,7 +47,7 @@ delay_models_available = ['Hyperbolic', 'Exponential',
 
 risky_models_available = ['Hyperbolic',
                           'ProportionalDifference',
-                          ]
+                          'LinearInLogOdds']
 
 delayed_and_risky_models_available = ['MultiplicativeHyperbolic']
 
@@ -221,6 +221,9 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     elif desired_model is 'MultiplicativeHyperbolic':
         model = models.MultiplicativeHyperbolic(
             n_particles=expInfo['particles'])
+
+    elif desired_model is 'LinearInLogOdds':
+        model = models.LinearInLogOdds(n_particles=expInfo['particles'])
 
     else:
         logging.error(f'Value of desired_model ({desired_model}) not recognised')
