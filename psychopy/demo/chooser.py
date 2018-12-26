@@ -20,15 +20,22 @@ expt_type = {'Experiment type':
              'risky (Bayesian Adaptive Design)',
              'delayed and risky (Bayesian Adaptive Design)',
              'delayed (Griskevicius et al, 2011)',
+             'delayed (Du, Green, & Myerson, 2002)',
              'delayed (Kirby 2009)',
              'delayed (Frye et al, 2016)',
              'risky (Griskevicius et al, 2011)',
+             'risky (Du, Green, & Myerson, 2002)',
              ]}
 
-delayed_design_set = {'delayed (Bayesian Adaptive Design)', 'delayed (Kirby 2009)',
-                      'delayed (Griskevicius et al, 2011)', 'delayed (Frye et al, 2016)'}
+delayed_design_set = {'delayed (Bayesian Adaptive Design)',
+                      'delayed (Kirby 2009)',
+                      'delayed (Griskevicius et al, 2011)',
+                      'delayed (Frye et al, 2016)',
+                      'delayed (Du, Green, & Myerson, 2002)'}
 
-risky_design_set = {'risky (Griskevicius et al, 2011)', 'risky (Bayesian Adaptive Design)'}
+risky_design_set = {'risky (Griskevicius et al, 2011)',
+                    'risky (Bayesian Adaptive Design)',
+                    'risky (Du, Green, & Myerson, 2002)'}
 
 delayed_and_risky_design_set = {'delayed and risky (Bayesian Adaptive Design)'}
 
@@ -149,6 +156,16 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         from darc.delayed.designs import Frye
         design_thing = Frye()
         from darc.delayed import models
+
+    elif desired_experiment_type == 'delayed (Du, Green, & Myerson, 2002)':
+        from darc.delayed.designs import DuGreenMyerson2002
+        design_thing = DuGreenMyerson2002()
+        from darc.delayed import models
+
+    elif desired_experiment_type == 'risky (Du, Green, & Myerson, 2002)':
+        from darc.risky.designs import DuGreenMyerson2002
+        design_thing = DuGreenMyerson2002()
+        from darc.risky import models
 
     elif desired_experiment_type == 'risky (Griskevicius et al, 2011)':
         from darc.risky.designs import Griskevicius2011
