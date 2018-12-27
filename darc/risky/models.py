@@ -106,8 +106,8 @@ class LinearInLogOdds(Model):
     def _w(p, δ, γ):
         if p == 0.0 or p == 1.0:
             return p
-
-        return (δ*p**γ) / ((δ*p**γ) + (1-p)**γ)
+        else:
+            return (δ*p**γ) / ((δ*p**γ) + (1-p)**γ)
 
 
 class ProportionalDifference(Model):

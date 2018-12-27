@@ -81,6 +81,7 @@ Model | Status | Info
 Hyperbolic | ✅ | Hyperbolic discounting of odds against reward
 Generalized hyperbolic | ❌ |
 Prelec (1998) | ❌ |
+Linear in log odds | ✅  | Gonzalez, R., & Wu, G. (1999). On the shape of the probability weighting function. Cognitive Psychology, 38(1), 129–166. http://doi.org/10.1006/cogp.1998.0710
 Prospect Theory | ❌ |
 Proportional difference | ✅ | González-Vallejo, C. (2002). Making trade-offs: A probabilistic and context-sensitive model of choice behavior. Psychological Review, 109(1), 137–155. http://doi.org/10.1037//0033-295X.109.1.137
 
@@ -89,7 +90,6 @@ Model | Status | Info
 --- | --- | ---
 AdditiveHyperbolic | ❌ | Yi, R., la Piedad, de, X., & Bickel, W. K. (2006). The combined effects of delay and probability in discounting. Behavioural Processes, 73(2), 149–155. http://doi.org/10.1016/j.beproc.2006.05.001
 MultiplicativeHyperbolic | ✅ | Vanderveldt, A., Green, L., & Myerson, J. (2015). Discounting of monetary rewards that are both delayed and probabilistic: delay and probability combine multiplicatively, not additively. Journal of Experimental Psychology: Learning, Memory, and Cognition, 41(1), 148–162. http://doi.org/10.1037/xlm0000029
-Proportional difference | ❌ | [think, then implement]
 Probability and Time Trade-off model | ❌ | (Baucells & Heukamp)
 
 
