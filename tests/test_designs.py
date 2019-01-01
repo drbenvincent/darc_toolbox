@@ -81,6 +81,39 @@ def test_DARCDesign_risky_instantiation():
                                 RB=[100.])
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
+def test_DARCDesign_delayed_and_risky_instantiation():
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
+                                                       DA=[0.], DB=[7., 30, 30*6, 365], PA=[1.],
+                                                       PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                                                       RA=list(100*np.linspace(0.05, 0.95, 91)),
+                                                       RB=[100.])
+    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
+# test using the alternate constructors
+def test_DARC_BAD_alt_delaymag():
+    design_thing = BayesianAdaptiveDesignGeneratorDARC.delay_magnitude_effect(max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
+
+def test_DARC_BAD_alt_delayandrisky():
+    design_thing = BayesianAdaptiveDesignGeneratorDARC.delayed_and_risky(
+        max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
+
+def test_DARC_BAD_alt_delayed():
+    design_thing = BayesianAdaptiveDesignGeneratorDARC.delayed(
+        max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
+
+def test_DARC_BAD_alt_risky():
+    design_thing = BayesianAdaptiveDesignGeneratorDARC.risky(
+        max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
+
+
 
 # a similar set of tests to above, but testing we have some designs
 

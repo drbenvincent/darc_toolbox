@@ -227,6 +227,32 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
 
         return D
 
+    # Define alternate constructors here =================================
+
+    @classmethod
+    def delay_magnitude_effect(cls, max_trials):
+        return cls(max_trials=max_trials,
+                   RB=[100, 500, 1_000],
+                   RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
+
+    @classmethod
+    def delayed_and_risky(cls, max_trials):
+        return cls(max_trials=max_trials, DA=[0.], DB=DEFAULT_DB,
+                   PA=[1.], PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                   RA=list(100*np.linspace(0.05, 0.95, 91)), RB=[100.])
+
+    @classmethod
+    def delayed(cls, max_trials):
+        return cls(max_trials=max_trials,
+                   RA=list(100*np.linspace(0.05, 0.95, 91)))
+
+    @classmethod
+    def risky(cls, max_trials):
+        prob_list = [0.1, 0.25, 0.5, 0.75, 0.8, 0.9]
+        return cls(max_trials=max_trials, DA=[0], DB=[0], PA=[1], PB=prob_list,
+                   RA=list(100*np.linspace(0.05, 0.95, 91)), RB=[100])
+
+
 
 def _remove_trials_already_run(design_set, exclude_these):
     '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)
@@ -291,3 +317,4 @@ def _remove_highly_predictable_designs(allowable_designs, model):
     logging.debug(
         f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
     return allowable_designs
+
