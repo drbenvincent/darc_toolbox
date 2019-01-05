@@ -264,7 +264,7 @@ class DesignSpaceBuilder():
         logging.debug(f'provided RA_over_RB = {self.RA_over_RB}')
         logging.debug(f'provided IRI = {self.IRI}')
 
-        if self.IRI is not None:
+        if len(self.IRI) > 1:
             '''
             We have been given IRI values. We want to
             set DB values based on all combinations of DA and
