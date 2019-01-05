@@ -4,7 +4,7 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 import numpy as np
 import darc.delayed.designs as delayed_designs
 import darc.risky.designs as risky_designs
-from darc.designs import BayesianAdaptiveDesignGeneratorDARC
+from darc.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
 import pytest
 
 
@@ -43,7 +43,8 @@ def test_DuGreenMyerson2002_risky_default_instantiation():
 
 
 def test_DARCDesign_default_instantiation():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(RA=list(100*np.linspace(0.05, 0.95, 91)))
+    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91))).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
@@ -56,9 +57,9 @@ def test_Frye_custom1_instantiation():
 
 
 def test_DARCDesign_delay_instantiation():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
-                                RA=list(100*np.linspace(0.05, 0.95, 91)),
-                                RB=[100.])
+    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91)),
+                           RB=[100.]).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
@@ -67,49 +68,50 @@ def test_DARCDesign_delay_magnitude_effect_instantiation():
     reasonable range of DB values. When we do this, we are going to provide
     a vector of proportions (RA_over_RB) which will be translated into
     actual RA values. '''
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
-                              RB=[10., 100., 1_000.],
-                              RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
+    D = DesignSpaceBuilder(RB=[10., 100., 1_000.],
+                           RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
 def test_DARCDesign_risky_instantiation():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
-                                DA=[0.], DB=[0.], PA=[1.],
-                                PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                                RA=list(100*np.linspace(0.05, 0.95, 91)),
-                                RB=[100.])
+    D = DesignSpaceBuilder(DA=[0.], DB=[0.], PA=[1.],
+                           PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                           RA=list(100*np.linspace(0.05, 0.95, 91)),
+                           RB=[100.]).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 def test_DARCDesign_delayed_and_risky_instantiation():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
-                                                       DA=[0.], DB=[7., 30, 30*6, 365], PA=[1.],
-                                                       PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                                                       RA=list(100*np.linspace(0.05, 0.95, 91)),
-                                                       RB=[100.])
+    D = DesignSpaceBuilder(DA=[0.], DB=[7., 30, 30*6, 365], PA=[1.],
+                           PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                           RA=list(100*np.linspace(0.05, 0.95, 91)),
+                           RB=[100.]).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 # test using the alternate constructors
 def test_DARC_BAD_alt_delaymag():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC.delay_magnitude_effect(max_trials=3)
+    D = DesignSpaceBuilder.delay_magnitude_effect().build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
 def test_DARC_BAD_alt_delayandrisky():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC.delayed_and_risky(
-        max_trials=3)
+    D = DesignSpaceBuilder.delayed_and_risky().build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
 def test_DARC_BAD_alt_delayed():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC.delayed(
-        max_trials=3)
+    D = DesignSpaceBuilder.delayed().build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
 def test_DARC_BAD_alt_risky():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC.risky(
-        max_trials=3)
+    D = DesignSpaceBuilder.risky().build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
@@ -119,7 +121,8 @@ def test_DARC_BAD_alt_risky():
 
 
 def test_DARCDesign_delay_initial_design_space():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(RA=list(100*np.linspace(0.05, 0.95, 91)))
+    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91))).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10
 
@@ -128,18 +131,18 @@ def test_DARCDesign_delay_magnitude_effect_initial_design_space():
     reasonable range of DB values. When we do this, we are going to provide
     a vector of proportions (RA_over_RB) which will be translated into
     actual RA values. '''
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
-                              RB=[10, 100, 1_000],
-                              RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
+    D = DesignSpaceBuilder(RB=[10, 100, 1_000],
+                           RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10
 
 
 def test_DARCDesign_risky_initial_design_space():
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=3,
-                              DA=[0], DB=[0], PA=[1],
-                              PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                              RA=list(100*np.linspace(0.05, 0.95, 91)),
-                              RB=[100])
+    D = DesignSpaceBuilder(DA=[0], DB=[0], PA=[1],
+                           PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+                           RA=list(100*np.linspace(0.05, 0.95, 91)),
+                           RB=[100]).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs>10

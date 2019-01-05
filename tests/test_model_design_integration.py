@@ -4,7 +4,7 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 
 from darc.delayed import models
-from darc.designs import BayesianAdaptiveDesignGeneratorDARC
+from darc.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
 import numpy as np
 import pandas as pd
 import logging
@@ -67,8 +67,8 @@ def test_model_design_integration_delayed(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=max_trials,
-                              RA=list(100*np.linspace(0.05, 0.95, 19)))
+    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 19))).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=max_trials)
 
     model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
@@ -82,9 +82,9 @@ def test_model_design_integration_delayed_ME(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=max_trials,
-                              RB=[100., 500., 1_000.],
-                              RA_over_RB=np.linspace(0.05, 0.95, 19).tolist())
+    D = DesignSpaceBuilder(RB=[100., 500., 1_000.],
+                           RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=max_trials)
 
     model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
@@ -97,11 +97,11 @@ def test_model_design_integration_risky(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=max_trials,
-                              DA=[0.], DB=[0.], PA=[1.],
-                              PB=list(np.linspace(0.01, 0.99, 91)),
-                              RA=list(100*np.linspace(0.05, 0.95, 19)),
-                              RB=[100.])
+    D = DesignSpaceBuilder(DA=[0.], DB=[0.], PA=[1.],
+                           PB=list(np.linspace(0.01, 0.99, 91)),
+                           RA=list(100*np.linspace(0.05, 0.95, 19)),
+                           RB=[100.]).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=max_trials)
 
     model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
@@ -114,9 +114,9 @@ def test_model_design_integration_delayed_and_risky(model):
     '''Tests integration of model and design. Basically conducts Parameter
     Estimation'''
 
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(max_trials=max_trials,
-                              RA=list(100*np.linspace(0.05, 0.95, 91)),
-                              PB=list(np.linspace(0.01, 0.99, 19)))
+    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91)),
+                           PB=list(np.linspace(0.01, 0.99, 19))).build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=max_trials)
 
     model = model(n_particles=n_particles)
     model = model.generate_faux_true_params()
