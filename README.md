@@ -95,7 +95,7 @@ Probability and Time Trade-off model | ❌ | (Baucells & Heukamp)
 
 # Installation instructions
 1. Ensure you have a Python 3 installation. I recommend https://www.anaconda.com/download/. I have been testing the code with Python 3.6.6.
-2. Install [PsychoPy](http://www.psychopy.org). Make sure you install a version that works with Python 3. Testing has been conducted with PsychoPy 1.90.1.
+2. Install [PsychoPy](http://www.psychopy.org). Make sure you install a version that works with Python 3. Early development was done with PsychoPy 1.90.1, but it works just fine with [PsychoPy 3.0.0](https://github.com/psychopy/psychopy/releases/tag/3.0.0), so I recommend using that.
 3. Download or clone this `darc-experiments-python` repository.
 4. Open up PsychoPy... Open the PsychoPy experiment `psychopy/demo/experiment.psyexp` in the builder view... Run the experiment (with the green man symbol). You will get some GUI options to chose from before the experiment starts. After it is finished, check the auto-saved data in the `\data` folder. This includes log files, saved trial-level data, and exported figures which could be useful.
 
