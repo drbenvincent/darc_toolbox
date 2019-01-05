@@ -187,7 +187,7 @@ class DesignSpaceBuilder():
                  RA=list(),
                  RB=[100.],
                  RA_over_RB=list(),
-                 inter_reward_interval=list(),
+                 IRI=list(),
                  PA=[1.],
                  PB=[1.]):
 
@@ -198,12 +198,12 @@ class DesignSpaceBuilder():
         self.RB = RB
         self.PB = PB
         self.RA_over_RB = RA_over_RB
-        self.inter_reward_interval = inter_reward_interval
+        self.IRI = IRI
 
         self._input_type_validation()
         self._input_value_validation()
 
-    def _input_type_validation(self, ):
+    def _input_type_validation(self):
         # NOTE: possibly not very Pythonic
         assert isinstance(self.RA, list), "RA should be a list"
         assert isinstance(self.DA, list), "DA should be a list"
@@ -212,8 +212,8 @@ class DesignSpaceBuilder():
         assert isinstance(self.DB, list), "DB should be a list"
         assert isinstance(self.PB, list), "PB should be a list"
         assert isinstance(self.RA_over_RB, list), "RA_over_RB should be a list"
-        assert isinstance(self.inter_reward_interval,
-                          list), "inter_reward_interval should be a list"
+        assert isinstance(self.IRI,
+                          list), "IRI should be a list"
 
         # we expect EITHER values in RA OR values in RA_over_RB
         # assert (not RA) ^ (not RA_over_RB), "Expecting EITHER RA OR RA_over_RB as an"
@@ -237,9 +237,9 @@ class DesignSpaceBuilder():
         if np.any(np.array(self.DB) < 0):
             raise ValueError('Expecting all values of DB to be >= 0')
 
-        if np.any(np.array(self.inter_reward_interval) < 0):
+        if np.any(np.array(self.IRI) < 0):
             raise ValueError(
-                'Expecting all values of inter_reward_interval to be >= 0')
+                'Expecting all values of IRI to be >= 0')
 
         if np.any((np.array(self.RA_over_RB) < 0) | (np.array(self.RA_over_RB) > 1)):
             raise ValueError(
@@ -262,10 +262,34 @@ class DesignSpaceBuilder():
         logging.debug(f'provided DB = {self.DB}')
         logging.debug(f'provided PB = {self.PB}')
         logging.debug(f'provided RA_over_RB = {self.RA_over_RB}')
-        logging.debug(
-            f'provided inter_reward_interval = {self.inter_reward_interval}')
+        logging.debug(f'provided IRI = {self.IRI}')
 
-        if not self.RA_over_RB:
+        if self.IRI is not None:
+            '''
+            We have been given IRI values. We want to
+            set DB values based on all combinations of DA and
+            IRI.
+
+            Example: if we have DA = [7, 14, 30] and IRI
+            = [1, 2, 3] then we want all combinations of DA + IRI
+            which results in DB = [8, 9, 10, 15, 16, 17, 31, 32, 33]
+            '''
+
+            if len(self.DB)>0:
+                print('We are expecting values in EITHER IRI OR RB')
+
+            if len(self.RA)>1 or len(self.RB)>1:
+                print('You might know what you are doing, but a fixed reward ratio is recommended when using front-end delays')
+
+            column_list = ['RA', 'DA', 'PA', 'RB', 'IRI', 'PB']
+            list_of_lists = [self.RA, self.DA, self.PA,
+                             self.RB, self.IRI, self.PB]
+            all_combinations = list(itertools.product(*list_of_lists))
+            D = pd.DataFrame(all_combinations, columns=column_list)
+            D['DB'] = D['DA'] + D['IRI']
+            D = D.drop(columns=['IRI'])
+
+        elif not self.RA_over_RB:
             '''assuming we are not doing magnitude effect, as this is
             when we normally would be providing RA_over_RB values'''
 
@@ -318,7 +342,11 @@ class DesignSpaceBuilder():
 
         return D
 
-    # Define alternate constructors here =================================
+
+    ''' Define alternate constructors here
+    These methods are convenient in order to set up design spaces without
+    having to define all the design dimensions individually.
+    '''
 
     @classmethod
     def delay_magnitude_effect(cls):
@@ -336,13 +364,14 @@ class DesignSpaceBuilder():
         return cls(RA=list(100*np.linspace(0.05, 0.95, 91)))
 
     @classmethod
-    def delayed_frontend_delay(cls):
+    def frontend_delay(cls):
         '''Defaults for a front-end delay experiment. These typically use a
         fixed reward ratio.
-        - inter_reward_interval = RA+RB'''
+        - IRI = RA+RB'''
         return cls(RA=[50.], RB=[100.],
                    DA=[0., 7, 30, 30*3, 30*6, 365, 365*5],
-                   inter_reward_interval=[1, 7, 14, 30, 30*3, 30*6, 365])
+                   DB=[],
+                   IRI=[1, 7, 14, 30, 30*3, 30*6])
 
     @classmethod
     def risky(cls):
