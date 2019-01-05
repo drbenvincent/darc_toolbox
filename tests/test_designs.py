@@ -115,6 +115,12 @@ def test_DARC_BAD_alt_risky():
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
+def test_DARC_BAD_alt_frontenddelay():
+    D = DesignSpaceBuilder.frontend_delay().build()
+    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
+
 
 
 # a similar set of tests to above, but testing we have some designs
