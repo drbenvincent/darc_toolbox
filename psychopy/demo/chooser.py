@@ -128,13 +128,15 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     # create desired experiment object ========================================
 
     if desired_experiment_type == 'delayed (Bayesian Adaptive Design)':
-        from darc.designs import BayesianAdaptiveDesignGeneratorDARC
+        from darc.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
         # regular, or magnitude effect
         if (desired_model is 'HyperbolicMagnitudeEffect') or (desired_model is 'ExponentialMagnitudeEffect'):
-            design_thing = BayesianAdaptiveDesignGeneratorDARC.delay_magnitude_effect(
+            D = DesignSpaceBuilder.delay_magnitude_effect().build()
+            design_thing = BayesianAdaptiveDesignGeneratorDARC(D,
                 max_trials=expInfo['trials'])
         else:
-            design_thing = BayesianAdaptiveDesignGeneratorDARC.delayed(
+            D = DesignSpaceBuilder.delayed().build()
+            design_thing = BayesianAdaptiveDesignGeneratorDARC(D,
                 max_trials=expInfo['trials'])
 
         # import the appropriate set of models
@@ -172,9 +174,10 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
         from darc.risky import models
 
     elif desired_experiment_type == 'risky (Bayesian Adaptive Design)':
-        from darc.designs import BayesianAdaptiveDesignGeneratorDARC
+        from darc.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
         # create an appropriate design object
-        design_thing = BayesianAdaptiveDesignGeneratorDARC.risky(
+        D = DesignSpaceBuilder.risky().build()
+        design_thing = BayesianAdaptiveDesignGeneratorDARC(D,
             max_trials=expInfo['trials'])
         # import the appropriate set of models
         from darc.risky import models
@@ -182,7 +185,8 @@ def act_on_choices(desired_experiment_type, desired_model, expInfo):
     elif desired_experiment_type == 'delayed and risky (Bayesian Adaptive Design)':
         from darc.designs import BayesianAdaptiveDesignGeneratorDARC
         # create an appropriate design object
-        design_thing = BayesianAdaptiveDesignGeneratorDARC.delayed_and_risky(
+        D = DesignSpaceBuilder.delayed_and_risky().build()
+        design_thing = BayesianAdaptiveDesignGeneratorDARC(D,
             max_trials=expInfo['trials'])
         # import the appropriate set of models
         from darc.delayed_and_risky import models
