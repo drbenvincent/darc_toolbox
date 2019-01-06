@@ -367,11 +367,19 @@ class DesignSpaceBuilder():
     def frontend_delay(cls):
         '''Defaults for a front-end delay experiment. These typically use a
         fixed reward ratio.
-        - IRI = RA+RB'''
-        return cls(RA=[50.], RB=[100.],
-                   DA=[0., 7, 30, 30*3, 30*6, 365, 365*5],
-                   DB=[],
-                   IRI=[1, 7, 14, 30, 30*3, 30*6])
+        inter-reward interval = IRI = DA+DB
+        DA and IRI values taken from:
+        Green, L., Fristoe, N., & Myerson, J. (1994). Temporal discounting
+        and preference reversals in choice between delayed outcomes.
+        Psychonomic Bulletin & Review, 1(3), 383–389.
+        http://doi.org/10.3758/BF03213979
+        '''
+        return cls(RA=[100.], RB=[250.],
+                   DA=[0, 7, 7*2, 30, 30*6, 365, 365*2, 365*3, 365*5,
+                       365*7, 365*10, 365*12, 365*15, 365*17, 365*20],
+                   DB = [],
+                   IRI=[7, 30, 30*3, 30*6, 365, 365*3, 365*5, 365*7,
+                        365*10, 365*15, 365*20])
 
     @classmethod
     def risky(cls):
