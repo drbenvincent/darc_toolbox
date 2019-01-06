@@ -68,33 +68,18 @@ def data_plotter(data, filename=None, ax=None):
 
 def plot_delay_with_front_end_delays(ax, data):
 
-    RA = data.RA.values
-    DA = data.DA.values
-    PA = data.PA.values
-    RB = data.RB.values
-    DB = data.DB.values
-    PB = data.PB.values
-    R = data.R.values
+    print('plot_delay_with_front_end_delays')
+    data = convert_delay_data_frontend(data)
 
-    # plot lines between pairs of prospects
-    n_points = len(R)
-    for t in range(n_points):
-        ax.plot(np.array([DA[t], DB[t]]),
-                np.array([RA[t], RB[t]]),
-                c='k',
-                linewidth=1)
+    ax.scatter(data['x'], data['y'],
+               s=freq_to_area(data['freq']),
+               c=data['prop'],
+               cmap='Greys',
+               edgecolor='k',
+               label='response data')
 
-    # plot option chosen as one colour
-    ax.scatter(x=[DA[R == 0], DB[R == 0]], y=[RA[R == 0], RB[R == 0]],
-               c='b', alpha=0.5, label='chose A')
-    ax.scatter(x=[DA[R == 1], DB[R == 1]], y=[RA[R == 1], RB[R == 1]],
-               c='r', alpha=0.5, label='chose B')
-
-    ax.legend()
-    ax.set_xlabel('delay (days)')
-    ax.set_ylabel('reward')
-    ax.set_xscale('log')
-    #ax.set_title('Plot for data with front-end delays')
+    ax.set_xlabel('time to smaller amount (days)')
+    ax.set_ylabel('inter-reward delay (days)')
 
 
 def plot_delay_without_front_end_delays(ax, data):
@@ -116,6 +101,27 @@ def plot_delay_without_front_end_delays(ax, data):
     # legend.legendHandles[0].set_color(plt.Greys(.5))
 
     #ax.set_title('Plot for data without front-end delays')
+
+
+def convert_delay_data_frontend(data):
+    ''' Convert raw data (dataframe) into a new data frame with:
+    x = DA
+    y = DB-DA = inter-reward interval
+    freq = frequency of this design
+    prop = average response to each unique design
+    '''
+
+    # define columns that define a unique design
+    cols = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB']
+    # new dataframe of unique designs with additional freq count column
+    new = data.groupby(cols).size().reset_index(name='freq')
+    # add average response to each unique design
+    new['prop'] = data.groupby(
+        cols)['R'].mean().reset_index(name='prop')['prop']
+    new['x'] = new['DA']
+    new['y'] = new['DB']-new['DA']
+    new = new[['x', 'y', 'freq', 'prop']]
+    return new
 
 
 def convert_delay_data(data):
