@@ -47,6 +47,7 @@ class TrialData():
         # a bit clumsy but...
         self.df['R'] = self.df['R'].astype('int64')
 
+        self.df = self.df.reset_index(drop=True)
         return
 
     def plot_data(self):

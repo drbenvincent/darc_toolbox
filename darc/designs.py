@@ -73,12 +73,19 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         allowable_designs = copy.copy(self.all_possible_designs)
         logging.debug(f'{allowable_designs.shape[0]} designs initially')
 
-        allowable_designs = _remove_highly_predictable_designs(allowable_designs,
-                                                               model)
+        # Refine the design space
+        allowable_designs = self._refine_design_space(model, allowable_designs)
 
-        allowable_designs = self._refine_design_space(model,
-                                                      allowable_designs)
+        # Some checks to see if we have been way too aggressive
+        # in refining the design space
+        if allowable_designs.shape[0] == 0:
+            logging.error(f'No ({allowable_designs.shape[0]}) designs left')
 
+        if allowable_designs.shape[0] < 10:
+            logging.warning(
+                f'Very few ({allowable_designs.shape[0]}) designs left')
+
+        # Run the low level design optimisation code
         chosen_design_df, _ = design_optimisation(allowable_designs,
                                                   model.predictive_y,
                                                   model.θ)
@@ -92,33 +99,24 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
 
 
     def _refine_design_space(self, model, allowable_designs):
-        '''A series of filter operations to refine down the space of designs which we
+        '''A series of operations to refine down the space of designs which we
         do design optimisations on.'''
 
-        # allowable_designs = copy.copy(self.all_possible_designs)
-        # logging.debug(f'{allowable_designs.shape[0]} designs initially')
+        # Remove already run designs, if appropriate
+        if not self.allow_repeats and self.trial > 1:
+            # strip the responses off of the stored data
+            designs_to_exclude = self.data.df.drop(columns=['R'])
 
-        if not self.allow_repeats and self.trial>1:
-            allowable_designs = _remove_trials_already_run(
-                allowable_designs, self.data.df.drop(columns=['R'])) # TODO: resolve this
+            # there is no convenient set difference function for pandas, but
+            # this achieves what we want
+            allowable_designs = allowable_designs.loc[~allowable_designs.isin(
+                designs_to_exclude.to_dict(orient="list")).all(axis=1), :]
 
-        if allowable_designs.shape[0] == 0:
-            logging.error(f'No ({allowable_designs.shape[0]}) designs left')
-
-        if allowable_designs.shape[0] < 10:
-            logging.warning(f'Very few ({allowable_designs.shape[0]}) designs left')
+        # Remove highly preductable designs
+        allowable_designs = _remove_highly_predictable_designs(allowable_designs,
+                                                               model)
 
         return allowable_designs
-
-
-def _remove_trials_already_run(design_set, exclude_these):
-    '''Take in a set of designs (design_set) and remove aleady run trials (exclude_these)
-    Dropping duplicates will work in this situation because `exclude_these` is going to
-    be a subset of `design_set`'''
-    # see https://stackoverflow.com/a/40209800/5172570
-    allowable_designs = pd.concat([design_set, exclude_these]).drop_duplicates(keep=False)
-    logging.debug(f'{allowable_designs.shape[0]} designs after removing prior designs')
-    return allowable_designs
 
 
 def _choose_one_along_design_dimension(allowable_designs, design_dim_name):
