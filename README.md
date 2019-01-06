@@ -34,8 +34,8 @@ A range of experimental designs and cognitive models are provided and are detail
 ## Experimental design paradigms
 One of the core components of this package is to provide designs chosen through Bayesian Adaptive Design, as outlined in our prepint (Vincent & Rainforth, 2017). The core classes of design we focus on are:
 
-- **Delayed choice tasks (aka inter-temporal choice):** you can choose between various protocols such as: front-end delays, fixed delayed reward, fixed immediate reward, fixed delay, etc.
-- **Risky choice tasks:** Ahoose your range of reward probabilities. These can also be seen as a transformed version of odds against recieving a reward.
+- **Delayed choice tasks (aka inter-temporal choice):** You can choose between various protocols such as: front-end delays, fixed delayed reward, fixed immediate reward, fixed delay, etc.
+- **Risky choice tasks:** Choose your range of reward probabilities. These can also be seen as a transformed version of odds against recieving a reward.
 - **Simultaneous delayed and risky choice tasks:** Again, you can customise the range of delays and reward probability (risk) levels used in your experiment.
 
 All of these paradigms are available, and can be fine tuned, using our Bayesian Adaptive procedure.
