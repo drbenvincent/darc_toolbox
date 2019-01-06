@@ -38,14 +38,14 @@ class BayesianAdaptiveDesignGeneratorPsychometric(DesignGeneratorABC):
     A Bayesian Adaptive Design class for estimation of Psychometric functions
     '''
 
-    def __init__(self, x=DEFAULT_X, max_trials=50, NO_REPEATS=False):
+    def __init__(self, x=DEFAULT_X, max_trials=50, allow_repeats=True):
         super().__init__()
 
         self._input_type_validation(x)
 
         self._x = x
         self.max_trials = max_trials
-        self.NO_REPEATS = NO_REPEATS
+        self.allow_repeats = allow_repeats
 
 
     def get_next_design(self, model):
@@ -80,7 +80,7 @@ class BayesianAdaptiveDesignGeneratorPsychometric(DesignGeneratorABC):
         '''A series of filter operations to refine down the space of designs which we
         do design optimisations on.'''
 
-        if self.NO_REPEATS and self.trial > 1:
+        if not self.allow_repeats and self.trial > 1:
             allowable_designs = _remove_trials_already_run(
                 allowable_designs, self.data.df.drop(columns=['R']))  # TODO: resolve this
 

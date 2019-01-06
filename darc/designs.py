@@ -55,12 +55,12 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
 
     def __init__(self, design_space,
                  max_trials=20,
-                 NO_REPEATS=False):
+                 allow_repeats=True):
         super().__init__()
 
         self.all_possible_designs = design_space
         self.max_trials = max_trials
-        self.NO_REPEATS = NO_REPEATS
+        self.allow_repeats = allow_repeats
 
 
     def get_next_design(self, model):
@@ -98,7 +98,7 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         # allowable_designs = copy.copy(self.all_possible_designs)
         # logging.debug(f'{allowable_designs.shape[0]} designs initially')
 
-        if self.NO_REPEATS and self.trial>1:
+        if not self.allow_repeats and self.trial>1:
             allowable_designs = _remove_trials_already_run(
                 allowable_designs, self.data.df.drop(columns=['R'])) # TODO: resolve this
 
