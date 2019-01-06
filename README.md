@@ -43,8 +43,8 @@ All of these paradigms are available, and can be fine tuned, using our Bayesian 
 However we also provide the ability to run some other prominent experiment design procedures from the literature. These are:
 - The Kirby (2009) delay discounting procedure.
 - The 5 trial procedure outlined by Koffarnus & Bickel (2014).
-- The 'delay slice' procedure from Du, Green & Myerson (2002)
-- The 'delay slice' procecure from Frye et al (2016).
+- The adaptive procedure from Du, Green & Myerson (2002) for delayed and risky choice tasks.
+- The 'delay slice' procecure from Frye et al (2016), closely related to the approach of Du, Green & Myerson (2002).
 - The delay and risky choice procedures from Griskevicius et al (2011).
 
 
@@ -96,7 +96,7 @@ Various Python packages including:
 
 > Vincent, B. T., & Rainforth, T. (2017, October 20). The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design. Retrieved from [psyarxiv.com/yehjb](https://psyarxiv.com/yehjb)
 
-Du, W., Green, L., & Myerson, J. (2002). Cross-cultural comparisons of discounting delayed and probabilistic rewards. The Psychological Record.
+Du, W., Green, L., & Myerson, J. (2002). Cross-Cultural Comparisons of Discounting Delayed and Probabilistic Rewards. The Psychological Record, 52(4), 479–492.
 
 Frye, C. C. J., Galizio, A., Friedel, J. E., DeHart, W. B., & Odum, A. L. (2016). Measuring Delay Discounting in Humans Using an Adjusting Amount Task. Journal of Visualized Experiments, (107), 1-8.
 
