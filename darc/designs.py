@@ -1,10 +1,8 @@
-from abc import ABC, abstractmethod
 from bad.designs import DesignGeneratorABC
 from darc import Prospect, Design
 import pandas as pd
 import numpy as np
 from bad.optimisation import design_optimisation
-import matplotlib.pyplot as plt
 import copy
 import logging
 import itertools
@@ -32,6 +30,7 @@ DEFAULT_DB = np.concatenate([
 #                   'PB': design.ProspectB.prob}
 #     return pd.DataFrame(trial_data)
 
+
 def df_to_design_tuple(df):
     ''' Convert 1-row pandas dataframe into named tuple'''
     RA = df.RA.values[0]
@@ -45,7 +44,7 @@ def df_to_design_tuple(df):
     return chosen_design
 
 
-# CONCRETE BAD CLASSES BELOW -----------------------------------------------------------------
+# CONCRETE BAD CLASSES BELOW --------------------------------------------------
 
 class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
     '''
@@ -61,7 +60,6 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         self.all_possible_designs = design_space
         self.max_trials = max_trials
         self.allow_repeats = allow_repeats
-
 
     def get_next_design(self, model):
 
@@ -96,7 +94,6 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         logging.info(
             f'get_next_design() took: {time.time()-start_time:1.3f} seconds')
         return chosen_design_named_tuple
-
 
     def _refine_design_space(self, model, allowable_designs):
         '''A series of operations to refine down the space of designs which we
@@ -135,27 +132,42 @@ def _choose_one_along_design_dimension(allowable_designs, design_dim_name):
 
 
 def _remove_highly_predictable_designs(allowable_designs, model):
-    ''' Eliminate designs which are highly predictable as these will not be very informative '''
+    ''' Eliminate designs which are highly predictable as these will not be
+    very informative '''
     θ_point_estimate = model.get_θ_point_estimate()
 
     # TODO: CHECK WE CAN EPSILON TO 0
     p_chose_B = model.predictive_y(θ_point_estimate, allowable_designs)
     # add p_chose_B as a column to allowable_designs
     allowable_designs['p_chose_B'] = pd.Series(p_chose_B)
-    # label rows which are highly predictable
-    threshold = 0.01  # TODO: Tom used a lower threshold of 0.005, but that was with epsilon=0
-    highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
-        allowable_designs['p_chose_B'] > 1 - threshold)
+
+    # Decide which designs (rows) correspond to highly predictable responses
+    # threshold = 0.05 means we drop designs with 0>P(y)<0.05 and 0.95<P(y)<1
+    threshold = 0.05
+    max_threshold = 0.25
+    n_not_predictable = 201
+    n_designs_provided = allowable_designs.shape[0]
+
+    while n_not_predictable > 200 and threshold < max_threshold:
+        threshold *= 1.05
+        highly_predictable, n_predictable, n_not_predictable = _calc_predictability(allowable_designs, threshold)
+
+    # print(f'n_designs_provided = {n_designs_provided}')
+    # print(f'threshold = {threshold}')
+    # print(f'n_predictable (will remove these) = {n_predictable}')
+    # print(f'n_not_predictable (will keep these) = {n_not_predictable}\n')
+
+    # add this as a column in the design DataFrame
     allowable_designs['highly_predictable'] = pd.Series(highly_predictable)
 
-    n_not_predictable = allowable_designs.size - \
-        sum(allowable_designs.highly_predictable)
     if n_not_predictable > 10:
         # drop the offending designs (rows)
         allowable_designs = allowable_designs.drop(
             allowable_designs[allowable_designs.p_chose_B < threshold].index)
         allowable_designs = allowable_designs.drop(
             allowable_designs[allowable_designs.p_chose_B > 1 - threshold].index)
+        if n_not_predictable > 200:
+            allowable_designs = allowable_designs.sample(n=200)
     else:
         # take the 10 designs closest to p_chose_B=0.5
         # NOTE: This is not exactly the same as Tom's implementation which examines
@@ -172,6 +184,16 @@ def _remove_highly_predictable_designs(allowable_designs, model):
     logging.debug(
         f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
     return allowable_designs
+
+
+def _calc_predictability(allowable_designs, threshold):
+    '''calculate how many designes are classified as predictable for a given
+    threshold on 'p_chose_B' '''
+    highly_predictable = (allowable_designs['p_chose_B'] < threshold) | (
+        allowable_designs['p_chose_B'] > 1 - threshold)
+    n_predictable = sum(highly_predictable)
+    n_not_predictable = allowable_designs.shape[0] - n_predictable
+    return (highly_predictable, n_predictable, n_not_predictable)
 
 
 class DesignSpaceBuilder():
@@ -319,7 +341,8 @@ class DesignSpaceBuilder():
 
         logging.debug(f'{D.shape[0]} designs generated initially')
 
-        # eliminate any designs where DA>DB, because by convention ProspectB is our more delayed reward
+        # eliminate any designs where DA>DB, because by convention ProspectB is
+        # our more delayed reward
         D.drop(D[D.DA > D.DB].index, inplace=True)
         logging.debug(f'{D.shape[0]} left after dropping DA>DB')
 
@@ -339,7 +362,6 @@ class DesignSpaceBuilder():
             D[col_name] = D[col_name].astype('float64')
 
         return D
-
 
     ''' Define alternate constructors here
     These methods are convenient in order to set up design spaces without
@@ -375,7 +397,7 @@ class DesignSpaceBuilder():
         return cls(RA=[100.], RB=[250.],
                    DA=[0, 7, 7*2, 30, 30*6, 365, 365*2, 365*3, 365*5,
                        365*7, 365*10, 365*12, 365*15, 365*17, 365*20],
-                   DB = [],
+                   DB=[],
                    IRI=[7, 30, 30*3, 30*6, 365, 365*3, 365*5, 365*7,
                         365*10, 365*15, 365*20])
 
