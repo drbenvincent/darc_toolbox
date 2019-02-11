@@ -5,7 +5,8 @@ import logging
 
 def design_optimisation(designs, predictive_y, θ,
                         n_particles=None, n_steps=50, gamma=None,
-                        output_type_force=None, pD_min_prop=0.01):
+                        output_type_force=None, pD_min_prop=0.01,
+                        penalty_func=None):
     """
     Performs a smc search algorithm similar to given in Amzal et al for
     calculating the best design from a discrete set according to an entropy
@@ -82,7 +83,13 @@ def design_optimisation(designs, predictive_y, θ,
     assert designs.ndim == 2, "designs must be 2D"
 
     nD, _ = designs.shape
-    nT,_ = θ.shape
+    nT, _ = θ.shape
+
+    # Calculate penalty factors
+    if penalty_func is None:
+        penalty_factors = np.ones((nD, 1))
+    else:
+        penalty_factors = penalty_func(designs)
 
     assert nD > 0, "No designs provided!"
 
@@ -98,7 +105,7 @@ def design_optimisation(designs, predictive_y, θ,
 
     # Ensure all input arguments are resolved properly
     if n_particles is None:
-        n_particles = np.uint32(nT/10)
+        n_particles = np.uint32(nT)
     else:
         assert n_particles <= nT, "n_particles must be <= nT"
 
@@ -110,7 +117,7 @@ def design_optimisation(designs, predictive_y, θ,
     # Randomly permute the samples so that if not using all of them then there
     # is not a bias originating from the ordering
     θ = shuffle_rows(θ)
-    
+
     θ_pos_counter = 0
 
     for nSam in range(1, n_steps):
@@ -132,7 +139,7 @@ def design_optimisation(designs, predictive_y, θ,
         #n_times_sampled_iter = np.bincount(iSamples, minlength=np.max(iSamples))
         # NOTE: BEN CHANGED TO...
         n_times_sampled_iter = np.bincount(iSamples, minlength=nD)
-        
+
         # Select the θ that will be used this iteration
         θ_iter, θ_pos_counter = get_θ_subset(θ, θ_pos_counter, n_particles)
 
@@ -144,7 +151,7 @@ def design_optimisation(designs, predictive_y, θ,
         log_p_y_given_θ_and_D = np.log(p_y_given_θ_and_D)
 
         # Calculate p(Y|D) by marginalizing over θ
-        
+
         p_y_given_D_iter_times_n_samples = np.bincount(iSamples,
                                                        weights=p_y_given_θ_and_D,
                                                        minlength=nD)
@@ -161,7 +168,7 @@ def design_optimisation(designs, predictive_y, θ,
 
         U = calc_utility(U, p_y_given_θ_and_D, log_p_y_given_θ_and_D,
                          p_y_given_D, iSamples, nD, n_times_sampled,
-                         n_times_sampled_iter)
+                         n_times_sampled_iter, penalty_factors)
 
         # Update the counts of times the design was sampled
         n_times_sampled += n_times_sampled_iter
@@ -170,7 +177,6 @@ def design_optimisation(designs, predictive_y, θ,
         U = do_output_type_force_thing(U, p_y_given_D, output_type_force)
 
     # Choose the design for which pD is maximal
-    #chosen_design = designs[np.argmax(U), :]
     chosen_design = designs.take([np.argmax(U)])
     return (chosen_design, U)
 
@@ -185,14 +191,14 @@ def calculate_pD(U, gamma, pD_min):
 
 
 def get_θ_subset(θ, θ_pos_counter, n_particles):
-    nT = θ.shape[0] 
+    nT = θ.shape[0]
     θ_end_position = θ_pos_counter + n_particles
     if θ_end_position < nT:
         idx = np.arange(θ_pos_counter, θ_end_position)
     else:
         idx = np.concatenate([np.arange(0, np.mod(θ_end_position, nT)),
                               np.arange(θ_pos_counter, nT)])
-    
+
     θ_iter = θ.iloc[idx]
     θ_pos_counter = np.mod(θ_end_position, nT)
     return (θ_iter, θ_pos_counter)
@@ -200,7 +206,7 @@ def get_θ_subset(θ, θ_pos_counter, n_particles):
 
 def calc_utility(U, p_y_given_θ_and_D, log_p_y_given_θ_and_D,
                  p_y_given_D, iSamples, nD, n_times_sampled,
-                 n_times_sampled_iter):
+                 n_times_sampled_iter, penalty_factors):
     """The utility of a step is the mutual information between the parameter and
     the observation.  Note this is equal to the expected gain in Shannon
     information from prior to posterior for a single question."""
@@ -220,21 +226,23 @@ def calc_utility(U, p_y_given_θ_and_D, log_p_y_given_θ_and_D,
     # TODO: calculate more than just the mean to calculate probability the
     # point is the maximum
 
+    U_iter_times_n_samples = U_iter_times_n_samples*penalty_factors
+
     # Update the running estimate of U for each point
     b_some_samples = (n_times_sampled+n_times_sampled_iter) > 0
     U = ((U * n_times_sampled + U_iter_times_n_samples) /
          (n_times_sampled + n_times_sampled_iter))
     U[np.logical_not(b_some_samples)] = 1/nD
     # guard against numerical error
-    U[U < 0] = 0
+    U[U < 0.0] = 0.0
     return U
 
 
 def do_output_type_force_thing(U, p_y_given_D, output_type_force):
     if output_type_force is True:
         if np.max(p_y_given_D) >= 0.5:
-            U[p_y_given_D < 0.5] = 0
+            U[p_y_given_D < 0.5] = 0.0
     elif output_type_force is False:
         if np.min(p_y_given_D) <= 0.5:
-            U[p_y_given_D > 0.5] = 0
+            U[p_y_given_D > 0.5] = 0.0
     return U
