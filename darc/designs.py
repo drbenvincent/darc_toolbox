@@ -254,6 +254,12 @@ def _choose_one_along_design_dimension(allowable_designs, design_dim_name):
 def _remove_highly_predictable_designs(allowable_designs, model):
     ''' Eliminate designs which are highly predictable as these will not be
     very informative '''
+
+    # grab the design variables. We are going to add some additional columns
+    # to the DataFrame in order to do the job, but we want to just grab the
+    # design variables after that
+    design_variables = allowable_designs.columns.values
+
     θ_point_estimate = model.get_θ_point_estimate()
 
     # TODO: CHECK WE CAN EPSILON TO 0
@@ -266,7 +272,7 @@ def _remove_highly_predictable_designs(allowable_designs, model):
     threshold = 0.05
     max_threshold = 0.25
     n_not_predictable = 201
-    n_designs_provided = allowable_designs.shape[0]
+    # n_designs_provided = allowable_designs.shape[0]
 
     while n_not_predictable > 200 and threshold < max_threshold:
         threshold *= 1.05
@@ -295,10 +301,10 @@ def _remove_highly_predictable_designs(allowable_designs, model):
         allowable_designs.sort_values(by=['badness'], inplace=True)
         allowable_designs = allowable_designs[:10]
 
-    # ensure the remaining columns in allowable_designs are only actually
-    # design space variables
-    allowable_designs.drop(columns=['p_chose_B', 'highly_predictable'],
-                           inplace=True)
+    # Grab just the design variables... we don't want any intermediate columns
+    # that we added above
+    allowable_designs = allowable_designs[design_variables]
+
     logging.debug(
         f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
     return allowable_designs
