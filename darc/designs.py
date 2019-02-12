@@ -8,6 +8,7 @@ import logging
 import itertools
 import time
 import random
+from scipy.stats import multivariate_normal
 
 
 DEFAULT_DB = np.concatenate([
@@ -54,12 +55,16 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
 
     def __init__(self, design_space,
                  max_trials=20,
-                 allow_repeats=True):
+                 allow_repeats=True,
+                 penalty_function_option='default'):
         super().__init__()
 
         self.all_possible_designs = design_space
         self.max_trials = max_trials
         self.allow_repeats = allow_repeats
+        self.penalty_function_option = penalty_function_option
+        # extract design variables as a list
+        self.design_variables = list(design_space.columns.values)
 
     def get_next_design(self, model):
 
@@ -83,10 +88,20 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
             logging.warning(
                 f'Very few ({allowable_designs.shape[0]}) designs left')
 
-        # Run the low level design optimisation code
+        # process penalty_function_option provided by user upon object
+        # construction
+        if self.penalty_function_option is 'default':
+            penalty_func = lambda d: self._default_penalty_func(d)
+        elif self.penalty_function_option is None:
+            penalty_func = None
+
+        # Run the low level design optimisation code ~~~~~~~~~~~~~~~~~~~~~~~~~~
         chosen_design_df, _ = design_optimisation(allowable_designs,
                                                   model.predictive_y,
-                                                  model.θ)
+                                                  model.θ,
+                                                  n_steps=50,
+                                                  penalty_func=penalty_func)
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         chosen_design_named_tuple = df_to_design_tuple(chosen_design_df)
 
@@ -114,6 +129,111 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
                                                                model)
 
         return allowable_designs
+
+    def _get_sorted_unique_design_vals(self, design_variable):
+        '''return sorted set of unique design values for the given design
+        variable
+        TODO: refactor this so it only gets called ONCE
+        '''
+        all_values = self.all_possible_designs[design_variable].values
+        return np.sort(np.unique(all_values))
+
+    def _convert_to_ranks(self, input_designs):
+        '''Convert each design variable to a quantile in the set of allowed
+        values for that variable, with the minimum and maximum
+        taken to be 0 and 1 respectively.
+
+        INPUT:
+        - input_designs is a subset of rows of self.all_possible_designs
+        OUTPUT:
+        - design_ranks = ?????
+        '''
+
+        design_variable_names = list(input_designs.columns.values)
+        # convert input_designs to martrix in the right dtype
+        input_designs = input_designs.to_numpy(dtype='float64')
+        design_ranks = np.full_like(input_designs, np.nan)
+
+        for n, design_variable in enumerate(design_variable_names):
+            # Get set of instances this design variable can take
+            all_designs_this_variable = self._get_sorted_unique_design_vals(design_variable)
+            N_this = len(all_designs_this_variable)
+
+            if N_this is 1:
+                design_ranks[:, n] = 0.5
+            else:
+                # Interpolate input_designs so they are a value between 0 and 1
+                # based on a linear regression from possible values of design
+                # variables to their scaled ranks (where the later is just
+                # (0:(N_this-1))'/(N_this-1))
+                design_ranks[:, n] = np.interp(input_designs[:, n],
+                                               all_designs_this_variable,
+                                               np.linspace(0., 1., num=N_this))
+
+        return design_ranks
+
+    def _default_penalty_func(self, candidate_designs, base_sigma=1, λ=2):
+        # get previous designs -----------------------------------
+        # TODO: refactor so there is a simple getter for just the designs,
+        # not the responses
+        # This will get previous designs AND responses, then just get design
+        # variables
+        previous_designs = self.get_df()[self.design_variables]
+        # --------------------------------------------------------
+
+        n_previous_designs = previous_designs.shape[0]
+        if n_previous_designs is 0:
+            # If there are no previous designs, we shouldn't apply any factors
+            penalty_factors = np.ones(candidate_designs.shape[0])
+            return penalty_factors
+
+        # To keep problem self similarity, we apply the kernel in the space of
+        # ranks.
+        # Note: output to self._convert_to_ranks() is DataFrame, output is
+        # numerical array
+        candidate_designs = self._convert_to_ranks(candidate_designs)
+        previous_designs = self._convert_to_ranks(previous_designs)
+
+        # Though will be eliminated later, this is useful for doing the
+        # rescaling of p without having to write everything twice.
+        candidate_designs = np.concatenate((candidate_designs,
+                                            previous_designs),
+                                           axis=0)
+
+        # Calculate density of each candidate point under a Gaussian
+        # distribution centered on each previous design.
+        nD, dD = candidate_designs.shape
+        # Reduce standard deviation as we get more designs
+        sigma = base_sigma/n_previous_designs
+        if np.isscalar(sigma):
+            sigma = sigma**2*np.eye(dD)
+        else:
+            sigma = np.diagflat(sigma**2)
+
+        # Calculate the density of each candidate design using a Gaussian
+        # centered at each previous point with covariance sigma
+        densities = np.empty((nD, n_previous_designs)) # <----- IS THIS CORRECT SIZE?
+
+        for n in range(n_previous_designs):
+            densities[:, n] = multivariate_normal.pdf(candidate_designs,
+                                                      mean=previous_designs[n, :],
+                                                      cov=sigma)
+
+        # p is a vector, one entry for each designs. It represents kernel
+        # density estimate of previous design points by averaging over a
+        # mixture of Gaussians centered at each previous design
+        p = np.mean(densities, axis=1)
+        p = p/np.max(p)  # Rescale so all p are between 0 and 1
+
+        # Remove previous designs
+        p = p[:-n_previous_designs]
+
+        # Calculate final penalty factors
+        penalty_factors = 1.0/(1.0+λ*p)
+
+        # penalty_factors should be a 1D vector
+        penalty_factors = np.squeeze(penalty_factors)
+        return penalty_factors
 
 
 def _choose_one_along_design_dimension(allowable_designs, design_dim_name):
@@ -152,11 +272,6 @@ def _remove_highly_predictable_designs(allowable_designs, model):
         threshold *= 1.05
         highly_predictable, n_predictable, n_not_predictable = _calc_predictability(allowable_designs, threshold)
 
-    # print(f'n_designs_provided = {n_designs_provided}')
-    # print(f'threshold = {threshold}')
-    # print(f'n_predictable (will remove these) = {n_predictable}')
-    # print(f'n_not_predictable (will keep these) = {n_not_predictable}\n')
-
     # add this as a column in the design DataFrame
     allowable_designs['highly_predictable'] = pd.Series(highly_predictable)
 
@@ -180,7 +295,10 @@ def _remove_highly_predictable_designs(allowable_designs, model):
         allowable_designs.sort_values(by=['badness'], inplace=True)
         allowable_designs = allowable_designs[:10]
 
-    allowable_designs.drop(columns=['p_chose_B'])
+    # ensure the remaining columns in allowable_designs are only actually
+    # design space variables
+    allowable_designs.drop(columns=['p_chose_B', 'highly_predictable'],
+                           inplace=True)
     logging.debug(
         f'{allowable_designs.shape[0]} designs after removing highly predicted designs')
     return allowable_designs
