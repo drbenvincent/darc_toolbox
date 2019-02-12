@@ -82,8 +82,8 @@ def design_optimisation(designs, predictive_y, θ,
 
     assert designs.ndim == 2, "designs must be 2D"
 
-    nD, _ = designs.shape
-    nT, _ = θ.shape
+    nD = designs.shape[0]
+    nT = θ.shape[0]
 
     # Calculate penalty factors
     if penalty_func is None:
@@ -124,8 +124,6 @@ def design_optimisation(designs, predictive_y, θ,
 
     for nSam in range(1, n_steps):
 
-        print(f'U.shape = {U.shape}')
-        print(f'sum(U) = {sum(U)}')
         if sum(U) == 0.0:
             logging.warning('No design helpful, off the edge of the design space!')
             chosen_design = designs[np.random.randint(0, nD), :]
