@@ -87,9 +87,11 @@ def design_optimisation(designs, predictive_y, θ,
 
     # Calculate penalty factors
     if penalty_func is None:
-        penalty_factors = np.ones((nD, 1))
+        penalty_factors = np.ones(nD)
     else:
         penalty_factors = penalty_func(designs)
+
+    assert penalty_factors.ndim is 1, "penalty_factors should be 1 dimensional"
 
     assert nD > 0, "No designs provided!"
 
@@ -122,7 +124,9 @@ def design_optimisation(designs, predictive_y, θ,
 
     for nSam in range(1, n_steps):
 
-        if sum(U) == 0:
+        print(f'U.shape = {U.shape}')
+        print(f'sum(U) = {sum(U)}')
+        if sum(U) == 0.0:
             logging.warning('No design helpful, off the edge of the design space!')
             chosen_design = designs[np.random.randint(0, nD), :]
             estimated_utilities = U
