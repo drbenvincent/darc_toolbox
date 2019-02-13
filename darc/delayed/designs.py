@@ -1,3 +1,9 @@
+'''
+This module is not 'required' for the DARC Toolbox. It simply provides a few
+more additional design generators. These are my implimentations of other
+approaches in the literature.
+'''
+
 import numpy as np
 import logging
 from darc.designs import DesignGeneratorABC
@@ -17,20 +23,26 @@ class Kirby2009(DesignGeneratorABC):
     # also have to explicitly call the superclass constructor at that point, I believe.
     max_trials = 27
     _RA = [80, 34, 25, 11, 49, 41, 34, 31, 19, 22, 55, 28, 47,
-          14, 54, 69, 54, 25, 27, 40, 54, 15, 33, 24, 78, 67, 20]
+           14, 54, 69, 54, 25, 27, 40, 54, 15, 33, 24, 78, 67, 20]
     _DA = 0
     _RB = [85, 50, 60, 30, 60, 75, 35, 85, 25, 25, 75, 30, 50,
-          25, 80, 85, 55, 30, 50, 55, 60, 35, 80, 35, 80, 75, 55]
+           25, 80, 85, 55, 30, 50, 55, 60, 35, 80, 35, 80, 75, 55]
     _DB = [157, 30, 14, 7, 89, 20, 186, 7, 53, 136, 61, 179, 160, 19,
-          30, 91, 117, 80, 21, 62, 111, 13, 14, 29, 162, 119, 7]
+           30, 91, 117, 80, 21, 62, 111, 13, 14, 29, 162, 119, 7]
     _PA, _PB = 1, 1
 
     def get_next_design(self, _):
-        # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
+        # NOTE: This is un-Pythonic as we are asking permission... we should
+        # just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             logging.info(f'Getting design for trial {self.trial}')
-            design = Design(ProspectA=Prospect(reward=self._RA[self.trial], delay=self._DA, prob=self._PA),
-                            ProspectB=Prospect(reward=self._RB[self.trial], delay=self._DB[self.trial], prob=self._PB))
+            ProspectA = Prospect(reward=self._RA[self.trial],
+                                 delay=self._DA,
+                                 prob=self._PA)
+            ProspectB = Prospect(reward=self._RB[self.trial],
+                                 delay=self._DB[self.trial],
+                                 prob=self._PB)
+            design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
             return design
         else:
             return None
@@ -62,8 +74,13 @@ class Griskevicius2011(DesignGeneratorABC):
         # we should just do it, and have a catch ??
         if self.trial < self.max_trials:
             logging.info(f'Getting design for trial {self.trial}')
-            design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-                            ProspectB=Prospect(reward=self._RB[self.trial], delay=self._DB, prob=self._PB))
+            ProspectA = Prospect(reward=self._RA,
+                                 delay=self._DA,
+                                 prob=self._PA)
+            ProspectB = Prospect(reward=self._RB[self.trial],
+                                 delay=self._DB,
+                                 prob=self._PB)
+            design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
             return design
         else:
             return None
@@ -92,7 +109,7 @@ class Koffarnus_Bickel(DesignGeneratorABC):
          29*np.array([1, 2, 3, 4, 6, 8]),
          365*np.array([1, 2, 3, 4, 5, 8, 12, 18, 25])])
     _PA, _PB = 1, 1
-    _delay_index = 16-1 # this is always the initial delay used (equals 3 weeks)
+    _delay_index = 16-1  # this is always the initial delay used (equals 3 weeks)
     _index_increments = 8
     # trial = 1
 
@@ -102,8 +119,13 @@ class Koffarnus_Bickel(DesignGeneratorABC):
             return None
 
         if self.trial == 0:
-            design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-                            ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB))
+            ProspectA = Prospect(reward=self._RA,
+                                 delay=self._DA,
+                                 prob=self._PA)
+            ProspectB = Prospect(reward=self._RB,
+                                 delay=self._DB[self._delay_index],
+                                 prob=self._PB)
+            design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
         else:
 
             if self.get_last_response_chose_B():
@@ -114,8 +136,13 @@ class Koffarnus_Bickel(DesignGeneratorABC):
             # each trial, the increments half, so will be: 8, 4, 2, 1
             self._index_increments = int(max(self._index_increments/2, 1))
 
-        design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-                        ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB))
+        ProspectA = Prospect(reward=self._RA,
+                             delay=self._DA,
+                             prob=self._PA)
+        ProspectB = Prospect(reward=self._RB,
+                             delay=self._DB[self._delay_index],
+                             prob=self._PB)
+        design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
         return design
 
 
@@ -163,8 +190,13 @@ class Frye(DesignGeneratorABC):
 
             self._post_choice_adjustment *= 0.5
 
-        design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-                        ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB))
+        ProspectA = Prospect(reward=self._RA,
+                             delay=self._DA,
+                             prob=self._PA)
+        ProspectB = Prospect(reward=self._RB,
+                             delay=self._DB[self._delay_counter],
+                             prob=self._PB)
+        design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
 
         self._trial_per_delay_counter += 1
         if self._trial_per_delay_counter > self._trials_per_delay-1:
@@ -184,7 +216,8 @@ class DuGreenMyerson2002(DesignGeneratorABC):
     Record.
     '''
 
-    def __init__(self, DB=[30, 30*3, 30*9, 365*2, 365*5, 365*10, 365*20], RB=100.):
+    def __init__(self, DB=[30, 30*3, 30*9, 365*2, 365*5, 365*10, 365*20],
+                 RB=100.):
         self._DA = 0
         self._DB = DB
         self._RB = RB
@@ -220,8 +253,14 @@ class DuGreenMyerson2002(DesignGeneratorABC):
 
             self._post_choice_adjustment *= 0.5
 
-        design = Design(ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-                        ProspectB=Prospect(reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB))
+        ProspectA = Prospect(reward=self._RA,
+                             delay=self._DA,
+                             prob=self._PA)
+        ProspectB = Prospect(reward=self._RB,
+                             delay=self._DB[self._delay_counter],
+                             prob=self._PB)
+
+        design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
 
         self._trial_per_delay_counter += 1
         if self._trial_per_delay_counter > self._trials_per_delay-1:
@@ -229,4 +268,3 @@ class DuGreenMyerson2002(DesignGeneratorABC):
             self._delay_counter += 1
             self._trial_per_delay_counter = 0
         return design
-
