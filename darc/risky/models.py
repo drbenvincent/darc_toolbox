@@ -1,4 +1,4 @@
-from scipy.stats import norm, bernoulli, halfnorm, beta, truncnorm
+from scipy.stats import norm, halfnorm, beta, truncnorm
 import numpy as np
 from bad.model import Model
 from bad.choice_functions import CumulativeNormalChoiceFunc
@@ -9,6 +9,7 @@ def prob_to_odds_against(probabilities):
     '''convert probabilities of getting reward to odds against getting it'''
     odds_against = (1 - probabilities) / probabilities
     return odds_against
+
 
 def odds_against_to_probs(odds):
     probabilities = 1 / (1+odds)
@@ -33,8 +34,10 @@ class Hyperbolic(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._odds_discount_func(data['PA'].values, θ['logh'].values)
-        VB = data['RB'].values * self._odds_discount_func(data['PB'].values, θ['logh'].values)
+        VA = data['RA'].values * self._odds_discount_func(data['PA'].values,
+                                                          θ['logh'].values)
+        VB = data['RB'].values * self._odds_discount_func(data['PB'].values,
+                                                          θ['logh'].values)
         return VB - VA
 
     @staticmethod
@@ -48,7 +51,8 @@ class Hyperbolic(Model):
 
 class PrelecOneParameter(Model):
     '''Prelec (1998) one parameter probability bias model
-    Prelec, D. (1998). The probability weighting function. Econometrica, 66, 497–527.
+    Prelec, D. (1998). The probability weighting function. Econometrica, 66,
+    497–527.
     '''
 
     prior = {'γ': beta(1,1),
@@ -97,8 +101,12 @@ class LinearInLogOdds(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._w(data['PA'].values, θ['δ'].values, θ['γ'].values)
-        VB = data['RB'].values * self._w(data['PB'].values, θ['δ'].values, θ['γ'].values)
+        VA = data['RA'].values * self._w(data['PA'].values,
+                                         θ['δ'].values,
+                                         θ['γ'].values)
+        VB = data['RB'].values * self._w(data['PB'].values,
+                                         θ['δ'].values,
+                                         θ['γ'].values)
         return VB - VA
 
     @staticmethod
@@ -145,11 +153,13 @@ class ProportionalDifference(Model):
 
     @staticmethod
     def _max_abs(x, y):
-        return np.max(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
+        return np.max(np.array([np.absolute(x),
+                                np.absolute(y)]).astype('float'), axis=0).T
 
     @staticmethod
     def _min_abs(x, y):
-        return np.min(np.array([np.absolute(x), np.absolute(y)]).astype('float'), axis=0).T
+        return np.min(np.array([np.absolute(x),
+                                np.absolute(y)]).astype('float'), axis=0).T
 
     def _proportion(self, x, y):
         diff = self._max_abs(x, y) - self._min_abs(x, y)
@@ -159,4 +169,3 @@ class ProportionalDifference(Model):
 class ProspectTheory(Model):
     '''Prospect Theory'''
     pass
-

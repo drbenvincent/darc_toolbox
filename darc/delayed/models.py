@@ -1,5 +1,5 @@
-'''The classes in this file are domain specific, and therefore include specifics
-about the design space and the model parameters.
+'''The classes in this file are domain specific, and therefore include
+specifics about the design space and the model parameters.
 
 The main jobs of the model classes are:
 a) define priors over parameters - as scipy distribution objects
@@ -15,7 +15,7 @@ TODO: Can this be made easier/better?
 '''
 
 
-from scipy.stats import norm, bernoulli, halfnorm, uniform
+from scipy.stats import norm, halfnorm, uniform
 import numpy as np
 from bad.model import Model
 from bad.choice_functions import CumulativeNormalChoiceFunc
@@ -69,8 +69,12 @@ class Hyperbolic(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, np.exp(θ['logk'].values))
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, np.exp(θ['logk'].values))
+        VA = (data['RA'].values
+              * self._time_discount_func(data['DA'].values,
+                                         np.exp(θ['logk'].values)))
+        VB = (data['RB'].values
+              * self._time_discount_func(data['DB'].values,
+                                         np.exp(θ['logk'].values)))
         return VB - VA
 
     @staticmethod
@@ -93,8 +97,10 @@ class Exponential(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['k'].values)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['k'].values)
+        VA = data['RA'].values * self._time_discount_func(data['DA'].values,
+                                                          θ['k'].values)
+        VB = data['RB'].values * self._time_discount_func(data['DB'].values,
+                                                          θ['k'].values)
         return VB - VA
 
     @staticmethod
@@ -106,14 +112,14 @@ class Exponential(Model):
 class HyperbolicMagnitudeEffect(Model):
     '''Hyperbolic time discounting model + magnitude effect
 
-    Vincent, B. T. (2016). Hierarchical Bayesian estimation and hypothesis testing for
-    delay discounting tasks. Behavior Research Methods, 48(4), 1608–1620.
-    http://doi.org/10.3758/s13428-015-0672-2
+    Vincent, B. T. (2016). Hierarchical Bayesian estimation and hypothesis
+    testing for delay discounting tasks. Behavior Research Methods, 48(4),
+    1608–1620. http://doi.org/10.3758/s13428-015-0672-2
     '''
 
     prior = dict()
     prior['m'] = norm(loc=-2.43, scale=2)
-    prior['c'] = norm(loc=0, scale=100) # <------ TODO: improve this
+    prior['c'] = norm(loc=0, scale=100)  # <------ TODO: improve this
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
     choiceFunction = CumulativeNormalChoiceFunc
@@ -141,13 +147,13 @@ class HyperbolicMagnitudeEffect(Model):
 class ExponentialMagnitudeEffect(Model):
     '''Exponential time discounting model + magnitude effect
     Similar to...
-    Vincent, B. T. (2016). Hierarchical Bayesian estimation and hypothesis testing for
-    delay discounting tasks. Behavior Research Methods, 48(4), 1608–1620.
-    http://doi.org/10.3758/s13428-015-0672-2
+    Vincent, B. T. (2016). Hierarchical Bayesian estimation and hypothesis
+    testing for delay discounting tasks. Behavior Research Methods, 48(4),
+    1608–1620. http://doi.org/10.3758/s13428-015-0672-2
     '''
 
     prior = dict()
-    prior['m'] = norm(loc=-2.43, scale=2) # <---- TODO: need to update
+    prior['m'] = norm(loc=-2.43, scale=2)  # <---- TODO: need to update
     prior['c'] = norm(loc=0, scale=100)  # <------ TODO: improve this
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
@@ -183,7 +189,7 @@ class ConstantSensitivity(Model):
 
     prior = dict()
     prior['a'] = norm(loc=0.01, scale=0.1)
-    prior['b'] = halfnorm(loc=0.001, scale=3) # TODO: Improve this prior! make it centered on 1, maybe lognormal
+    prior['b'] = halfnorm(loc=0.001, scale=3)  # TODO: Improve this prior! make it centered on 1, maybe lognormal
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
     choiceFunction = CumulativeNormalChoiceFunc
@@ -195,15 +201,18 @@ class ConstantSensitivity(Model):
 
     def _calc_decision_variable(self, θ, data):
         VA = data['RA'].values * \
-            self._time_discount_func(
-                data['DA'].values, θ['a'].values, θ['b'].values)
-        VB = data['RB'].values * self._time_discount_func(
-                data['DB'].values, θ['a'].values, θ['b'].values)
+            self._time_discount_func(data['DA'].values,
+                                     θ['a'].values,
+                                     θ['b'].values)
+        VB = data['RB'].values * self._time_discount_func(data['DB'].values,
+                                                          θ['a'].values,
+                                                          θ['b'].values)
         return VB-VA
 
     @ staticmethod
     def _time_discount_func(delay, a, b):
-        # NOTE: we want params as a row matrix, and delays as a column matrix to do the appropriate array broadcasting.
+        # NOTE: we want params as a row matrix, and delays as a column matrix
+        # to do the appropriate array broadcasting.
         return np.exp(-np.power(a * delay, b))
 
 
@@ -224,14 +233,18 @@ class MyersonHyperboloid(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['logk'].values, θ['s'].values)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['logk'].values, θ['s'].values)
+        VA = data['RA'].values * self._time_discount_func(data['DA'].values,
+                                                          θ['logk'].values,
+                                                          θ['s'].values)
+        VB = data['RB'].values * self._time_discount_func(data['DB'].values,
+                                                          θ['logk'].values,
+                                                          θ['s'].values)
         return VB-VA
 
     @staticmethod
     def _time_discount_func(delay, logk, s):
-        # NOTE: we want logk as a row matrix, and delays as a column matrix to do the
-        # appropriate array broadcasting.
+        # NOTE: we want logk as a row matrix, and delays as a column matrix to
+        # do the appropriate array broadcasting.
         k = np.exp(logk)
         return 1 / np.power(1 + k * delay, s)
 
@@ -282,12 +295,13 @@ class HyperbolicNonLinearUtility(Model):
     '''Hyperbolic time discounting + non-linear utility model.
     The a-model from ...
     Cheng, J., & González-Vallejo, C. (2014). Hyperbolic Discounting: Value and
-    Time Processes of Substance Abusers and Non-Clinical Individuals in Intertemporal
-    Choice. PLoS ONE, 9(11), e111378–18. http://doi.org/10.1371/journal.pone.0111378
+    Time Processes of Substance Abusers and Non-Clinical Individuals in
+    Intertemporal Choice. PLoS ONE, 9(11), e111378–18.
+    http://doi.org/10.1371/journal.pone.0111378
     '''
 
     prior = dict()
-    prior['a'] = norm(loc=1, scale=0.1) # TODO: must be positive!
+    prior['a'] = norm(loc=1, scale=0.1)  # TODO: must be positive!
     prior['logk'] = norm(loc=np.log(1/365), scale=2)
     prior['α'] = halfnorm(loc=0, scale=3)
     θ_fixed = {'ϵ': 0.01}
@@ -300,8 +314,10 @@ class HyperbolicNonLinearUtility(Model):
 
     def _calc_decision_variable(self, θ, data):
         a = np.exp(θ['a'].values)
-        VA = np.power(data['RA'].values,a) * self._time_discount_func(data['DA'].values, θ['logk'].values)
-        VB = np.power(data['RB'].values,a) * self._time_discount_func(data['DB'].values, θ['logk'].values)
+        VA = (np.power(data['RA'].values,a)
+              * self._time_discount_func(data['DA'].values, θ['logk'].values))
+        VB = (np.power(data['RB'].values,a)
+              * self._time_discount_func(data['DB'].values, θ['logk'].values))
         return VB-VA
 
     @staticmethod

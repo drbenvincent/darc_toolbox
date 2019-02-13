@@ -1,4 +1,4 @@
-from scipy.stats import norm, bernoulli, halfnorm
+from scipy.stats import norm, halfnorm
 import numpy as np
 from bad.model import Model
 from bad.choice_functions import CumulativeNormalChoiceFunc
@@ -22,8 +22,8 @@ class MultiplicativeHyperbolic(Model):
 
     Vanderveldt, A., Green, L., & Myerson, J. (2015). Discounting of monetary
     rewards that are both delayed and probabilistic: delay and probability
-    combine multiplicatively, not additively. Journal of Experimental Psychology:
-    Learning, Memory, and Cognition, 41(1), 148–162.
+    combine multiplicatively, not additively. Journal of Experimental
+    Psychology: Learning, Memory, and Cognition, 41(1), 148–162.
     http://doi.org/10.1037/xlm0000029
     '''
 
@@ -41,8 +41,12 @@ class MultiplicativeHyperbolic(Model):
         return p_chose_B
 
     def _calc_decision_variable(self, θ, data):
-        VA = data['RA'].values * self._time_discount_func(data['DA'].values, θ['logk'].values) * self._odds_discount_func(data['PA'].values, θ['logh'].values)
-        VB = data['RB'].values * self._time_discount_func(data['DB'].values, θ['logk'].values) * self._odds_discount_func(data['PB'].values, θ['logh'].values)
+        VA = (data['RA'].values
+              * self._time_discount_func(data['DA'].values, θ['logk'].values)
+              * self._odds_discount_func(data['PA'].values, θ['logh'].values))
+        VB = (data['RB'].values
+              * self._time_discount_func(data['DB'].values, θ['logk'].values)
+              * self._odds_discount_func(data['PB'].values, θ['logh'].values))
         return VB - VA
 
     @staticmethod
