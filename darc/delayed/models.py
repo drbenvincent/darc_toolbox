@@ -324,3 +324,54 @@ class HyperbolicNonLinearUtility(Model):
     def _time_discount_func(delay, logk):
         k = np.exp(logk)
         return 1/(1 + k * delay)
+
+
+class ITCH(Model):
+    '''ITCH model, as presented in:
+    Ericson, K. M. M., White, J. M., Laibson, D., & Cohen, J. D. (2015). Money
+    earlier or later? Simple heuristics explain intertemporal choices better
+    than delay discounting does. Psychological Science, 26(6), 826–833.
+    http://doi.org/10.1177/0956797615572232
+
+    Note that we are setting α as a fixed value. This is because α and the
+    scale of all the β are indeterminate. So if we fix α then the scale of
+    β parameters will essentially do the job of determining α, effectively.
+    '''
+
+    prior = dict()
+    prior['β_I'] = norm(loc=0, scale=1)
+    prior['β_abs_reward'] = norm(loc=0, scale=1)
+    prior['β_rel_reward'] = norm(loc=0, scale=1)
+    prior['β_abs_delay'] = norm(loc=0, scale=1)
+    prior['β_rel_relay'] = norm(loc=0, scale=1)
+    prior['α'] = 1.
+    θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
+
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
+        # organised so that higher values of the decision variable will
+        # mean higher probabability for the delayed option (prospect B)
+
+        reward_abs_diff = data['RB'].values - data['RA'].values
+        reward_rel_diff = self._rel_diff(data['RB'].values, data['RA'].values)
+        delay_abs_diff = data['DB'].values - data['DA'].values
+        delay_rel_diff = self._rel_diff(data['DB'].values, data['DA'].values)
+
+        decision_variable = (θ['β_I'].values
+                             + θ['β_abs_reward'].values * reward_abs_diff
+                             + θ['β_rel_reward'].values * reward_rel_diff
+                             + θ['β_abs_delay'].values * delay_abs_diff
+                             + θ['β_rel_relay'].values * delay_rel_diff)
+
+        return decision_variable
+
+    @staticmethod
+    def _rel_diff(B, A):
+        '''Calculate the difference between B and A, normalised by the mean
+        of B and A'''
+        return (B-A)/((B+A)/2)
