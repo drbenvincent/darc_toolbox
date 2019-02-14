@@ -17,9 +17,18 @@ import numpy as np
 
 
 @staticmethod
+def StandardCumulativeNormalChoiceFunc(decision_variable, θ, θ_fixed):
+    '''Cumulative normal choice function, but no alpha parameter'''
+    p_chose_B = θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(decision_variable)
+    return p_chose_B
+
+
+@staticmethod
 def CumulativeNormalChoiceFunc(decision_variable, θ, θ_fixed):
+    '''Our default choice function'''
     α = θ['α'].values
-    p_chose_B = θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ']) * _Phi(np.divide(decision_variable, α))
+    p_chose_B = (θ_fixed['ϵ'] + (1 - 2 * θ_fixed['ϵ'])
+                 * _Phi(np.divide(decision_variable, α)))
     return p_chose_B
 
 

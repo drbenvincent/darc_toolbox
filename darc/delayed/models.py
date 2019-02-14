@@ -18,7 +18,7 @@ TODO: Can this be made easier/better?
 from scipy.stats import norm, halfnorm, uniform
 import numpy as np
 from bad.model import Model
-from bad.choice_functions import CumulativeNormalChoiceFunc
+from bad.choice_functions import CumulativeNormalChoiceFunc, StandardCumulativeNormalChoiceFunc
 
 
 class DelaySlice(Model):
@@ -333,20 +333,17 @@ class ITCH(Model):
     than delay discounting does. Psychological Science, 26(6), 826–833.
     http://doi.org/10.1177/0956797615572232
 
-    Note that we are setting α as a fixed value. This is because α and the
-    scale of all the β are indeterminate. So if we fix α then the scale of
-    β parameters will essentially do the job of determining α, effectively.
+    Note that we use a choice function _without_ a slope parameter.
     '''
 
     prior = dict()
-    prior['β_I'] = norm(loc=0, scale=1)
-    prior['β_abs_reward'] = norm(loc=0, scale=1)
-    prior['β_rel_reward'] = norm(loc=0, scale=1)
-    prior['β_abs_delay'] = norm(loc=0, scale=1)
-    prior['β_rel_relay'] = norm(loc=0, scale=1)
-    prior['α'] = 1.
+    prior['β_I'] = norm(loc=0, scale=50)
+    prior['β_abs_reward'] = norm(loc=0, scale=50)
+    prior['β_rel_reward'] = norm(loc=0, scale=50)
+    prior['β_abs_delay'] = norm(loc=0, scale=50)
+    prior['β_rel_relay'] = norm(loc=0, scale=50)
     θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    choiceFunction = StandardCumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
