@@ -372,3 +372,37 @@ class ITCH(Model):
         '''Calculate the difference between B and A, normalised by the mean
         of B and A'''
         return (B-A)/((B+A)/2)
+
+
+class DRIFT(Model):
+    '''DRIFT model, as presented in:
+    Note that we use a choice function _without_ a slope parameter.
+    '''
+
+    prior = dict()
+    prior['β0'] = norm(loc=0, scale=50)
+    prior['β1'] = norm(loc=0, scale=50)
+    prior['β2'] = norm(loc=0, scale=50)
+    prior['β3'] = norm(loc=0, scale=50)
+    prior['β4'] = norm(loc=0, scale=50)
+    θ_fixed = {'ϵ': 0.01}
+    choiceFunction = StandardCumulativeNormalChoiceFunc
+
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
+        reward_abs_diff = data['RB'].values - data['RA'].values
+        reward_diff = (data['RB'].values - data['RA'].values) / data['RA'].values
+        delay_abs_diff = data['DB'].values - data['DA'].values
+        delay_component = (data['RB'].values/data['RA'].values)**(1/(delay_abs_diff)) - 1
+
+        decision_variable = (θ['β0'].values
+                             + θ['β1'].values * reward_abs_diff
+                             + θ['β2'].values * reward_diff
+                             + θ['β3'].values * delay_component
+                             + θ['β4'].values * delay_abs_diff)
+
+        return decision_variable
