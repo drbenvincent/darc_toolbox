@@ -377,6 +377,11 @@ class ITCH(Model):
 class DRIFT(Model):
     '''DRIFT model, as presented in:
     Note that we use a choice function _without_ a slope parameter.
+
+    Read, D., Frederick, S., & Scholten, M. (2013). DRIFT: an analysis of
+    outcome framing in intertemporal choice. Journal of Experimental
+    Psychology: Learning, Memory, and Cognition, 39(2), 573–588.
+    http://doi.org/10.1037/a0029177
     '''
 
     prior = dict()
