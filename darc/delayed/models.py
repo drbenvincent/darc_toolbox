@@ -411,3 +411,36 @@ class DRIFT(Model):
                              + θ['β4'].values * delay_abs_diff)
 
         return decision_variable
+
+
+class TradeOff(Model):
+    '''Tradeoff model by Scholten & Read (2010). Model forumulation as defined
+    in Ericson et al (2015).
+
+    Scholten, M., & Read, D. (2010). The psychology of intertemporal tradeoffs.
+    Psychological Review, 117(3), 925–944. http://doi.org/10.1037/a0019619
+    '''
+
+    prior = dict()
+    prior['gamma_reward'] = halfnorm(loc=0, scale=10)
+    prior['gamma_delay'] = halfnorm(loc=0, scale=10)
+    prior['k'] = norm(loc=0, scale=2)
+    prior['α'] = halfnorm(loc=0, scale=3)
+    θ_fixed = {'ϵ': 0.01}
+    choiceFunction = CumulativeNormalChoiceFunc
+
+    def predictive_y(self, θ, data):
+        decision_variable = self._calc_decision_variable(θ, data)
+        p_chose_B = self.choiceFunction(decision_variable, θ, self.θ_fixed)
+        return p_chose_B
+
+    def _calc_decision_variable(self, θ, data):
+        return ((self._f(data['RB'].values, θ['gamma_reward'].values)
+                 - self._f(data['RA'].values, θ['gamma_reward'].values))
+                - θ['k'].values *
+                (self._f(data['DB'].values, θ['gamma_delay'].values)
+                 - self._f(data['DA'].values, θ['gamma_delay'].values)))
+
+    @staticmethod
+    def _f(x, gamma):
+        return np.log(1.0 + gamma*x)/gamma
