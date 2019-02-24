@@ -150,8 +150,11 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         '''
 
         design_variable_names = list(input_designs.columns.values)
-        # convert input_designs to martrix in the right dtype
-        input_designs = input_designs.to_numpy(dtype='float64')
+
+        # convert input_designs to martrix in the right dtype -----------------
+        # input_designs = input_designs.to_numpy(dtype='float64')  # desired
+        input_designs = input_designs.values  # for backward compatibility
+
         design_ranks = np.full_like(input_designs, np.nan)
 
         for n, design_variable in enumerate(design_variable_names):
