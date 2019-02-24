@@ -3,6 +3,7 @@
 *_lastrun.py
 psychopy/demo/data/*
 psychopy/delayed_minimal_example/data/*
+psychopy/risky_minimal_example/data/*
 .vscode/*
 *.pdf
 *.log
