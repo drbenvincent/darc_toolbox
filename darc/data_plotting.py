@@ -78,8 +78,11 @@ def plot_delay_with_front_end_delays(ax, data):
                edgecolor='k',
                label='response data')
 
-    ax.set_xlabel('time to smaller amount (days)')
-    ax.set_ylabel('inter-reward delay (days)')
+    _, ymax = ax.get_ylim()
+    ax.set_ylim([0, ymax])
+
+    ax.set_xlabel('time to smaller amount [days]')
+    ax.set_ylabel('inter-reward delay [days]')
 
 
 def plot_delay_without_front_end_delays(ax, data):
