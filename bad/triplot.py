@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import logging
 
 
-def tri_plot(θ, filename, θ_true=None, priors=None):
+def tri_plot(θ, filename=None, θ_true=None, priors=None):
 
     logging.debug('Entered tri_plot.py')
     n_params = len(priors)
-    
-    fig, axes = plt.subplots(n_params, n_params, 
+
+    fig, axes = plt.subplots(n_params, n_params,
         figsize=(9, 9), tight_layout=True, sharex='col')
 
     # plot marginal histograms on the diagonal
@@ -34,14 +34,14 @@ def tri_plot(θ, filename, θ_true=None, priors=None):
                         y=θ_true[row_key][0], color='k', linestyle='-')
                 axes[row, col].set_xlabel(col_key)
                 axes[row, col].set_ylabel(row_key)
-            
+
             # remove axes in the upper triangle
             if col > row:
                 axes[row, col].remove()
 
     logging.debug('Plotted bivariate scatter plots ok')
 
-    savename = filename + '_parameter_plot.pdf'
-    plt.savefig(savename)
-    logging.info(f'Posterior histograms exported: {savename}')
-
+    if filename is not None:
+        savename = filename + '_parameter_plot.pdf'
+        plt.savefig(savename)
+        logging.info(f'Posterior histograms exported: {savename}')
