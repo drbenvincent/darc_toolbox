@@ -1,1 +1,0 @@
-# Bayesian Adaptive Design for Psychometric function estimation
