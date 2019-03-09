@@ -1,3 +1,17 @@
+def was_last_response_B(last_keypress):
+    '''this function returns last_response_chose_delayed as True or False,
+    taking into account the location of the immediate and delayed rewards.
+    last_keypress is either 'left' or 'right'
+    '''
+    if last_keypress == 'left':
+        last_response_chose_B = False
+    elif last_keypress == 'right':
+        last_response_chose_B = True
+    else:
+        raise Exception('unexpected last_keypress')
+    return last_response_chose_B
+
+
 def days_to_string(delay_days):
     '''convert a number of days to a sensible string'''
     DAYS_PER_MONTH = 30
