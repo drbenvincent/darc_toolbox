@@ -1,5 +1,16 @@
 '''
-Model base class used by _any_ domain specific use of our Bayesian Adaptive Design package
+Model base class used by _any_ domain specific use of our Bayesian Adaptive
+Design package
+
+This is meant to be a very general model class. Therefore we have NOTHING
+specific about the design space or the parameters. The only thing we are
+assuming is that we have binary responses R.
+
+NOTE: we are dealing with particles differently from the Matlab version of the
+code. We are only ever representing particles for the free parameters.
+Fixed parameters are just build in to the model class as scalars and are used
+by model functions when needed... they are never converted into a series of
+particles.
 '''
 
 
@@ -15,35 +26,24 @@ from random import random
 from bad.triplot import tri_plot
 
 
-# MODEL RELATED ====================================================================
-
-# This is meant to be a very general model class. Therefore we have NOTHING specific
-# about the design space or the parameters. The only thing we are assuming is that
-# we have binary responses R
-
-# NOTE: we are dealing with particles differently from the Matlab version of the code. We are
-# only ever representing particles for the free parameters.
-# Fixed parameters are just build in to the model class as scalars and are used by model
-# functions when needed... they are never converted into a series of particles.
-
-
 class Model(ABC):
     '''
-    Model abstract base class. It does nothing on it's own, but it sketches out the core
-    elements of _any_ model which we could use. To be clear, a model could be pretty much
-    any computational/mathematical model which relates inputs (ie experimental designs)
-    and model parameters to a behavioural response:
+    Model abstract base class. It does nothing on it's own, but it sketches out
+    the core elements of _any_ model which we could use. To be clear, a model
+    could be pretty much any computational/mathematical model which relates
+    inputs (ie experimental designs) and model parameters to a behavioural
+    response:
         response = f(design, parameters)
 
-    We are only considering experimental paradigms where we have two possible responses.
-    This is a simplification, but it also covers a very wide range of experiment classes
-    including:
+    We are only considering experimental paradigms where we have two possible
+    responses. This is a simplification, but it also covers a very wide range
+    of experiment classes including:
     a) psychophysics such as yes/no or 2AFC paradigms,
     b) decision making experiments with choices between 2 prospects
 
-    I also impose that all of the models will involve a single decision variable. A choice
-    function then operates on this decision variable in order to produce a probability of
-    responding one way of the other.
+    I also impose that all of the models will involve a single decision
+    variable. A choice function then operates on this decision variable in
+    order to produce a probability of responding one way of the other.
     '''
 
     prior = dict()
@@ -54,8 +54,9 @@ class Model(ABC):
         self.n_particles = int(n_particles)
         logging.debug(f'number of particles = {self.n_particles}')
         # FINISHING UP STUFF ==================================
-        # NOTE `prior` and `θ_fixed` must be defined in the concrete model class before
-        # we call this. I've not figures out how to demand these exist in this ABC yet
+        # NOTE `prior` and `θ_fixed` must be defined in the concrete model
+        # class before we call this. I've not figured out how to demand these
+        # exist in this ABC yet
         self.parameter_names = self.prior.keys()
         self.θ = self._sample_from_prior()
         self.n_free_parameters = len(self.θ.columns)
@@ -144,8 +145,9 @@ class Model(ABC):
     def simulate_y(self, design_df):
         '''
         Get simulated response for a given set of true parameter.
-        This functionality is only needed when we are simulating experiment. It is not
-        needed when we just want to run experiments on real participants.
+        This functionality is only needed when we are simulating experiment.
+        It is not needed when we just want to run experiments on real
+        participants.
         '''
         p_chose_B = self.predictive_y(self.θ_true, design_df)
         chose_B = random() < p_chose_B[0]
@@ -153,7 +155,8 @@ class Model(ABC):
 
     def export_posterior_histograms(self, filename):
         '''Export pdf of marginal posteriors
-        filename: expecting this to be a string of filename and experiment date & time.
+        filename: expecting this to be a string of filename and experiment date
+        & time.
         '''
         tri_plot(self.θ, filename, θ_true=self.θ_true, priors=self.prior)
 
@@ -178,10 +181,11 @@ class Model(ABC):
         return summary_stats
 
     def get_θ_entropy(self, param_name):
-        '''Calculate the entropy of the distribution of samples for the requested parameter.
-        Calculate this based upon the normal distribution.'''
+        '''Calculate the entropy of the distribution of samples for the
+        requested parameter. Calculate this based upon the normal distribution.
+        '''
         samples = self.θ[param_name].values
-        distribution = norm # TODO: ASSSUMES A NORMAL DISTRIBUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        distribution = norm # TODO: ASSSUMES A NORMAL DISTRIBUTION !!!!!!!!!!!!
         return float(distribution.entropy(*distribution.fit(samples)))
 
     def generate_faux_true_params(self):
