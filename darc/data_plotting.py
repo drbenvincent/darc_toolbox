@@ -71,15 +71,18 @@ def plot_delay_with_front_end_delays(ax, data):
     print('plot_delay_with_front_end_delays')
     data = convert_delay_data_frontend(data)
 
-    ax.scatter(data['x'], data['y'],
-               s=freq_to_area(data['freq']),
-               c=data['prop'],
-               cmap='Greys',
-               edgecolor='k',
-               label='response data')
+    s = ax.scatter(data['x'], data['y'],
+                   s=freq_to_area(data['freq']),
+                   c=data['prop'],
+                   cmap='Greys',
+                   edgecolor='k',
+                   label='response data')
 
     _, ymax = ax.get_ylim()
     ax.set_ylim([0, ymax])
+
+    cbar = plt.colorbar(s)
+    cbar.set_label('proportion chose delayed')
 
     ax.set_xlabel('time to smaller amount [days]')
     ax.set_ylabel('inter-reward delay [days]')
@@ -89,17 +92,19 @@ def plot_delay_without_front_end_delays(ax, data):
 
     data = convert_delay_data(data)
 
-    ax.scatter(data['x'], data['y'],
-               s=freq_to_area(data['freq']),
-               c=data['prop'],
-               cmap='Greys',
-               edgecolor='k',
-               label='response data')
+    s = ax.scatter(data['x'], data['y'],
+                   s=freq_to_area(data['freq']),
+                   c=data['prop'],
+                   cmap='Greys',
+                   edgecolor='k',
+                   label='response data')
 
     ax.set_xlabel('delay (days)')
     ax.set_ylabel('$R^A/R^B$')
     ax.set_xscale('linear')
 
+    cbar = plt.colorbar(s)
+    cbar.set_label('proportion chose delayed')
     # legend = ax.get_legend()
     # legend.legendHandles[0].set_color(plt.Greys(.5))
 
