@@ -21,12 +21,13 @@ class Hyperbolic(Model):
     The idea is that we hyperbolically discount ODDS AGAINST the reward.
     '''
 
-    prior = dict()
-    # h=1 (ie logh=0) equates to risk neutral
-    prior['logh'] = norm(loc=0, scale=1)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior = {'logh': norm(loc=0, scale=1),
+                          'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -55,10 +56,13 @@ class PrelecOneParameter(Model):
     497–527.
     '''
 
-    prior = {'γ': beta(1,1),
-             'α': halfnorm(loc=0, scale=3)}
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'γ': beta(1, 1),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -82,18 +86,20 @@ class LinearInLogOdds(Model):
     http://doi.org/10.1006/cogp.1998.0710
     '''
 
-    # frustrating but necessary stuff for a truncated normal
-    myclip_a = 0
-    myclip_b = 100
-    my_mean = 1
-    my_std = 3
-    a, b = (myclip_a - my_mean) / my_std, (myclip_b - my_mean) / my_std
+    def __init__(self, n_particles):
+        # frustrating but necessary stuff for a truncated normal
+        myclip_a = 0
+        myclip_b = 100
+        my_mean = 1
+        my_std = 3
+        a, b = (myclip_a - my_mean) / my_std, (myclip_b - my_mean) / my_std
 
-    prior = {'γ': truncnorm(a, b, loc=my_mean, scale=my_std),  # curvature
-             'δ': truncnorm(a, b, loc=my_mean, scale=my_std),  # elevation
-             'α': halfnorm(loc=0, scale=3)}
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+        self.n_particles = int(n_particles)
+        self.prior = {'γ': truncnorm(a, b, loc=my_mean, scale=my_std),
+                      'δ': truncnorm(a, b, loc=my_mean, scale=my_std),
+                      'α': halfnorm(loc=0, scale=3)}
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -126,11 +132,13 @@ class ProportionalDifference(Model):
     137–155. http://doi.org/10.1037//0033-295X.109.1.137
     '''
 
-    prior = dict()
-    prior['δ'] = norm(loc=0, scale=10)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'δ': norm(loc=0, scale=10),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -164,8 +172,3 @@ class ProportionalDifference(Model):
     def _proportion(self, x, y):
         diff = self._max_abs(x, y) - self._min_abs(x, y)
         return diff / self._max_abs(x, y)
-
-
-class ProspectTheory(Model):
-    '''Prospect Theory'''
-    pass

@@ -27,13 +27,14 @@ class MultiplicativeHyperbolic(Model):
     http://doi.org/10.1037/xlm0000029
     '''
 
-    prior = dict()
-    prior['logk'] = norm(loc=np.log(1/365), scale=2)
-    # h=1 (ie logh=0) equates to risk neutral
-    prior['logh'] = norm(loc=0, scale=1)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'logk': norm(loc=np.log(1/365), scale=2),
+                        'logh': norm(loc=0, scale=1),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)

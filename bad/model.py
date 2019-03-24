@@ -26,7 +26,7 @@ from random import random
 from bad.triplot import tri_plot
 
 
-class Model(ABC):
+class Model():
     '''
     Model abstract base class. It does nothing on it's own, but it sketches out
     the core elements of _any_ model which we could use. To be clear, a model
@@ -46,20 +46,10 @@ class Model(ABC):
     order to produce a probability of responding one way of the other.
     '''
 
-    prior = dict()
+    _prior = dict()
     θ_fixed = dict()
     θ_true = None
-
-    def __init__(self, n_particles):
-        self.n_particles = int(n_particles)
-        logging.debug(f'number of particles = {self.n_particles}')
-        # FINISHING UP STUFF ==================================
-        # NOTE `prior` and `θ_fixed` must be defined in the concrete model
-        # class before we call this. I've not figured out how to demand these
-        # exist in this ABC yet
-        self.parameter_names = self.prior.keys()
-        self.θ = self._sample_from_prior()
-        self.n_free_parameters = len(self.θ.columns)
+    n_particles = None
 
     def update_beliefs(self, data):
         '''simply call the low-level `update_beliefs` function'''
@@ -117,6 +107,18 @@ class Model(ABC):
 
         log_prior = np.sum(log_prior, axis=1)  # sum over columns (parameters)
         return log_prior
+
+    @property
+    def prior(self):
+        return self._prior
+
+    @prior.setter
+    def prior(self, dict_of_priors):
+        '''Ensure that we call _sample_from_prior() whenever we set _prior '''
+        self._prior = dict_of_priors
+        self.parameter_names = self._prior.keys()
+        self.θ = self._sample_from_prior()
+        self.n_free_parameters = len(self.θ.columns)
 
     def _sample_from_prior(self):
         """Generate initial θ particles, by sampling from the prior"""

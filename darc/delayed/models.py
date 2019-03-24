@@ -32,11 +32,13 @@ class DelaySlice(Model):
     α is more restricted to low values near zero
     '''
 
-    prior = dict()
-    prior['indiff'] = uniform(0, 1)
-    prior['α'] = halfnorm(loc=0, scale=0.1)
-    θ_fixed = {'ϵ': 0.001}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'indiff': uniform(0, 1),
+                        'α': halfnorm(loc=0, scale=0.1)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -58,10 +60,13 @@ class Hyperbolic(Model):
     73. Erlbaum, Hillsdale, NJ.
     '''
 
-    prior = {'logk': norm(loc=-4.5, scale=1),
-             'α': halfnorm(loc=0, scale=2)}
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'logk': norm(loc=-4.5, scale=1),
+                        'α': halfnorm(loc=0, scale=2)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -85,11 +90,13 @@ class Hyperbolic(Model):
 class Exponential(Model):
     '''Exponential time discounting model'''
 
-    prior = dict()
-    prior['k'] = norm(loc=0.01, scale=0.1)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'k': norm(loc=0.01, scale=0.1),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior =prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -117,12 +124,14 @@ class HyperbolicMagnitudeEffect(Model):
     1608–1620. http://doi.org/10.3758/s13428-015-0672-2
     '''
 
-    prior = dict()
-    prior['m'] = norm(loc=-2.43, scale=2)
-    prior['c'] = norm(loc=0, scale=100)  # <------ TODO: improve this
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'m': norm(loc=-2.43, scale=2),
+                        'c': norm(loc=0, scale=100),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -152,12 +161,14 @@ class ExponentialMagnitudeEffect(Model):
     1608–1620. http://doi.org/10.3758/s13428-015-0672-2
     '''
 
-    prior = dict()
-    prior['m'] = norm(loc=-2.43, scale=2)  # <---- TODO: need to update
-    prior['c'] = norm(loc=0, scale=100)  # <------ TODO: improve this
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'m': norm(loc=-2.43, scale=2),
+                        'c': norm(loc=0, scale=100),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -187,12 +198,14 @@ class ConstantSensitivity(Model):
     of the Near and Far Future. Management Science, 53(9):1423–1438.
     '''
 
-    prior = dict()
-    prior['a'] = norm(loc=0.01, scale=0.1)
-    prior['b'] = halfnorm(loc=0.001, scale=3)  # TODO: Improve this prior! make it centered on 1, maybe lognormal
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'a': norm(loc=0.01, scale=0.1),
+                        'b': halfnorm(loc=0.001, scale=3),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -220,12 +233,14 @@ class MyersonHyperboloid(Model):
     '''Myerson style hyperboloid
     '''
 
-    prior = dict()
-    prior['logk'] = norm(loc=np.log(1 / 365), scale=2)
-    prior['s'] = halfnorm(loc=0, scale=2)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'logk': norm(loc=np.log(1 / 365), scale=2),
+                        's': halfnorm(loc=0, scale=2),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -260,12 +275,14 @@ class ModifiedRachlin(Model):
         https://doi.org/10.31234/osf.io/29sgd
     '''
 
-    prior = dict()
-    prior['logk'] = norm(loc=np.log(1 / 365), scale=2)
-    prior['s'] = halfnorm(loc=1, scale=2) # TODO: needs to be a positive value, with mode of 1.
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'logk': norm(loc=np.log(1 / 365), scale=2),
+                        's': halfnorm(loc=1, scale=2),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -300,12 +317,14 @@ class HyperbolicNonLinearUtility(Model):
     http://doi.org/10.1371/journal.pone.0111378
     '''
 
-    prior = dict()
-    prior['a'] = norm(loc=1, scale=0.1)  # TODO: must be positive!
-    prior['logk'] = norm(loc=np.log(1/365), scale=2)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'a': norm(loc=1, scale=0.1),
+                        'logk': norm(loc=np.log(1/365), scale=2),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -336,14 +355,17 @@ class ITCH(Model):
     Note that we use a choice function _without_ a slope parameter.
     '''
 
-    prior = dict()
-    prior['β_I'] = norm(loc=0, scale=50)
-    prior['β_abs_reward'] = norm(loc=0, scale=50)
-    prior['β_rel_reward'] = norm(loc=0, scale=50)
-    prior['β_abs_delay'] = norm(loc=0, scale=50)
-    prior['β_rel_relay'] = norm(loc=0, scale=50)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = StandardCumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'β_I': norm(loc=0, scale=50),
+                        'β_abs_reward': norm(loc=0, scale=50),
+                        'β_rel_reward': norm(loc=0, scale=50),
+                        'β_abs_delay': norm(loc=0, scale=50),
+                        'β_rel_relay': norm(loc=0, scale=50),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -384,14 +406,17 @@ class DRIFT(Model):
     http://doi.org/10.1037/a0029177
     '''
 
-    prior = dict()
-    prior['β0'] = norm(loc=0, scale=50)
-    prior['β1'] = norm(loc=0, scale=50)
-    prior['β2'] = norm(loc=0, scale=50)
-    prior['β3'] = norm(loc=0, scale=50)
-    prior['β4'] = norm(loc=0, scale=50)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = StandardCumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'β0': norm(loc=0, scale=50),
+                        'β1': norm(loc=0, scale=50),
+                        'β2': norm(loc=0, scale=50),
+                        'β3': norm(loc=0, scale=50),
+                        'β4': norm(loc=0, scale=50),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
@@ -421,13 +446,15 @@ class TradeOff(Model):
     Psychological Review, 117(3), 925–944. http://doi.org/10.1037/a0019619
     '''
 
-    prior = dict()
-    prior['gamma_reward'] = halfnorm(loc=0, scale=10)
-    prior['gamma_delay'] = halfnorm(loc=0, scale=10)
-    prior['k'] = norm(loc=0, scale=2)
-    prior['α'] = halfnorm(loc=0, scale=3)
-    θ_fixed = {'ϵ': 0.01}
-    choiceFunction = CumulativeNormalChoiceFunc
+    def __init__(self, n_particles,
+                 prior={'gamma_reward': halfnorm(loc=0, scale=10),
+                        'gamma_delay': halfnorm(loc=0, scale=10),
+                        'k': norm(loc=0, scale=2),
+                        'α': halfnorm(loc=0, scale=3)}):
+        self.n_particles = int(n_particles)
+        self.prior = prior
+        self.θ_fixed = {'ϵ': 0.01}
+        self.choiceFunction = CumulativeNormalChoiceFunc
 
     def predictive_y(self, θ, data):
         decision_variable = self._calc_decision_variable(θ, data)
