@@ -8,6 +8,7 @@ from darc.delayed import models as delayed_models
 from darc.risky import models as risky_models
 from darc.delayed_and_risky import models as delayed_and_risky_models
 from darc import Prospect, Design
+from scipy.stats import norm, expon
 
 
 delayed_models_list = [
@@ -38,6 +39,16 @@ def test_model_creation(model):
     n_particles = 10
     model_instance = model(n_particles=n_particles)
     assert isinstance(model_instance, model)
+
+
+def test_model_creation_custom_prior():
+    # just a test of one model as each model has different parameter names
+    n_particles = 10
+    prior = {'logk': norm(loc=1, scale=1),
+            'α': expon(loc=0, scale=0.04)}
+    model_instance = delayed_models.Hyperbolic(
+        n_particles=n_particles, prior=prior)
+    assert isinstance(model_instance, delayed_models.Hyperbolic)
 
 
 # test predictive_y() method of model classes ==========
