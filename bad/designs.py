@@ -4,7 +4,6 @@ domain specific use of this Bayesian Adaptive Design package.
 '''
 
 
-from darc.data_plotting import data_plotter
 from abc import ABC, abstractmethod
 import pandas as pd
 import logging
@@ -49,10 +48,6 @@ class TrialData():
 
         self.df = self.df.reset_index(drop=True)
         return
-
-    def plot_data(self):
-        '''Visualise data'''
-        data_plotter(self.df)
 
     # TODO: look up how to do getters in a Pythonic way.
     def get_df(self):
