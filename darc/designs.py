@@ -56,7 +56,8 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
     def __init__(self, design_space,
                  max_trials=20,
                  allow_repeats=True,
-                 penalty_function_option='default'):
+                 penalty_function_option='default',
+                 λ=None):
         super().__init__()
 
         self.all_possible_designs = design_space
@@ -65,6 +66,7 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         self.penalty_function_option = penalty_function_option
         # extract design variables as a list
         self.design_variables = list(design_space.columns.values)
+        self.λ = λ  # penalty factor for _default_penalty_func()
 
     def get_next_design(self, model):
 
@@ -91,7 +93,8 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
         # process penalty_function_option provided by user upon object
         # construction
         if self.penalty_function_option is 'default':
-            penalty_func = lambda d: self._default_penalty_func(d)
+            # penalty_func = lambda d: self._default_penalty_func(d)
+            def penalty_func(d): return self._default_penalty_func(d, λ=self.λ)
         elif self.penalty_function_option is None:
             penalty_func = None
 
