@@ -88,7 +88,7 @@ def plot_delay_with_front_end_delays(ax, data):
     ax.set_ylabel('inter-reward delay [days]')
 
 
-def plot_delay_without_front_end_delays(ax, data):
+def plot_delay_without_front_end_delays(ax, data, cbar=True):
 
     data = convert_delay_data(data)
 
@@ -103,8 +103,9 @@ def plot_delay_without_front_end_delays(ax, data):
     ax.set_ylabel('$R^A/R^B$')
     ax.set_xscale('linear')
 
-    cbar = plt.colorbar(s)
-    cbar.set_label('proportion chose delayed')
+    if cbar:
+        cbar = plt.colorbar(s)
+        cbar.set_label('proportion chose delayed')
     # legend = ax.get_legend()
     # legend.legendHandles[0].set_color(plt.Greys(.5))
 
