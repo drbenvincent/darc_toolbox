@@ -57,7 +57,7 @@ class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
                  max_trials=20,
                  allow_repeats=True,
                  penalty_function_option='default',
-                 λ=None):
+                 λ=2):
         super().__init__()
 
         self.all_possible_designs = design_space
