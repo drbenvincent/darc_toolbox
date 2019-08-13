@@ -12,7 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/drbenvincent/darc_toolbox",
-    keywords = ["delay discounting", "risky choice", "psychological experiments". "bayesian", "adaptive design", "inference"],
+    keywords = ["delay discounting", "risky choice", "psychological experiments", "bayesian", "adaptive design", "inference"],
     packages=['darc_toolbox'],
     install_requires=['badapted>=0.0.2'],
     classifiers=[

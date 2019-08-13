@@ -12,3 +12,6 @@ psychopy/adaptive_risky_choice/data/*
 .ipynb_checkpoints*
 dev/model testing scratchpad.ipynb
 dev/broadcasting tests.ipynb
+*.egg-info/*
+build/
+dist/
