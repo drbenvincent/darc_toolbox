@@ -1,8 +1,8 @@
-from bad.designs import DesignGeneratorABC
-from darc import Prospect, Design
+from badapted.designs import DesignGeneratorABC
+from darc_toolbox import Prospect, Design
 import pandas as pd
 import numpy as np
-from bad.optimisation import design_optimisation
+from badapted.optimisation import design_optimisation
 import copy
 import logging
 import itertools

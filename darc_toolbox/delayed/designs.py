@@ -6,8 +6,8 @@ approaches in the literature.
 
 import numpy as np
 import logging
-from darc.designs import DesignGeneratorABC
-from darc import Prospect, Design
+from darc_toolbox.designs import DesignGeneratorABC
+from darc_toolbox import Prospect, Design
 
 
 class Kirby2009(DesignGeneratorABC):

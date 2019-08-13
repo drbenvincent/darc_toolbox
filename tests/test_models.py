@@ -4,10 +4,10 @@ sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 import pandas as pd
 import numpy as np
 import pytest
-from darc.delayed import models as delayed_models
-from darc.risky import models as risky_models
-from darc.delayed_and_risky import models as delayed_and_risky_models
-from darc import Prospect, Design
+from darc_toolbox.delayed import models as delayed_models
+from darc_toolbox.risky import models as risky_models
+from darc_toolbox.delayed_and_risky import models as delayed_and_risky_models
+from darc_toolbox import Prospect, Design
 from scipy.stats import norm, expon
 
 

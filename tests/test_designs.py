@@ -2,9 +2,9 @@ import sys
 sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
 
 import numpy as np
-import darc.delayed.designs as delayed_designs
-import darc.risky.designs as risky_designs
-from darc.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
+import darc_toolbox.delayed.designs as delayed_designs
+import darc_toolbox.risky.designs as risky_designs
+from darc_toolbox.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
 import pytest
 
 

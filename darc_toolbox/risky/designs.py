@@ -1,6 +1,6 @@
 import logging
-from darc.designs import DesignGeneratorABC
-from darc import Prospect, Design
+from darc_toolbox.designs import DesignGeneratorABC
+from darc_toolbox import Prospect, Design
 
 
 class Griskevicius2011(DesignGeneratorABC):

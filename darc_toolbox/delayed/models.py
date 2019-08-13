@@ -17,8 +17,8 @@ TODO: Can this be made easier/better?
 
 from scipy.stats import norm, halfnorm, uniform
 import numpy as np
-from bad.model import Model
-from bad.choice_functions import CumulativeNormalChoiceFunc, StandardCumulativeNormalChoiceFunc
+from badapted.model import Model
+from badapted.choice_functions import CumulativeNormalChoiceFunc, StandardCumulativeNormalChoiceFunc
 
 
 class DelaySlice(Model):

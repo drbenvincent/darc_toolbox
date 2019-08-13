@@ -1,7 +1,7 @@
 from scipy.stats import norm, halfnorm, beta, truncnorm
 import numpy as np
-from bad.model import Model
-from bad.choice_functions import CumulativeNormalChoiceFunc
+from badapted.model import Model
+from badapted.choice_functions import CumulativeNormalChoiceFunc
 
 
 # TODO: THESE UTILITY FUNCTIONS ARE IN MULTIPLE PLACES !!!
