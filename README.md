@@ -1,5 +1,7 @@
 # The DARC Toolbox: automated, flexible, and efficient delayed and risky choice experiments using Bayesian adaptive design.
 
+[![PyPI](https://img.shields.io/pypi/v/darc_toolbox.svg?color=green)](https://pypi.org/project/darc_toolbox/)
+
 Run efficient Bayesian adaptive experiments using Python and the [PsychoPy](http://www.psychopy.org) experiment framework.
 
 This code relates to the following pre-print. But, the pre-print is likely to appear in quite a different form when finally published.
