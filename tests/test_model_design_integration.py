@@ -1,8 +1,3 @@
-# Point Python to the path where we have installed the bad and darc packages
-import sys
-sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
-
-
 from darc_toolbox.delayed import models
 from darc_toolbox.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
 import numpy as np
@@ -50,7 +45,7 @@ def simulated_experiment_trial_loop(design_thing, model):
         if design is None:
             break
 
-        design_df = darc.single_design_tuple_to_df(design)
+        design_df = darc_toolbox.single_design_tuple_to_df(design)
         response = model.simulate_y(design_df)
         design_thing.enter_trial_design_and_response(design, response)
 

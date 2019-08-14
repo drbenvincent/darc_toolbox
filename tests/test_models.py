@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, '/Users/btvincent/git-local/darc-experiments-python')
-
 import pandas as pd
 import numpy as np
 import pytest
