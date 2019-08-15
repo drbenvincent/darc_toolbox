@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/drbenvincent/darc_toolbox",
     keywords = ["delay discounting", "risky choice", "psychological experiments", "bayesian", "adaptive design", "inference"],
-    packages=['darc_toolbox'],
+    packages=['darc_toolbox'] + setuptools.find_packages('darc_toolbox'),
     install_requires=['badapted>=0.0.2', 'matplotlib', 'numpy', 'pandas', 'scipy'],
     classifiers=[
         "Programming Language :: Python :: 3",
