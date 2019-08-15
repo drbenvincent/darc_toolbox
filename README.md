@@ -22,11 +22,13 @@ Advanced features are available with some simple edits to the Python code:
 - Simultaneously fit mulitple models to an experimental participant.
 - Inject custom trials: if you have particular experimental needs, you can inject your own (manually specified) designs amongst automatically run trials.
 
-# Installation instructions
-1. Ensure you have a Python 3 installation. I recommend https://www.anaconda.com/download/, you should be fine with Python 3.6.6 or later versions.
-2. Install [PsychoPy 3.0.0](https://github.com/psychopy/psychopy/releases/tag/3.0.0). I recommend running one of their demo experiments to confirm that it is working correctly.
-3. Download or clone this `darc-experiments-python` repository.
-4. Open up PsychoPy... Open the PsychoPy experiment `psychopy/demo/experiment.psyexp` in the builder view... Run the experiment. You will get some GUI options to chose from before the experiment starts. After it is finished, check the auto-saved data in the `\data` folder. This includes log files, saved trial-level data, and exported figures which could be useful.
+# Installation instructions (for most people)
+1. **Download PsychoPy:** The DARC Toolbox is built into PsychoPy (version 3.2.0 onwards). So go and [download PsychoPy](https://www.psychopy.org).
+2. **Unpack demos:** From the menu, choose `Demos > Unpack demos` to a location of your choosing.
+3. **Run demo:** Run one of the adpative demos, for example the `adaptive_decision_making_demo`.
+
+# Installation instructions (for developers)
+Coming soon...
 
 # Adaptive Experiment = Experimental Design Space + Cognitive Model
 An adaptive experiment is a combination of a set of allowable designs (questions) which we call the **design space** and a **cognitive model**. The Bayesian Adaptive Design methods select which design to present to participants on a trial-to-trial basis, in real time. The goal of this is to maximise the information we gain about our model parameters.
