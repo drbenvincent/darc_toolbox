@@ -86,6 +86,7 @@ MultiplicativeHyperbolic | Vanderveldt, A., Green, L., & Myerson, J. (2015). Dis
 
 # Other projects we rely upon
 
+- `badapted` [[GitHub repo](https://github.com/drbenvincent/badapted), [PyPi](https://pypi.org/project/badapted/)]  is the core code which conducts design optimisation and inference.
 - [PsychoPy](http://www.psychopy.org) as the experiment environment.
 
 Various Python packages including:
