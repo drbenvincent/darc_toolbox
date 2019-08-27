@@ -1,6 +1,6 @@
 '''Code here is only intended for use by developers'''
 
-import darc
+import darc_toolbox
 import pandas as pd
 import numpy as np
 import copy
@@ -57,7 +57,7 @@ def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=N
         if design is None:
             break
 
-        design_df = darc.single_design_tuple_to_df(design)
+        design_df = darc_toolbox.single_design_tuple_to_df(design)
         response = response_model.simulate_y(design_df)
 
         design_thing.enter_trial_design_and_response(design, response)
@@ -94,7 +94,7 @@ def simulated_multi_experiment(design_thing, models_to_fit, response_model):
         print(f'trial {trial}, design from model: {m}')
 
         # get response from response model
-        design_df = darc.single_design_tuple_to_df(design)
+        design_df = darc_toolbox.single_design_tuple_to_df(design)
         response = response_model.simulate_y(design_df)
         design_thing.enter_trial_design_and_response(design, response)
 
