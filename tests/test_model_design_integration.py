@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '/Users/benjamv/git-local/badapted')
+
 from darc_toolbox.delayed import models
 from darc_toolbox.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
 import numpy as np

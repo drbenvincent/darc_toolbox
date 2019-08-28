@@ -1,3 +1,7 @@
+import sys
+sys.path.insert(0, '/Users/benjamv/git-local/badapted')
+
+
 import numpy as np
 import darc_toolbox.delayed.designs as delayed_designs
 import darc_toolbox.risky.designs as risky_designs

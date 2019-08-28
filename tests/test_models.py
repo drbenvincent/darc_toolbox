@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '/Users/benjamv/git-local/badapted')
+
 import pandas as pd
 import numpy as np
 import pytest
