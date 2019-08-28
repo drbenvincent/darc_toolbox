@@ -226,7 +226,7 @@ class BayesianAdaptiveDesignGeneratorDARC(DARCDesignGenerator):
         # not the responses
         # This will get previous designs AND responses, then just get design
         # variables
-        previous_designs = self.get_df()[self.design_variables]
+        previous_designs = self.data[self.design_variables]
         # --------------------------------------------------------
 
         n_previous_designs = previous_designs.shape[0]

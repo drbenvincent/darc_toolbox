@@ -52,7 +52,7 @@ def simulated_experiment_trial_loop(design_thing, model):
         response = model.simulate_y(design_df)
         design_thing.enter_trial_design_and_response(design, response)
 
-        model.update_beliefs(design_thing.get_df())
+        model.update_beliefs(design_thing.data)
 
         logging.info(f'Trial {trial} complete')
 

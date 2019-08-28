@@ -62,7 +62,7 @@ def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=N
 
         design_thing.enter_trial_design_and_response(design, response)
 
-        fitted_model.update_beliefs(design_thing.get_df())
+        fitted_model.update_beliefs(design_thing.data)
 
         if track_this_parameter is not None:
             # add another row to summary_stats
@@ -99,6 +99,6 @@ def simulated_multi_experiment(design_thing, models_to_fit, response_model):
         design_thing.enter_trial_design_and_response(design, response)
 
         # update beliefs of all models
-        [model.update_beliefs(design_thing.get_df()) for model in models_to_fit]
+        [model.update_beliefs(design_thing.data) for model in models_to_fit]
 
     return models_to_fit, design_thing
