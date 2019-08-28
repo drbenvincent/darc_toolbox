@@ -45,9 +45,49 @@ def df_to_design_tuple(df):
     return chosen_design
 
 
+
+class DARCDesignGenerator(DesignGeneratorABC):
+    '''This class extends the abstract base class and adds DARC specific components.
+    It is still not a fully functioning concrete class however as the
+    get_next_design() method still needs to be implemented.'''
+
+    def __init__(self):
+        super().__init__()
+
+        # generate empty dataframe
+        data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
+        self.data = pd.DataFrame(columns=data_columns)
+
+    def enter_trial_design_and_response(self, design, response):
+        '''middle-man method'''
+
+        # TODO: need to specify types here I think... then life might be
+        # easier to decant the data out at another point
+        # trial_df = design_to_df(design)
+        # self.data = self.data.append(trial_df)
+
+        trial_data = {'RA': design.ProspectA.reward,
+                    'DA': design.ProspectA.delay,
+                    'PA': design.ProspectA.prob,
+                    'RB': design.ProspectB.reward,
+                    'DB': design.ProspectB.delay,
+                    'PB': design.ProspectB.prob,
+                    'R': [int(response)]}
+        self.data = self.data.append(pd.DataFrame(trial_data))
+        # a bit clumsy but...
+        self.data['R'] = self.data['R'].astype('int64')
+        self.data = self.data.reset_index(drop=True)
+
+
+        self.trial += 1
+
+        # we potentially manually call model to update beliefs here. But so far
+        # this is done manually in PsychoPy
+        return
+
 # CONCRETE BAD CLASSES BELOW --------------------------------------------------
 
-class BayesianAdaptiveDesignGeneratorDARC(DesignGeneratorABC):
+class BayesianAdaptiveDesignGeneratorDARC(DARCDesignGenerator):
     '''
     This class selects the next design to run, based on a provided design
     space, a model, and a design/response history.

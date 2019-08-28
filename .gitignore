@@ -1,9 +1,9 @@
 *.DS_Store
 *.pyc
 *_lastrun.py
-psychopy/adaptive_decision_making_demo/data/*
-psychopy/adaptive_hyperbolic_discounting/data/*
-psychopy/adaptive_risky_choice/data/*
+psychopy-demos/adaptive_decision_making_demo/data/*
+psychopy-demos/adaptive_hyperbolic_discounting/data/*
+psychopy-demos/adaptive_risky_choice/data/*
 .vscode/*
 *.pdf
 *.log

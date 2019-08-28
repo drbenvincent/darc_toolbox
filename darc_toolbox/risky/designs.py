@@ -1,9 +1,9 @@
 import logging
-from darc_toolbox.designs import DesignGeneratorABC
+from darc_toolbox.designs import DARCDesignGenerator
 from darc_toolbox import Prospect, Design
 
 
-class Griskevicius2011(DesignGeneratorABC):
+class Griskevicius2011(DARCDesignGenerator):
     '''
     A class to provide designs from the Griskevicius et al (2011) risky
     choice task.
@@ -36,7 +36,7 @@ class Griskevicius2011(DesignGeneratorABC):
             return None
 
 
-class DuGreenMyerson2002(DesignGeneratorABC):
+class DuGreenMyerson2002(DARCDesignGenerator):
     '''
     A class to provide designs based on the Du et al (2002) protocol.
 

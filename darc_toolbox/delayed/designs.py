@@ -6,11 +6,11 @@ approaches in the literature.
 
 import numpy as np
 import logging
-from darc_toolbox.designs import DesignGeneratorABC
+from darc_toolbox.designs import DARCDesignGenerator
 from darc_toolbox import Prospect, Design
 
 
-class Kirby2009(DesignGeneratorABC):
+class Kirby2009(DARCDesignGenerator):
     '''
     A class to provide designs from the Kirby (2009) delay discounting task.
 
@@ -48,7 +48,7 @@ class Kirby2009(DesignGeneratorABC):
             return None
 
 
-class Griskevicius2011(DesignGeneratorABC):
+class Griskevicius2011(DARCDesignGenerator):
     '''
     A class to provide designs from the Griskevicius et al (2011) delay
     discounting task.
@@ -86,7 +86,7 @@ class Griskevicius2011(DesignGeneratorABC):
             return None
 
 
-class Koffarnus_Bickel(DesignGeneratorABC):
+class Koffarnus_Bickel(DARCDesignGenerator):
     '''
     This function returns a function which returns designs according to the
     method described by:
@@ -146,7 +146,7 @@ class Koffarnus_Bickel(DesignGeneratorABC):
         return design
 
 
-class Frye(DesignGeneratorABC):
+class Frye(DARCDesignGenerator):
     '''
     A class to provide designs based on the Frye et al (2016) protocol.
 
@@ -207,7 +207,7 @@ class Frye(DesignGeneratorABC):
         return design
 
 
-class DuGreenMyerson2002(DesignGeneratorABC):
+class DuGreenMyerson2002(DARCDesignGenerator):
     '''
     A class to provide designs based on the Du et al (2002) protocol.
 
