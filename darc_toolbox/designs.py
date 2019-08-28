@@ -58,8 +58,13 @@ class DARCDesignGenerator(DesignGeneratorABC):
         data_columns = ['RA', 'DA', 'PA', 'RB', 'DB', 'PB', 'R']
         self.data = pd.DataFrame(columns=data_columns)
 
-    def enter_trial_design_and_response(self, design, response):
-        '''middle-man method'''
+    def add_design_response_to_dataframe(self, design, response):
+        '''
+        This method must take in `design` and `reward` from the current trial
+        and store this as a new row in self.data which is a pandas data frame.
+        It must also increment the trial counter with:
+            self.trial += 1
+        '''
 
         # TODO: need to specify types here I think... then life might be
         # easier to decant the data out at another point
@@ -77,9 +82,6 @@ class DARCDesignGenerator(DesignGeneratorABC):
         # a bit clumsy but...
         self.data['R'] = self.data['R'].astype('int64')
         self.data = self.data.reset_index(drop=True)
-
-
-        self.trial += 1
 
         # we potentially manually call model to update beliefs here. But so far
         # this is done manually in PsychoPy
