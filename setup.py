@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="darc_experiment_toolbox",
-    version="0.0.1",
+    version="0.0.2",
     author="Benjamin T. Vincent",
     author_email="b.t.vincent@dundee.ac.uk",
     description="Delayed And Risky Choice Toolbox",
@@ -14,11 +14,11 @@ setuptools.setup(
     url="https://github.com/drbenvincent/darc_toolbox",
     keywords=["delay discounting", "risky choice", "psychological experiments", "bayesian", "adaptive design", "inference"],
     packages=setuptools.find_packages(),
-    install_requires=['badapted>=0.0.2', 'matplotlib', 'numpy', 'pandas', 'scipy'],
+    install_requires=['badapted=0.0.3', 'matplotlib', 'numpy', 'pandas', 'scipy'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    data_files = [("", ["LICENSE"])]
+    include_package_data=True,
 )
