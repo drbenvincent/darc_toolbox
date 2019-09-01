@@ -4,7 +4,6 @@
 psychopy-demos/adaptive_decision_making_demo/data/*
 psychopy-demos/adaptive_hyperbolic_discounting/data/*
 psychopy-demos/adaptive_risky_choice/data/*
-.vscode/*
 *.pdf
 *.log
 .pytest_cache/*

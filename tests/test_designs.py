@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(0, '/Users/benjamv/git-local/badapted')
+
+sys.path.insert(0, "/Users/benjamv/git-local/badapted")
 
 
 import numpy as np
@@ -12,6 +13,7 @@ import pytest
 def test_Kirby_default_instantiation():
     design_thing = delayed_designs.Kirby2009()
     assert isinstance(design_thing, delayed_designs.Kirby2009)
+
 
 def test_Koffarnus_Bickel_default_instantiation():
     design_thing = delayed_designs.Koffarnus_Bickel()
@@ -44,7 +46,7 @@ def test_DuGreenMyerson2002_risky_default_instantiation():
 
 
 def test_DARCDesign_default_instantiation():
-    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91))).build()
+    D = DesignSpaceBuilder(RA=list(100 * np.linspace(0.05, 0.95, 91))).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
@@ -52,44 +54,57 @@ def test_DARCDesign_default_instantiation():
 # below we test our ability to create design objects with various
 # options
 
+
 def test_Frye_custom1_instantiation():
-    design_thing = delayed_designs.Frye(DB=[7., 30, 30*6, 365], trials_per_delay=7)
+    design_thing = delayed_designs.Frye(DB=[7.0, 30, 30 * 6, 365], trials_per_delay=7)
     assert isinstance(design_thing, delayed_designs.Frye)
 
 
 def test_DARCDesign_delay_instantiation():
-    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91)),
-                           RB=[100.]).build()
+    D = DesignSpaceBuilder(
+        RA=list(100 * np.linspace(0.05, 0.95, 91)), RB=[100.0]
+    ).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
 def test_DARCDesign_delay_magnitude_effect_instantiation():
-    '''When we are investigating the magnitide effect, we want to ask for a
+    """When we are investigating the magnitide effect, we want to ask for a
     reasonable range of DB values. When we do this, we are going to provide
     a vector of proportions (RA_over_RB) which will be translated into
-    actual RA values. '''
-    D = DesignSpaceBuilder(RB=[10., 100., 1_000.],
-                           RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()).build()
+    actual RA values. """
+    D = DesignSpaceBuilder(
+        RB=[10.0, 100.0, 1_000.0], RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()
+    ).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
 def test_DARCDesign_risky_instantiation():
-    D = DesignSpaceBuilder(DA=[0.], DB=[0.], PA=[1.],
-                           PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                           RA=list(100*np.linspace(0.05, 0.95, 91)),
-                           RB=[100.]).build()
+    D = DesignSpaceBuilder(
+        DA=[0.0],
+        DB=[0.0],
+        PA=[1.0],
+        PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+        RA=list(100 * np.linspace(0.05, 0.95, 91)),
+        RB=[100.0],
+    ).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
+
 def test_DARCDesign_delayed_and_risky_instantiation():
-    D = DesignSpaceBuilder(DA=[0.], DB=[7., 30, 30*6, 365], PA=[1.],
-                           PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                           RA=list(100*np.linspace(0.05, 0.95, 91)),
-                           RB=[100.]).build()
+    D = DesignSpaceBuilder(
+        DA=[0.0],
+        DB=[7.0, 30, 30 * 6, 365],
+        PA=[1.0],
+        PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+        RA=list(100 * np.linspace(0.05, 0.95, 91)),
+        RB=[100.0],
+    ).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+
 
 # test using the alternate constructors
 def test_DARC_BAD_alt_delaymag():
@@ -122,34 +137,38 @@ def test_DARC_BAD_alt_frontenddelay():
     assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
 
 
-
-
 # a similar set of tests to above, but testing we have some designs
 
 
 def test_DARCDesign_delay_initial_design_space():
-    D = DesignSpaceBuilder(RA=list(100*np.linspace(0.05, 0.95, 91))).build()
+    D = DesignSpaceBuilder(RA=list(100 * np.linspace(0.05, 0.95, 91))).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10
 
+
 def test_DARCDesign_delay_magnitude_effect_initial_design_space():
-    '''When we are investigating the magnitide effect, we want to ask for a
+    """When we are investigating the magnitide effect, we want to ask for a
     reasonable range of DB values. When we do this, we are going to provide
     a vector of proportions (RA_over_RB) which will be translated into
-    actual RA values. '''
-    D = DesignSpaceBuilder(RB=[10, 100, 1_000],
-                           RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()).build()
+    actual RA values. """
+    D = DesignSpaceBuilder(
+        RB=[10, 100, 1_000], RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()
+    ).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10
 
 
 def test_DARCDesign_risky_initial_design_space():
-    D = DesignSpaceBuilder(DA=[0], DB=[0], PA=[1],
-                           PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
-                           RA=list(100*np.linspace(0.05, 0.95, 91)),
-                           RB=[100]).build()
+    D = DesignSpaceBuilder(
+        DA=[0],
+        DB=[0],
+        PA=[1],
+        PB=[0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.99],
+        RA=list(100 * np.linspace(0.05, 0.95, 91)),
+        RB=[100],
+    ).build()
     design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
     n_designs = design_thing.all_possible_designs.shape[0]
-    assert n_designs>10
+    assert n_designs > 10

@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(0, '/Users/benjamv/git-local/badapted')
+
+sys.path.insert(0, "/Users/benjamv/git-local/badapted")
 
 import pandas as pd
 import numpy as np
@@ -18,23 +19,24 @@ delayed_models_list = [
     delayed_models.ExponentialMagnitudeEffect,
     delayed_models.ModifiedRachlin,
     delayed_models.MyersonHyperboloid,
-    #delayed_models.HyperbolicNonLinearUtility
+    # delayed_models.HyperbolicNonLinearUtility
 ]
 
 risky_models_list = [
     risky_models.Hyperbolic,
     risky_models.ProportionalDifference,
-    risky_models.LinearInLogOdds
+    risky_models.LinearInLogOdds,
 ]
 
-delayed_and_risky_models_list = [
-    delayed_and_risky_models.MultiplicativeHyperbolic
-]
+delayed_and_risky_models_list = [delayed_and_risky_models.MultiplicativeHyperbolic]
 
 
 # test model instantiation
 
-@pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
+
+@pytest.mark.parametrize(
+    "model", delayed_models_list + risky_models_list + delayed_and_risky_models_list
+)
 def test_model_creation(model):
     n_particles = 10
     model_instance = model(n_particles=n_particles)
@@ -44,22 +46,31 @@ def test_model_creation(model):
 def test_model_creation_custom_prior():
     # just a test of one model as each model has different parameter names
     n_particles = 10
-    prior = {'logk': norm(loc=1, scale=1),
-            'α': expon(loc=0, scale=0.04)}
-    model_instance = delayed_models.Hyperbolic(
-        n_particles=n_particles, prior=prior)
+    prior = {"logk": norm(loc=1, scale=1), "α": expon(loc=0, scale=0.04)}
+    model_instance = delayed_models.Hyperbolic(n_particles=n_particles, prior=prior)
     assert isinstance(model_instance, delayed_models.Hyperbolic)
 
 
 # test predictive_y() method of model classes ==========
 
-@pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
+
+@pytest.mark.parametrize(
+    "model", delayed_models_list + risky_models_list + delayed_and_risky_models_list
+)
 def test_predictive_y(model):
     n_particles = 10
     model_instance = model(n_particles=n_particles)
 
-    faux_design = pd.DataFrame({'RA': [100.], 'DA': [0.], 'PA': [1.],
-                                'RB': [150.], 'DB': [14.], 'PB': [1.]})
+    faux_design = pd.DataFrame(
+        {
+            "RA": [100.0],
+            "DA": [0.0],
+            "PA": [1.0],
+            "RB": [150.0],
+            "DB": [14.0],
+            "PB": [1.0],
+        }
+    )
     dv = model_instance._calc_decision_variable(model_instance.θ, faux_design)
     assert isinstance(dv, np.ndarray)
 
@@ -84,22 +95,34 @@ def test_predictive_y(model):
 #     assert isinstance(model_instance, model)
 
 
-@pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
+@pytest.mark.parametrize(
+    "model", delayed_models_list + risky_models_list + delayed_and_risky_models_list
+)
 def test_generate_faux_true_params(model):
     model_instance = model(n_particles=30)
     model_instance = model_instance.generate_faux_true_params()
     isinstance(model_instance.θ_true, dict)
 
 
-@pytest.mark.parametrize("model", delayed_models_list + risky_models_list + delayed_and_risky_models_list)
+@pytest.mark.parametrize(
+    "model", delayed_models_list + risky_models_list + delayed_and_risky_models_list
+)
 def test_simulate_y(model):
     # set up model
     n_particles = 100
     model_instance = model(n_particles=n_particles)
     model_instance = model_instance.generate_faux_true_params()
 
-    faux_design = pd.DataFrame({'RA': [100.], 'DA': [0.], 'PA': [1.],
-                                'RB': [150.], 'DB': [14.], 'PB': [1.]})
+    faux_design = pd.DataFrame(
+        {
+            "RA": [100.0],
+            "DA": [0.0],
+            "PA": [1.0],
+            "RB": [150.0],
+            "DB": [14.0],
+            "PB": [1.0],
+        }
+    )
 
     response = model_instance.simulate_y(faux_design)
     isinstance(response, bool)
