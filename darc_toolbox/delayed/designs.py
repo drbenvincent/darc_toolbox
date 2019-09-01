@@ -156,7 +156,7 @@ class Frye(DARCDesignGenerator):
     http://doi.org/10.3791/53584
     '''
 
-    def __init__(self, DB=[7, 30, 30*3, 30*6, 365], RB=100., trials_per_delay=5):
+    def __init__(self, DB=[7, 30, 30*3, 30*6, 30*9, 365], RB=100., trials_per_delay=5):
         self._DA = 0
         self._DB = DB
         self._RB = RB
