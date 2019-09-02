@@ -55,12 +55,11 @@ def simulated_experiment_trial_loop(
 
     for trial in range(666):
 
-        design = design_thing.get_next_design(fitted_model)
+        design, design_df = design_thing.get_next_design(fitted_model)
 
         if design is None:
             break
 
-        design_df = darc_toolbox.single_design_tuple_to_df(design)
         response = response_model.simulate_y(design_df)
 
         design_thing.enter_trial_design_and_response(design, response)
@@ -92,14 +91,13 @@ def simulated_multi_experiment(design_thing, models_to_fit, response_model):
 
         # get the design from a random model
         m = random.randint(0, n_models - 1)
-        design = design_thing.get_next_design(models_to_fit[m])
+        design, design_df = design_thing.get_next_design(models_to_fit[m])
         if design is None:
             break
 
         print(f"trial {trial}, design from model: {m}")
 
         # get response from response model
-        design_df = darc_toolbox.single_design_tuple_to_df(design)
         response = response_model.simulate_y(design_df)
         design_thing.enter_trial_design_and_response(design, response)
 

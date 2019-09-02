@@ -43,8 +43,10 @@ class DARCDesignGenerator(DesignGeneratorABC):
 
     def add_design_response_to_dataframe(self, design, response):
         """
-        This method must take in `design` and `reward` from the current trial
+        This method must take in `design` and `response` from the current trial
         and store this as a new row in self.data which is a pandas data frame.
+        So it needs to be sensitive to the structure of the information in `design`
+        which is possible a NamedTuple.
         """
 
         # TODO: need to specify types here I think... then life might be

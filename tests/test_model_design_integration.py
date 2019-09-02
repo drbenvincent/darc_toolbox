@@ -50,12 +50,11 @@ n_particles = 2_000  # needs to be highish to ensure reliable test outcome
 def simulated_experiment_trial_loop(design_thing, model):
     """run a simulated experiment trial loop"""
     for trial in range(666):
-        design = design_thing.get_next_design(model)
+        design, design_df = design_thing.get_next_design(model)
 
         if design is None:
             break
 
-        design_df = darc_toolbox.single_design_tuple_to_df(design)
         response = model.simulate_y(design_df)
         design_thing.enter_trial_design_and_response(design, response)
 
