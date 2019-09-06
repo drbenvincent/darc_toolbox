@@ -119,7 +119,7 @@ class Kirby2009(DARCDesignGenerator):
         if self.trial < self.max_trials - 1:
             logging.info(f"Getting design for trial {self.trial}")
 
-            design = Design(
+            return Design(
                 DA=self._DA,
                 RA=self._RA[self.trial],
                 PA=self._PA,
@@ -127,12 +127,8 @@ class Kirby2009(DARCDesignGenerator):
                 RB=self._RB[self.trial],
                 PB=self._PB,
             )
-
-            design_df = pd.DataFrame(data=[design])
-
-            return (design, design_df)
         else:
-            return (None, None)
+            return None
 
 
 class Griskevicius2011(DARCDesignGenerator):
@@ -162,7 +158,7 @@ class Griskevicius2011(DARCDesignGenerator):
         if self.trial < self.max_trials:
             logging.info(f"Getting design for trial {self.trial}")
 
-            design = Design(
+            return Design(
                 DA=self._DA,
                 RA=self._RA[self.trial],
                 PA=self._PA,
@@ -170,12 +166,8 @@ class Griskevicius2011(DARCDesignGenerator):
                 RB=self._RB[self.trial],
                 PB=self._PB,
             )
-
-            design_df = pd.DataFrame(data=[design])
-
-            return (design, design_df)
         else:
-            return (None, None)
+            return None
 
 
 class Koffarnus_Bickel(DARCDesignGenerator):
@@ -212,14 +204,18 @@ class Koffarnus_Bickel(DARCDesignGenerator):
     def get_next_design(self, _):
 
         if self.trial >= self.max_trials:
-            return (None, None)
+            return None
 
         if self.trial == 0:
-            ProspectA = Prospect(reward=self._RA, delay=self._DA, prob=self._PA)
-            ProspectB = Prospect(
-                reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB
+            design = Design(
+                DA=self._DA,
+                RA=self._RA,
+                PA=self._PA,
+                DB=self._DB,
+                RB=self._RB[self._delay_index],
+                PB=self._PB,
             )
-            design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
+
         else:
 
             if self.get_last_response_chose_B():
@@ -239,9 +235,7 @@ class Koffarnus_Bickel(DARCDesignGenerator):
             PB=self._PB,
         )
 
-        design_df = pd.DataFrame(data=[design])
-
-        return (design, design_df)
+        return design
 
 
 class Frye(DARCDesignGenerator):
@@ -274,7 +268,7 @@ class Frye(DARCDesignGenerator):
         """return the next design as a tuple of prospects"""
 
         if self._delay_counter == len(self._DB):
-            return (None, None)
+            return None
 
         logging.info(f"Getting design for trial {self.trial}")
         last_response_chose_B = self.get_last_response_chose_B()
@@ -298,7 +292,6 @@ class Frye(DARCDesignGenerator):
             RB=self._RB,
             PB=self._PB,
         )
-        design_df = pd.DataFrame(data=[design])
 
         self._trial_per_delay_counter += 1
         if self._trial_per_delay_counter > self._trials_per_delay - 1:
@@ -307,7 +300,7 @@ class Frye(DARCDesignGenerator):
             self._trial_per_delay_counter = 0
             self._post_choice_adjustment = 0.25
 
-        return (design, design_df)
+        return design
 
 
 class DuGreenMyerson2002(DARCDesignGenerator):
@@ -340,7 +333,7 @@ class DuGreenMyerson2002(DARCDesignGenerator):
         """return the next design as a tuple of prospects"""
 
         if self._delay_counter == len(self._DB):
-            return (None, None)
+            return None
 
         logging.info(f"Getting design for trial {self.trial}")
         last_response_chose_B = self.get_last_response_chose_B()
@@ -366,13 +359,11 @@ class DuGreenMyerson2002(DARCDesignGenerator):
             PB=self._PB,
         )
 
-        design_df = pd.DataFrame(data=[design])
-
         self._trial_per_delay_counter += 1
         if self._trial_per_delay_counter > self._trials_per_delay - 1:
             # done trials for this delay, so move on to next
             self._delay_counter += 1
             self._trial_per_delay_counter = 0
 
-        return (design, design_df)
+        return design
 
