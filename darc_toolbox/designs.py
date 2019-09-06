@@ -1,5 +1,5 @@
 from badapted.designs import DesignGeneratorABC, BayesianAdaptiveDesignGenerator
-from darc_toolbox import Prospect, Design
+from darc_toolbox import Design
 import pandas as pd
 import numpy as np
 import logging
@@ -19,16 +19,6 @@ DEFAULT_DB = np.concatenate(
 
 # helper functions
 
-# def design_tuple_to_df(design):
-#     ''' Convert the named tuple into a 1-row pandas dataframe'''
-#     trial_data = {'RA': design.ProspectA.reward,
-#                   'DA': design.ProspectA.delay,
-#                   'PA': design.ProspectA.prob,
-#                   'RB': design.ProspectB.reward,
-#                   'DB': design.ProspectB.delay,
-#                   'PB': design.ProspectB.prob}
-#     return pd.DataFrame(trial_data)
-
 
 class DARCDesignGenerator(DesignGeneratorABC):
     """This adds DARC specific functionality to the design generator"""
@@ -41,36 +31,21 @@ class DARCDesignGenerator(DesignGeneratorABC):
         data_columns = ["RA", "DA", "PA", "RB", "DB", "PB", "R"]
         self.data = pd.DataFrame(columns=data_columns)
 
-    def add_design_response_to_dataframe(self, design, response):
-        """
-        This method must take in `design` and `response` from the current trial
-        and store this as a new row in self.data which is a pandas data frame.
-        So it needs to be sensitive to the structure of the information in `design`
-        which is possible a NamedTuple.
-        """
+    # def add_design_response_to_dataframe(self, design, response):
+    #     """
+    #     Take in the current trial data (design + response), convert to dataframe,
+    #     and append to our dataframe of trial data from previous trials.
+    #     """
 
-        # TODO: need to specify types here I think... then life might be
-        # easier to decant the data out at another point
-        # trial_df = design_to_df(design)
-        # self.data = self.data.append(trial_df)
+    #     # build dataframe of data from current trial (design + response)
+    #     trial_data = pd.DataFrame(data=[design])
+    #     trial_data["R"] = int(response)
 
-        trial_data = {
-            "RA": design.ProspectA.reward,
-            "DA": design.ProspectA.delay,
-            "PA": design.ProspectA.prob,
-            "RB": design.ProspectB.reward,
-            "DB": design.ProspectB.delay,
-            "PB": design.ProspectB.prob,
-            "R": [int(response)],
-        }
-        self.data = self.data.append(pd.DataFrame(trial_data))
-        # a bit clumsy but...
-        self.data["R"] = self.data["R"].astype("int64")
-        self.data = self.data.reset_index(drop=True)
+    #     # append this trial's df with data from previous trials (self.data)
+    #     self.data = self.data.append(pd.DataFrame(trial_data))
 
-        # we potentially manually call model to update beliefs here. But so far
-        # this is done manually in PsychoPy
-        return
+    #     self.data = self.data.reset_index(drop=True)
+    #     return
 
     @staticmethod
     def df_to_design_tuple(df):
@@ -78,15 +53,17 @@ class DARCDesignGenerator(DesignGeneratorABC):
         single row of pandas dataframe, and it must return the chosen design as a
         named tuple.
         Convert 1-row pandas dataframe into named tuple"""
-        RA = df.RA.values[0]
-        DA = df.DA.values[0]
-        PA = df.PA.values[0]
-        RB = df.RB.values[0]
-        DB = df.DB.values[0]
-        PB = df.PB.values[0]
+        print(
+            "df_to_design_tuple function called. SWAP WITH GENERIC NAMED TUPLE TO DF FUNCTION AND PUT IN BADAPTED"
+        )
+
         chosen_design = Design(
-            ProspectA=Prospect(reward=RA, delay=DA, prob=PA),
-            ProspectB=Prospect(reward=RB, delay=DB, prob=PB),
+            RA=df.RA.values[0],
+            DA=df.DA.values[0],
+            PA=df.PA.values[0],
+            RB=df.RB.values[0],
+            DB=df.DB.values[0],
+            PB=df.PB.values[0],
         )
         return chosen_design
 

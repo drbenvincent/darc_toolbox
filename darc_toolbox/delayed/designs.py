@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import logging
 from darc_toolbox.designs import DARCDesignGenerator
-from darc_toolbox import Prospect, Design
+from darc_toolbox import Design
 
 
 class Kirby2009(DARCDesignGenerator):
@@ -118,24 +118,17 @@ class Kirby2009(DARCDesignGenerator):
         # just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             logging.info(f"Getting design for trial {self.trial}")
-            ProspectA = Prospect(
-                reward=self._RA[self.trial], delay=self._DA, prob=self._PA
-            )
-            ProspectB = Prospect(
-                reward=self._RB[self.trial], delay=self._DB[self.trial], prob=self._PB
-            )
-            design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
 
-            design_df = pd.DataFrame.from_dict(
-                {
-                    "RA": [design.ProspectA.reward],
-                    "DA": [design.ProspectA.delay],
-                    "PA": [design.ProspectA.prob],
-                    "RB": [design.ProspectB.reward],
-                    "DB": [design.ProspectB.delay],
-                    "PB": [design.ProspectB.prob],
-                }
+            design = Design(
+                DA=self._DA,
+                RA=self._RA[self.trial],
+                PA=self._PA,
+                DB=self._DB[self.trial],
+                RB=self._RB[self.trial],
+                PB=self._PB,
             )
+
+            design_df = pd.DataFrame(data=[design])
 
             return (design, design_df)
         else:
@@ -168,22 +161,17 @@ class Griskevicius2011(DARCDesignGenerator):
         # we should just do it, and have a catch ??
         if self.trial < self.max_trials:
             logging.info(f"Getting design for trial {self.trial}")
-            ProspectA = Prospect(reward=self._RA, delay=self._DA, prob=self._PA)
-            ProspectB = Prospect(
-                reward=self._RB[self.trial], delay=self._DB, prob=self._PB
-            )
-            design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
 
-            design_df = pd.DataFrame.from_dict(
-                {
-                    "RA": [design.ProspectA.reward],
-                    "DA": [design.ProspectA.delay],
-                    "PA": [design.ProspectA.prob],
-                    "RB": [design.ProspectB.reward],
-                    "DB": [design.ProspectB.delay],
-                    "PB": [design.ProspectB.prob],
-                }
+            design = Design(
+                DA=self._DA,
+                RA=self._RA[self.trial],
+                PA=self._PA,
+                DB=self._DB,
+                RB=self._RB[self.trial],
+                PB=self._PB,
             )
+
+            design_df = pd.DataFrame(data=[design])
 
             return (design, design_df)
         else:
@@ -242,22 +230,16 @@ class Koffarnus_Bickel(DARCDesignGenerator):
             # each trial, the increments half, so will be: 8, 4, 2, 1
             self._index_increments = int(max(self._index_increments / 2, 1))
 
-        ProspectA = Prospect(reward=self._RA, delay=self._DA, prob=self._PA)
-        ProspectB = Prospect(
-            reward=self._RB, delay=self._DB[self._delay_index], prob=self._PB
+        design = Design(
+            DA=self._DA,
+            RA=self._RA,
+            PA=self._PA,
+            DB=self._DB[self._delay_index],
+            RB=self._RB,
+            PB=self._PB,
         )
-        design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
 
-        design_df = pd.DataFrame.from_dict(
-            {
-                "RA": [design.ProspectA.reward],
-                "DA": [design.ProspectA.delay],
-                "PA": [design.ProspectA.prob],
-                "RB": [design.ProspectB.reward],
-                "DB": [design.ProspectB.delay],
-                "PB": [design.ProspectB.prob],
-            }
-        )
+        design_df = pd.DataFrame(data=[design])
 
         return (design, design_df)
 
@@ -308,11 +290,15 @@ class Frye(DARCDesignGenerator):
 
             self._post_choice_adjustment *= 0.5
 
-        ProspectA = Prospect(reward=self._RA, delay=self._DA, prob=self._PA)
-        ProspectB = Prospect(
-            reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB
+        design = Design(
+            DA=self._DA,
+            RA=self._RA,
+            PA=self._PA,
+            DB=self._DB[self._delay_counter],
+            RB=self._RB,
+            PB=self._PB,
         )
-        design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
+        design_df = pd.DataFrame(data=[design])
 
         self._trial_per_delay_counter += 1
         if self._trial_per_delay_counter > self._trials_per_delay - 1:
@@ -320,17 +306,6 @@ class Frye(DARCDesignGenerator):
             self._delay_counter += 1
             self._trial_per_delay_counter = 0
             self._post_choice_adjustment = 0.25
-
-        design_df = pd.DataFrame.from_dict(
-            {
-                "RA": [design.ProspectA.reward],
-                "DA": [design.ProspectA.delay],
-                "PA": [design.ProspectA.prob],
-                "RB": [design.ProspectB.reward],
-                "DB": [design.ProspectB.delay],
-                "PB": [design.ProspectB.prob],
-            }
-        )
 
         return (design, design_df)
 
@@ -382,29 +357,22 @@ class DuGreenMyerson2002(DARCDesignGenerator):
 
             self._post_choice_adjustment *= 0.5
 
-        ProspectA = Prospect(reward=self._RA, delay=self._DA, prob=self._PA)
-        ProspectB = Prospect(
-            reward=self._RB, delay=self._DB[self._delay_counter], prob=self._PB
+        design = Design(
+            DA=self._DA,
+            RA=self._RA,
+            PA=self._PA,
+            DB=self._DB[self._delay_counter],
+            RB=self._RB,
+            PB=self._PB,
         )
 
-        design = Design(ProspectA=ProspectA, ProspectB=ProspectB)
+        design_df = pd.DataFrame(data=[design])
 
         self._trial_per_delay_counter += 1
         if self._trial_per_delay_counter > self._trials_per_delay - 1:
             # done trials for this delay, so move on to next
             self._delay_counter += 1
             self._trial_per_delay_counter = 0
-
-        design_df = pd.DataFrame.from_dict(
-            {
-                "RA": [design.ProspectA.reward],
-                "DA": [design.ProspectA.delay],
-                "PA": [design.ProspectA.prob],
-                "RB": [design.ProspectB.reward],
-                "DB": [design.ProspectB.delay],
-                "PB": [design.ProspectB.prob],
-            }
-        )
 
         return (design, design_df)
 

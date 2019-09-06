@@ -1,6 +1,6 @@
 import logging
 from darc_toolbox.designs import DARCDesignGenerator
-from darc_toolbox import Prospect, Design
+from darc_toolbox import Design
 import pandas as pd
 
 
@@ -30,22 +30,17 @@ class Griskevicius2011(DARCDesignGenerator):
         # NOTE: This is un-Pythonic as we are asking permission... we should just do it, and have a catch ??
         if self.trial < self.max_trials - 1:
             logging.info(f"Getting design for trial {self.trial}")
+
             design = Design(
-                ProspectA=Prospect(
-                    reward=self._RA[self.trial], delay=self._DA, prob=self._PA
-                ),
-                ProspectB=Prospect(reward=self._RB, delay=self._DB, prob=self._PB),
+                DA=self._DA,
+                RA=self._RA[self.trial],
+                PA=self._PA,
+                DB=self._DB[self._delay_counter],
+                RB=self._RB,
+                PB=self._PB,
             )
-            design_df = pd.DataFrame.from_dict(
-                {
-                    "RA": [design.ProspectA.reward],
-                    "DA": [design.ProspectA.delay],
-                    "PA": [design.ProspectA.prob],
-                    "RB": [design.ProspectB.reward],
-                    "DB": [design.ProspectB.delay],
-                    "PB": [design.ProspectB.prob],
-                }
-            )
+
+            design_df = pd.DataFrame(data=[design])
 
             return (design, design_df)
         else:
@@ -80,7 +75,7 @@ class DuGreenMyerson2002(DARCDesignGenerator):
         """return the next design as a tuple of prospects"""
 
         if self._prob_counter == len(self._PB):
-            return None
+            return (None, None)
 
         logging.info(f"Getting design for trial {self.trial}")
         last_response_chose_B = self.get_last_response_chose_B()
@@ -98,15 +93,19 @@ class DuGreenMyerson2002(DARCDesignGenerator):
             self._post_choice_adjustment *= 0.5
 
         design = Design(
-            ProspectA=Prospect(reward=self._RA, delay=self._DA, prob=self._PA),
-            ProspectB=Prospect(
-                reward=self._RB, delay=self._DB, prob=self._PB[self._prob_counter]
-            ),
+            DA=self._DA,
+            RA=self._RA,
+            PA=self._PA,
+            DB=self._DB,
+            RB=self._RB,
+            PB=self._PB[self._prob_counter],
         )
+
+        design_df = pd.DataFrame(data=[design])
 
         self._trial_per_prob_counter += 1
         if self._trial_per_prob_counter > self._trials_per_prob - 1:
             # done trials for this prob level, so move on to next
             self._prob_counter += 1
             self._trial_per_prob_counter = 0
-        return design
+        return (design, design_df)
