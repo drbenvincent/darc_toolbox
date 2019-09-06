@@ -33,9 +33,7 @@ def parameter_recovery_sweep(sweep_θ_true, model, design_thing, target_param_na
     return (pd.concat(summary_stats_final_trial), summary_stats_all_trials)
 
 
-def simulated_experiment_trial_loop(
-    design_thing, fitted_model, response_model=None, track_this_parameter="logk"
-):
+def simulated_experiment_trial_loop(design_thing, fitted_model, response_model=None):
     """run a simulated experiment trial loop
     If we provide an optional response_model then we use that in order to generate
     response data. This allows responses to come from one model and the fitted model to
@@ -48,10 +46,6 @@ def simulated_experiment_trial_loop(
 
     if response_model.θ_true is None:
         raise ValueError("response_model must have θ_true values set")
-
-    if track_this_parameter is not None:
-        # first row of summary_stats will represent the prior
-        summary_stats = fitted_model.get_θ_summary_stats(track_this_parameter)
 
     for trial in range(666):
 
@@ -66,16 +60,7 @@ def simulated_experiment_trial_loop(
 
         fitted_model.update_beliefs(design_thing.data)
 
-        if track_this_parameter is not None:
-            # add another row to summary_stats
-            summary_stats = summary_stats.append(
-                fitted_model.get_θ_summary_stats(track_this_parameter),
-                ignore_index=True,
-            )
-    if track_this_parameter is None:
-        summary_stats = None
-
-    return fitted_model, summary_stats
+    return fitted_model, design_thing
 
 
 def simulated_multi_experiment(design_thing, models_to_fit, response_model):
