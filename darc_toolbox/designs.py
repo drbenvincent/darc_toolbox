@@ -31,42 +31,6 @@ class DARCDesignGenerator(DesignGeneratorABC):
         data_columns = ["RA", "DA", "PA", "RB", "DB", "PB", "R"]
         self.data = pd.DataFrame(columns=data_columns)
 
-    # def add_design_response_to_dataframe(self, design, response):
-    #     """
-    #     Take in the current trial data (design + response), convert to dataframe,
-    #     and append to our dataframe of trial data from previous trials.
-    #     """
-
-    #     # build dataframe of data from current trial (design + response)
-    #     trial_data = pd.DataFrame(data=[design])
-    #     trial_data["R"] = int(response)
-
-    #     # append this trial's df with data from previous trials (self.data)
-    #     self.data = self.data.append(pd.DataFrame(trial_data))
-
-    #     self.data = self.data.reset_index(drop=True)
-    #     return
-
-    @staticmethod
-    def df_to_design_tuple(df):
-        """User must impliment this method. It takes in a design in the form of a
-        single row of pandas dataframe, and it must return the chosen design as a
-        named tuple.
-        Convert 1-row pandas dataframe into named tuple"""
-        print(
-            "df_to_design_tuple function called. SWAP WITH GENERIC NAMED TUPLE TO DF FUNCTION AND PUT IN BADAPTED"
-        )
-
-        chosen_design = Design(
-            RA=df.RA.values[0],
-            DA=df.DA.values[0],
-            PA=df.PA.values[0],
-            RB=df.RB.values[0],
-            DB=df.DB.values[0],
-            PB=df.PB.values[0],
-        )
-        return chosen_design
-
 
 class BayesianAdaptiveDesignGeneratorDARC(
     DARCDesignGenerator, BayesianAdaptiveDesignGenerator
