@@ -1,6 +1,7 @@
 import logging
 from darc_toolbox.designs import DARCDesignGenerator
 from darc_toolbox import Prospect, Design
+import pandas as pd
 
 
 class Griskevicius2011(DARCDesignGenerator):
@@ -35,9 +36,20 @@ class Griskevicius2011(DARCDesignGenerator):
                 ),
                 ProspectB=Prospect(reward=self._RB, delay=self._DB, prob=self._PB),
             )
-            return design
+            design_df = pd.DataFrame.from_dict(
+                {
+                    "RA": [design.ProspectA.reward],
+                    "DA": [design.ProspectA.delay],
+                    "PA": [design.ProspectA.prob],
+                    "RB": [design.ProspectB.reward],
+                    "DB": [design.ProspectB.delay],
+                    "PB": [design.ProspectB.prob],
+                }
+            )
+
+            return (design, design_df)
         else:
-            return None
+            return (None, None)
 
 
 class DuGreenMyerson2002(DARCDesignGenerator):
