@@ -17,48 +17,6 @@ DEFAULT_DB = np.concatenate(
     ]
 ).tolist()
 
-# helper functions
-
-
-class DARCDesignGenerator(DesignGeneratorABC):
-    """This adds DARC specific functionality to the design generator"""
-
-    def __init__(self):
-        # super().__init__()
-        DesignGeneratorABC.__init__(self)
-
-        # generate empty dataframe
-        data_columns = ["RA", "DA", "PA", "RB", "DB", "PB", "R"]
-        self.data = pd.DataFrame(columns=data_columns)
-
-
-class BayesianAdaptiveDesignGeneratorDARC(
-    DARCDesignGenerator, BayesianAdaptiveDesignGenerator
-):
-    """This will be the concrete class for doing Bayesian adaptive design
-    in the DARC experiment domain."""
-
-    def __init__(
-        self,
-        design_space,
-        max_trials=20,
-        allow_repeats=True,
-        penalty_function_option="default",
-        λ=2,
-    ):
-
-        # call superclass constructors - note that the order of calling these is important
-        BayesianAdaptiveDesignGenerator.__init__(
-            self,
-            design_space,
-            max_trials=max_trials,
-            allow_repeats=allow_repeats,
-            penalty_function_option=penalty_function_option,
-            λ=λ,
-        )
-
-        DARCDesignGenerator.__init__(self)
-
 
 class DesignSpaceBuilder:
     """

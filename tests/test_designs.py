@@ -6,7 +6,7 @@ sys.path.insert(0, "/Users/benjamv/git-local/badapted")
 import numpy as np
 import darc_toolbox.delayed.designs as delayed_designs
 import darc_toolbox.risky.designs as risky_designs
-from darc_toolbox.designs import BayesianAdaptiveDesignGeneratorDARC, DesignSpaceBuilder
+from darc_toolbox.designs import BayesianAdaptiveDesignGenerator, DesignSpaceBuilder
 import pytest
 
 
@@ -47,8 +47,8 @@ def test_DuGreenMyerson2002_risky_default_instantiation():
 
 def test_DARCDesign_default_instantiation():
     D = DesignSpaceBuilder(RA=list(100 * np.linspace(0.05, 0.95, 91))).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 # below we test our ability to create design objects with various
@@ -64,8 +64,8 @@ def test_DARCDesign_delay_instantiation():
     D = DesignSpaceBuilder(
         RA=list(100 * np.linspace(0.05, 0.95, 91)), RB=[100.0]
     ).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARCDesign_delay_magnitude_effect_instantiation():
@@ -76,8 +76,8 @@ def test_DARCDesign_delay_magnitude_effect_instantiation():
     D = DesignSpaceBuilder(
         RB=[10.0, 100.0, 1_000.0], RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()
     ).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARCDesign_risky_instantiation():
@@ -89,8 +89,8 @@ def test_DARCDesign_risky_instantiation():
         RA=list(100 * np.linspace(0.05, 0.95, 91)),
         RB=[100.0],
     ).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARCDesign_delayed_and_risky_instantiation():
@@ -102,39 +102,39 @@ def test_DARCDesign_delayed_and_risky_instantiation():
         RA=list(100 * np.linspace(0.05, 0.95, 91)),
         RB=[100.0],
     ).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 # test using the alternate constructors
 def test_DARC_BAD_alt_delaymag():
     D = DesignSpaceBuilder.delay_magnitude_effect().build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARC_BAD_alt_delayandrisky():
     D = DesignSpaceBuilder.delayed_and_risky().build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARC_BAD_alt_delayed():
     D = DesignSpaceBuilder.delayed().build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARC_BAD_alt_risky():
     D = DesignSpaceBuilder.risky().build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 def test_DARC_BAD_alt_frontenddelay():
     D = DesignSpaceBuilder.frontend_delay().build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
-    assert isinstance(design_thing, BayesianAdaptiveDesignGeneratorDARC)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
+    assert isinstance(design_thing, BayesianAdaptiveDesignGenerator)
 
 
 # a similar set of tests to above, but testing we have some designs
@@ -142,7 +142,7 @@ def test_DARC_BAD_alt_frontenddelay():
 
 def test_DARCDesign_delay_initial_design_space():
     D = DesignSpaceBuilder(RA=list(100 * np.linspace(0.05, 0.95, 91))).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D)
+    design_thing = BayesianAdaptiveDesignGenerator(D)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10
 
@@ -155,7 +155,7 @@ def test_DARCDesign_delay_magnitude_effect_initial_design_space():
     D = DesignSpaceBuilder(
         RB=[10, 100, 1_000], RA_over_RB=np.linspace(0.05, 0.95, 19).tolist()
     ).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10
 
@@ -169,6 +169,6 @@ def test_DARCDesign_risky_initial_design_space():
         RA=list(100 * np.linspace(0.05, 0.95, 91)),
         RB=[100],
     ).build()
-    design_thing = BayesianAdaptiveDesignGeneratorDARC(D, max_trials=3)
+    design_thing = BayesianAdaptiveDesignGenerator(D, max_trials=3)
     n_designs = design_thing.all_possible_designs.shape[0]
     assert n_designs > 10

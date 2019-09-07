@@ -1,10 +1,10 @@
 import logging
-from darc_toolbox.designs import DARCDesignGenerator
+from badapted.designs import DesignGeneratorABC
 from darc_toolbox import Design
 import pandas as pd
 
 
-class Griskevicius2011(DARCDesignGenerator):
+class Griskevicius2011(DesignGeneratorABC):
     """
     A class to provide designs from the Griskevicius et al (2011) risky
     choice task.
@@ -44,7 +44,7 @@ class Griskevicius2011(DARCDesignGenerator):
             return None
 
 
-class DuGreenMyerson2002(DARCDesignGenerator):
+class DuGreenMyerson2002(DesignGeneratorABC):
     """
     A class to provide designs based on the Du et al (2002) protocol.
 
