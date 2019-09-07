@@ -1,3 +1,8 @@
+"""
+Here are some useful utility functions. Currently these are just used by the PsychoPy experiments.
+"""
+
+
 def was_last_response_B(last_keypress):
     """this function returns last_response_chose_delayed as True or False,
     taking into account the location of the immediate and delayed rewards.

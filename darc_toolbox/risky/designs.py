@@ -1,3 +1,9 @@
+"""
+This module is not 'required' for the DARC Toolbox. It simply provides a few
+more additional design generators. These are my implimentations of other
+approaches in the literature.
+"""
+
 import logging
 from badapted.designs import DesignGeneratorABC
 from darc_toolbox import Design
