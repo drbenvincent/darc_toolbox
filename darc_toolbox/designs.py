@@ -1,4 +1,3 @@
-from badapted.designs import DesignGeneratorABC, BayesianAdaptiveDesignGenerator
 from darc_toolbox import Design
 import pandas as pd
 import numpy as np
