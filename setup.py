@@ -21,7 +21,7 @@ setuptools.setup(
         "inference",
     ],
     packages=setuptools.find_packages(),
-    install_requires=["badapted=0.0.3", "matplotlib", "numpy", "pandas", "scipy"],
+    install_requires=["badapted==0.0.3", "matplotlib", "numpy", "pandas", "scipy"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
